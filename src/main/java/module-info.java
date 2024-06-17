@@ -5,6 +5,7 @@ module com.musigma {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.logging;
 
     opens com.musigma to javafx.fxml;
     exports com.musigma;
