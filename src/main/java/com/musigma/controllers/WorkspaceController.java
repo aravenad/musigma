@@ -20,7 +20,7 @@ public abstract class WorkspaceController {
 
     protected Festival festival;
 
-    public void setFestival(Festival festival) {
+    public void initialize(Festival festival) {
         this.festival = festival;
     }
 }
