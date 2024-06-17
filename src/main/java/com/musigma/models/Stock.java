@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import static fr.uga.iut2.musigma.util.Log.getLogger;
+import static com.musigma.util.Log.getLogger;
 
 /**
  * La classe Stock représente un stock avec un nom, une quantité absolue,

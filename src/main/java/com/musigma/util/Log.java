@@ -1,4 +1,4 @@
-package fr.uga.iut2.musigma.util;
+package com.musigma.util;
 
 import java.io.IOException;
 import java.util.logging.Level;
