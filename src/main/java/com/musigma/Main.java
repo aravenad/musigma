@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
     @Override
@@ -17,11 +18,16 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        ((MainController) fxmlLoader.getController()).addWorkspace(
-            "test",
-            getClass().getResource("/com/musigma/images/home.png").getPath(),
-            getClass().getResource("/com/musigma/views/test.fxml").getPath()
-        );
+        MainController controller = fxmlLoader.getController();
+
+//        controller.addWorkspace(
+//            "test",
+//            Objects.requireNonNull(getClass().getResource("/com/musigma/images/home.png")).getPath(),
+//            Objects.requireNonNull(getClass().getResource("/com/musigma/views/test.fxml")).getPath()
+//        );
+
+//        System.out.println("/com/musigma/views/test.fxml");
+//        controller.setWorkspace("/com/musigma/views/test.fxml");
     }
 
     public static void main(String[] args) {

@@ -71,13 +71,6 @@
                     </ImageView>
                 </graphic>
             </Button>
-            <Button fx:id="maximizeButton" style="-fx-background-color: transparent;">
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@../images/maximize.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
             <Button fx:id="closeButton" style="-fx-background-color: transparent;">
                 <graphic>
                     <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
@@ -132,7 +125,8 @@
             </VBox>
         </VBox>
         <VBox fx:id="workspace" prefHeight="369.0" prefWidth="110.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-<!--            <VBox prefHeight="313.0" prefWidth="110.0">-->
+            <!-- <fx:include source="test.fxml"/>-->
+            <!--            <VBox prefHeight="313.0" prefWidth="110.0">-->
 <!--                <HBox alignment="CENTER" prefHeight="48.0" prefWidth="110.0">-->
 <!--                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />-->
 <!--                </HBox>-->

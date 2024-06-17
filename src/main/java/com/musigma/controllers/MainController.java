@@ -27,11 +27,9 @@ public class MainController {
     @FXML
     public void initialize() {
         minimizeButton.setOnAction(this::handleButtonAction);
-        maximizeButton.setOnAction(this::handleButtonAction);
         closeButton.setOnAction(this::handleButtonAction);
 
         addHoverEffect(minimizeButton, "lightgrey");
-        addHoverEffect(maximizeButton, "lightgrey");
         addHoverEffect(closeButton, "red");
     }
 
@@ -42,10 +40,6 @@ public class MainController {
             case "minimizeButton":
                 window.setIconified(true);
                 System.out.println("Minimize button clicked");
-                break;
-            case "maximizeButton":
-                window.setMaximized(!window.isMaximized());
-                System.out.println("Maximize button clicked");
                 break;
             case "closeButton":
                 window.close();
@@ -66,12 +60,11 @@ public class MainController {
         VBox pageButtonBox = new VBox();
         pageButtonBox.setAlignment(Pos.CENTER);
 //        ImageView icon = new ImageView();
-//        icon.setImage(new Image("@../images/home.png"));
 //        icon.setImage(new Image(pathToIcon));
         Label pageLabel = new Label();
+        pageLabel.setStyle("-fx-text-fill: #f3f3f5;");
         pageLabel.setText(pageName);
         pageButtonBox.getChildren().addAll(pageLabel);
-//        pageButtonBox.getChildren().addAll(icon, pageLabel);
         pageButtonBox.setOnMouseClicked(ev -> {
             try {
                 setWorkspace(pathToFXML);
@@ -82,7 +75,7 @@ public class MainController {
         pageMenu.getChildren().add(pageButtonBox);
     }
 
-    protected void setWorkspace(String pathToFXML) throws IOException {
+    public void setWorkspace(String pathToFXML) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainController.class.getResource(pathToFXML));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
     }
