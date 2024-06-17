@@ -52,30 +52,42 @@
          </Pane>
            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="216.0" style="-fx-background-color: #30304d;">
                <VBox alignment="CENTER" prefHeight="60.0" prefWidth="52.0">
-                   <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                       <VBox.margin>
-                           <Insets top="10.0" />
-                       </VBox.margin>
-                       <Image url="@../images/icons/calendar.png" />
-                   </ImageView>
+                   <Button fx:id="calendarButton" style="-fx-background-color: transparent;">
+                       <graphic>
+                           <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                               <VBox.margin>
+                                   <Insets top="10.0" />
+                               </VBox.margin>
+                               <Image url="@../images/icons/calendar.png" />
+                           </ImageView>
+                       </graphic>
+                   </Button>
                    <Label style="-fx-text-fill: #f3f3f5;" text="Calendrier" />
                </VBox>
                <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="60.0" prefWidth="52.0">
-                   <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                       <VBox.margin>
-                           <Insets top="10.0" />
-                       </VBox.margin>
-                       <Image url="@../images/icons/stock.png" />
-                   </ImageView>
+                   <Button fx:id="stockButton" style="-fx-background-color: transparent;">
+                       <graphic>
+                           <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                               <VBox.margin>
+                                   <Insets top="10.0" />
+                               </VBox.margin>
+                               <Image url="@../images/icons/stock.png" />
+                           </ImageView>
+                       </graphic>
+                   </Button>
                    <Label style="-fx-text-fill: #f3f3f5;" text="Stock" />
                </VBox>
                <VBox alignment="CENTER" layoutX="10.0" layoutY="70.0" prefHeight="60.0" prefWidth="52.0">
-                   <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                       <VBox.margin>
-                           <Insets top="10.0" />
-                       </VBox.margin>
-                       <Image url="@../images/icons/ticket.png" />
-                   </ImageView>
+                   <Button fx:id="ticketButton" style="-fx-background-color: transparent;">
+                       <graphic>
+                           <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                               <VBox.margin>
+                                   <Insets top="10.0" />
+                               </VBox.margin>
+                               <Image url="@../images/icons/ticket.png" />
+                           </ImageView>
+                       </graphic>
+                   </Button>
                    <Label style="-fx-text-fill: #f3f3f5;" text="Ticket" />
                </VBox>
            </VBox>
