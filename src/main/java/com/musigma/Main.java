@@ -12,7 +12,7 @@ import java.util.Objects;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/musigma/views/main-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/musigma/views/stock-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         stage.setScene(scene);
