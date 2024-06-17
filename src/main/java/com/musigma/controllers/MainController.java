@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class MainController {
     @FXML
-    Button minimizeButton, maximizeButton, closeButton;
+    Button minimizeButton, closeButton;
 
     @FXML
     VBox pageMenu;
