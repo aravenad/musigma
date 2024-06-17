@@ -9,10 +9,12 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class MainController {
     @FXML
@@ -22,7 +24,7 @@ public class MainController {
     VBox pageMenu;
 
     @FXML
-    VBox workspace;
+    Pane workspace;
 
     @FXML
     public void initialize() {
@@ -53,21 +55,24 @@ public class MainController {
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent;"));
     }
 
-    public void addWorkspace(String pageName, String pathToIcon, String pathToFXML) {
-        System.out.println(pageName);
-        System.out.println(pathToIcon);
-        System.out.println(pathToFXML);
-        VBox pageButtonBox = new VBox();
-        pageButtonBox.setAlignment(Pos.CENTER);
-//        ImageView icon = new ImageView();
-//        icon.setImage(new Image(pathToIcon));
+    public void addWorkspace(WorkspaceController.WorkspaceRegister register) {
+        ImageView icon = new ImageView();
+        icon.setImage(new Image(getClass().getResourceAsStream(register.iconPath)));
+        icon.setFitHeight(32);
+        icon.setFitWidth(32);
+        icon.setPreserveRatio(true);
+        icon.setPickOnBounds(true);
+
         Label pageLabel = new Label();
         pageLabel.setStyle("-fx-text-fill: #f3f3f5;");
-        pageLabel.setText(pageName);
-        pageButtonBox.getChildren().addAll(pageLabel);
+        pageLabel.setText(register.name);
+        VBox pageButtonBox = new VBox();
+
+        pageButtonBox.setAlignment(Pos.CENTER);
+        pageButtonBox.getChildren().addAll(icon, pageLabel);
         pageButtonBox.setOnMouseClicked(ev -> {
             try {
-                setWorkspace(pathToFXML);
+                setWorkspace(register);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -75,8 +80,8 @@ public class MainController {
         pageMenu.getChildren().add(pageButtonBox);
     }
 
-    public void setWorkspace(String pathToFXML) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(MainController.class.getResource(pathToFXML));
+    public void setWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
     }
 }
