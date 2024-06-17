@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright © 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <GridPane>
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="66.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="427.0" minWidth="10.0" prefWidth="346.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="313.0" minWidth="10.0" prefWidth="230.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="1">
+            <MenuBar prefHeight="30.0" prefWidth="149.0" style="-fx-background-color: rgba(48, 48, 77, 0);">
+                <Menu mnemonicParsing="false" text="File">
+                    <MenuItem mnemonicParsing="false" text="Close" />
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <MenuItem mnemonicParsing="false" text="Delete" />
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <MenuItem mnemonicParsing="false" text="About" />
+                </Menu>
+            </MenuBar>
+        </HBox>
+        <HBox alignment="TOP_RIGHT" prefHeight="27.0" prefWidth="493.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="2">
+            <Button style="-fx-background-color: transparent;">
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@../images/minimize.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button style="-fx-background-color: transparent;">
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@../images/maximize.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button style="-fx-background-color: transparent;">
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@../images/close.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+        <HBox alignment="CENTER" prefHeight="32.0" prefWidth="54.0" style="-fx-background-color: #30304d;">
+            <ImageView fitHeight="38.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@../images/logo.png" />
+            </ImageView>
+        </HBox>
+    </GridPane>
+    <GridPane>
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="65.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="305.0" minWidth="10.0" prefWidth="163.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="423.0" minWidth="10.0" prefWidth="412.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints />
+        </rowConstraints>
+        <VBox alignment="TOP_CENTER" prefHeight="375.0" prefWidth="65.0" style="-fx-background-color: #30304d;" GridPane.rowIndex="1">
+            <VBox alignment="CENTER" prefHeight="60.0" prefWidth="52.0">
+                <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                    <Image url="@../images/home.png" />
+                </ImageView>
+                <Label style="-fx-text-fill: #f3f3f5;" text="Label" />
+            </VBox>
+            <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="60.0" prefWidth="52.0">
+                <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                    <Image url="@../images/home.png" />
+                </ImageView>
+                <Label style="-fx-text-fill: #f3f3f5;" text="Label" />
+            </VBox>
+            <VBox alignment="CENTER" layoutX="10.0" layoutY="70.0" prefHeight="60.0" prefWidth="52.0">
+                <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                    <Image url="@../images/home.png" />
+                </ImageView>
+                <Label style="-fx-text-fill: #f3f3f5;" text="Label" />
+            </VBox>
+        </VBox>
+        <VBox prefHeight="369.0" prefWidth="110.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <VBox prefHeight="313.0" prefWidth="110.0">
+                <HBox alignment="CENTER" prefHeight="48.0" prefWidth="110.0">
+                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />
+                </HBox>
+                <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="48.0" prefWidth="110.0">
+                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />
+                </HBox>
+                <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="48.0" prefWidth="110.0">
+                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />
+                </HBox>
+                <HBox alignment="CENTER" layoutX="10.0" layoutY="58.0" prefHeight="48.0" prefWidth="110.0">
+                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />
+                </HBox>
+            </VBox>
+            <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="110.0">
+                <HBox alignment="CENTER" prefHeight="48.0" prefWidth="110.0">
+                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />
+                </HBox>
+                <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="48.0" prefWidth="110.0">
+                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </GridPane>
+</VBox>
