@@ -38,26 +38,60 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="720.0" prefWidth="1121.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
-   <HBox prefHeight="100.0" prefWidth="200.0">
+<HBox prefHeight="720.0" prefWidth="1121.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
+   <VBox prefHeight="720.0" prefWidth="182.0">
       <children>
-         <Pane prefHeight="63.0" prefWidth="412.0">
+         <Pane prefHeight="139.0" prefWidth="226.0">
             <children>
-                 <HBox alignment="CENTER" prefHeight="63.0" prefWidth="225.0" style="-fx-background-color: #30304d;">
-                     <ImageView fitHeight="76.0" fitWidth="74.0" pickOnBounds="true" preserveRatio="true">
+                 <HBox alignment="CENTER" prefHeight="89.0" prefWidth="155.0" style="-fx-background-color: #30304d;">
+                     <ImageView fitHeight="111.0" fitWidth="98.0" pickOnBounds="true" preserveRatio="true">
                          <Image url="@../images/logo.png" />
                      </ImageView>
                  </HBox>
-            </children></Pane>
-          <GridPane maxHeight="25.0" prefHeight="50.0" prefWidth="1083.0">
+            </children>
+         </Pane>
+           <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="216.0" style="-fx-background-color: #30304d;">
+               <VBox alignment="CENTER" prefHeight="60.0" prefWidth="52.0">
+                   <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                       <VBox.margin>
+                           <Insets top="10.0" />
+                       </VBox.margin>
+                       <Image url="@../images/icons/calendar.png" />
+                   </ImageView>
+                   <Label style="-fx-text-fill: #f3f3f5;" text="Calendrier" />
+               </VBox>
+               <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="60.0" prefWidth="52.0">
+                   <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                       <VBox.margin>
+                           <Insets top="10.0" />
+                       </VBox.margin>
+                       <Image url="@../images/icons/stock.png" />
+                   </ImageView>
+                   <Label style="-fx-text-fill: #f3f3f5;" text="Stock" />
+               </VBox>
+               <VBox alignment="CENTER" layoutX="10.0" layoutY="70.0" prefHeight="60.0" prefWidth="52.0">
+                   <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                       <VBox.margin>
+                           <Insets top="10.0" />
+                       </VBox.margin>
+                       <Image url="@../images/icons/ticket.png" />
+                   </ImageView>
+                   <Label style="-fx-text-fill: #f3f3f5;" text="Ticket" />
+               </VBox>
+           </VBox>
+      </children>
+   </VBox>
+   <VBox prefHeight="556.0" prefWidth="994.0">
+      <children>
+          <GridPane maxHeight="-Infinity" prefHeight="25.0" prefWidth="903.0">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="583.0" minWidth="10.0" prefWidth="577.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="313.0" minWidth="10.0" prefWidth="163.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="200.0" />
               </columnConstraints>
               <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
-              <HBox prefHeight="63.0" prefWidth="0.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);">
+              <HBox prefHeight="63.0" prefWidth="581.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);">
                   <MenuBar prefHeight="25.0" prefWidth="120.0" style="-fx-background-color: rgba(48, 48, 77, 0);">
                       <Menu mnemonicParsing="false" text="File">
                           <MenuItem mnemonicParsing="false" text="Close" />
@@ -73,7 +107,7 @@
                   </padding>
                   </MenuBar>
               </HBox>
-              <HBox alignment="TOP_RIGHT" prefHeight="63.0" prefWidth="339.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="1">
+              <HBox alignment="TOP_RIGHT" prefHeight="63.0" prefWidth="337.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="1">
                   <Button fx:id="minimizeButton" style="-fx-background-color: transparent;">
                       <graphic>
                           <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
@@ -90,50 +124,11 @@
                   </Button>
               </HBox>
           </GridPane>
+         <Pane prefHeight="699.0" prefWidth="895.0">
+            <children>
+               <CalendarView layoutY="-1.0" prefHeight="697.0" prefWidth="965.0" />
+            </children>
+         </Pane>
       </children>
-   </HBox>
-    <GridPane>
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="356.0" minWidth="10.0" prefWidth="225.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="896.0" minWidth="10.0" prefWidth="896.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints vgrow="SOMETIMES" />
-            <RowConstraints />
-        </rowConstraints>
-        <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="695.0" prefWidth="225.0" style="-fx-background-color: #30304d;" GridPane.rowIndex="1">
-            <VBox alignment="CENTER" prefHeight="60.0" prefWidth="52.0">
-                <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                    <Image url="@../images/icons/calendar.png" />
-                </ImageView>
-                <Label style="-fx-text-fill: #f3f3f5;" text="Calendrier" />
-            </VBox>
-            <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="60.0" prefWidth="52.0">
-                <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                    <Image url="@../images/icons/stock.png" />
-                </ImageView>
-                <Label style="-fx-text-fill: #f3f3f5;" text="Stock" />
-            </VBox>
-            <VBox alignment="CENTER" layoutX="10.0" layoutY="70.0" prefHeight="60.0" prefWidth="52.0">
-                <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                    <Image url="@../images/icons/ticket.png" />
-                </ImageView>
-                <Label style="-fx-text-fill: #f3f3f5;" text="Ticket" />
-            </VBox>
-        </VBox>
-      <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <children>
-            <CalendarView prefHeight="656.0" prefWidth="895.0" />
-         </children>
-      </Pane>
-    </GridPane>
-</VBox>
+   </VBox>
+</HBox>
