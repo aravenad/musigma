@@ -5,11 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox prefHeight="720.0" prefWidth="1121.0"
-      style="-fx-background-color: rgba(48, 48, 77, 0.1);"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.musigma.controllers.MainController">
+<HBox prefHeight="720.0" prefWidth="1121.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
     <VBox prefHeight="720.0" prefWidth="182.0">
         <children>
             <Pane prefHeight="139.0" prefWidth="226.0">
@@ -21,7 +17,16 @@
                     </HBox>
                 </children>
             </Pane>
-            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="216.0" style="-fx-background-color: #30304d;" />
+            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="216.0" spacing="20" style="-fx-background-color: #30304d;">
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
+            <padding>
+               <Insets top="20.0" />
+            </padding></VBox>
         </children>
     </VBox>
     <VBox prefHeight="556.0" prefWidth="994.0">
