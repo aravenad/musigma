@@ -1,5 +1,6 @@
 package com.musigma.controllers;
 
+import com.musigma.models.Festival;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -14,9 +15,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 
 public class MainController {
+    private Festival festival;
+
     @FXML
     Button minimizeButton, closeButton;
 
@@ -83,5 +85,6 @@ public class MainController {
     public void setWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
+        ((WorkspaceController) fxmlLoader.getController()).setFestival(festival);
     }
 }
