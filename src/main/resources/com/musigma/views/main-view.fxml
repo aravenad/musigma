@@ -37,96 +37,108 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:controller="com.musigma.controllers.MainController"
-      prefHeight="400.0" prefWidth="640.0"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="720.0" prefWidth="1121.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
+   <HBox prefHeight="100.0" prefWidth="200.0">
+      <children>
+         <Pane prefHeight="63.0" prefWidth="412.0">
+            <children>
+                 <HBox alignment="CENTER" prefHeight="63.0" prefWidth="225.0" style="-fx-background-color: #30304d;">
+                     <ImageView fitHeight="76.0" fitWidth="74.0" pickOnBounds="true" preserveRatio="true">
+                         <Image url="@../images/logo.png" />
+                     </ImageView>
+                 </HBox>
+            </children></Pane>
+          <GridPane maxHeight="25.0" prefHeight="50.0" prefWidth="1083.0">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="583.0" minWidth="10.0" prefWidth="577.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="313.0" minWidth="10.0" prefWidth="163.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+              <HBox prefHeight="63.0" prefWidth="0.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);">
+                  <MenuBar prefHeight="25.0" prefWidth="120.0" style="-fx-background-color: rgba(48, 48, 77, 0);">
+                      <Menu mnemonicParsing="false" text="File">
+                          <MenuItem mnemonicParsing="false" text="Close" />
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Edit">
+                          <MenuItem mnemonicParsing="false" text="Delete" />
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Help">
+                          <MenuItem mnemonicParsing="false" text="About" />
+                      </Menu>
+                  <padding>
+                     <Insets left="-5.0E-5" />
+                  </padding>
+                  </MenuBar>
+              </HBox>
+              <HBox alignment="TOP_RIGHT" prefHeight="63.0" prefWidth="339.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="1">
+                  <Button fx:id="minimizeButton" style="-fx-background-color: transparent;">
+                      <graphic>
+                          <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                              <Image url="@../images/minimize.png" />
+                          </ImageView>
+                      </graphic>
+                  </Button>
+                  <Button fx:id="maximizeButton" style="-fx-background-color: transparent;">
+                      <graphic>
+                          <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                              <Image url="@../images/maximize.png" />
+                          </ImageView>
+                      </graphic>
+                  </Button>
+                  <Button fx:id="closeButton" style="-fx-background-color: transparent;">
+                      <graphic>
+                          <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                              <Image url="@../images/close.png" />
+                          </ImageView>
+                      </graphic>
+                  </Button>
+              </HBox>
+          </GridPane>
+      </children>
+   </HBox>
     <GridPane>
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="66.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="427.0" minWidth="10.0" prefWidth="346.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="313.0" minWidth="10.0" prefWidth="230.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-        <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="1">
-            <MenuBar prefHeight="30.0" prefWidth="149.0" style="-fx-background-color: rgba(48, 48, 77, 0);">
-                <Menu mnemonicParsing="false" text="File">
-                    <MenuItem mnemonicParsing="false" text="Close" />
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                    <MenuItem mnemonicParsing="false" text="About" />
-                </Menu>
-            </MenuBar>
-        </HBox>
-        <HBox alignment="TOP_RIGHT" prefHeight="27.0" prefWidth="493.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" GridPane.columnIndex="2">
-            <Button fx:id="minimizeButton" style="-fx-background-color: transparent;">
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@../images/minimize.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-            <Button fx:id="closeButton" style="-fx-background-color: transparent;">
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@../images/close.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-        </HBox>
-        <HBox alignment="CENTER" prefHeight="32.0" prefWidth="54.0" style="-fx-background-color: #30304d;">
-            <ImageView fitHeight="38.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../images/logo.png" />
-            </ImageView>
-        </HBox>
-    </GridPane>
-    <GridPane>
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="65.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="305.0" minWidth="10.0" prefWidth="163.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="423.0" minWidth="10.0" prefWidth="412.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="356.0" minWidth="10.0" prefWidth="225.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="609.0" minWidth="10.0" prefWidth="159.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="766.0" minWidth="10.0" prefWidth="737.0" />
         </columnConstraints>
         <rowConstraints>
             <RowConstraints vgrow="SOMETIMES" />
             <RowConstraints />
         </rowConstraints>
-        <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="375.0" prefWidth="65.0" style="-fx-background-color: #30304d;" GridPane.rowIndex="1">
+        <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="695.0" prefWidth="225.0" style="-fx-background-color: #30304d;" GridPane.rowIndex="1">
             <VBox alignment="CENTER" prefHeight="60.0" prefWidth="52.0">
                 <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                     <VBox.margin>
                         <Insets top="10.0" />
                     </VBox.margin>
-                    <Image url="@../images/home.png" />
+                    <Image url="@../images/icons/calendar.png" />
                 </ImageView>
-                <Label style="-fx-text-fill: #f3f3f5;" text="Label" />
+                <Label style="-fx-text-fill: #f3f3f5;" text="Calendrier" />
             </VBox>
             <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="60.0" prefWidth="52.0">
                 <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                     <VBox.margin>
                         <Insets top="10.0" />
                     </VBox.margin>
-                    <Image url="@../images/home.png" />
+                    <Image url="@../images/icons/stock.png" />
                 </ImageView>
-                <Label style="-fx-text-fill: #f3f3f5;" text="Label" />
+                <Label style="-fx-text-fill: #f3f3f5;" text="Stock" />
             </VBox>
             <VBox alignment="CENTER" layoutX="10.0" layoutY="70.0" prefHeight="60.0" prefWidth="52.0">
                 <ImageView fitHeight="32.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                     <VBox.margin>
                         <Insets top="10.0" />
                     </VBox.margin>
-                    <Image url="@../images/home.png" />
+                    <Image url="@../images/icons/ticket.png" />
                 </ImageView>
-                <Label style="-fx-text-fill: #f3f3f5;" text="Label" />
+                <Label style="-fx-text-fill: #f3f3f5;" text="Ticket" />
             </VBox>
         </VBox>
-        <VBox fx:id="workspace" prefHeight="369.0" prefWidth="110.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            <!-- <fx:include source="test.fxml"/>-->
-            <!--            <VBox prefHeight="313.0" prefWidth="110.0">-->
+        <VBox fx:id="workspace" prefHeight="658.0" prefWidth="139.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+<!--            <VBox prefHeight="313.0" prefWidth="110.0">-->
 <!--                <HBox alignment="CENTER" prefHeight="48.0" prefWidth="110.0">-->
 <!--                    <Button alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Button" />-->
 <!--                </HBox>-->
