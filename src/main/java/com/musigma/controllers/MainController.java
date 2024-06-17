@@ -85,6 +85,6 @@ public class MainController {
     public void setWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
-//        ((WorkspaceController) fxmlLoader.getController()).setFestival(festival);
+        ((WorkspaceController) fxmlLoader.getController()).setFestival(festival);
     }
 }
