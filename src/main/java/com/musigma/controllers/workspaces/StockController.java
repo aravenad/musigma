@@ -1,4 +1,6 @@
-package com.musigma.controllers;
+package com.musigma.controllers.workspaces;
+
+import com.musigma.controllers.WorkspaceController;
 
 public class StockController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(

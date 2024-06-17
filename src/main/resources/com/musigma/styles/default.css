@@ -1,0 +1,39 @@
+/* General */
+
+* {
+}
+
+/* Window */
+
+.window {
+    -fx-background-color: rgba(48, 48, 77, 0.1);
+}
+
+.windowBar {
+    -fx-background-color: rgba(48, 48, 77, 0.1);
+}
+
+.windowBar .menu-bar,
+.windowBar .button {
+    -fx-background-color: transparent;
+}
+
+.windowBar .button {
+    -fx-background-radius: 0;
+}
+
+.windowBar .button:hover {
+    -fx-background-color: darkgrey;
+}
+
+.windowBar .close:hover {
+    -fx-background-color: crimson;
+}
+
+#pageMenu VBox * {
+    -fx-text-fill: #f3f3f5;
+}
+
+#pageMenu VBox.currentWorkspace {
+    -fx-background-color: #ffffff0f;
+}

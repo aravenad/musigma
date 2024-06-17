@@ -16,8 +16,6 @@ public abstract class WorkspaceController {
         }
     }
 
-    public static WorkspaceRegister REGISTER;
-
     protected Festival festival;
 
     public void initialize(Festival festival) {

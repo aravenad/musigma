@@ -83,7 +83,7 @@ public class Festival implements Serializable {
      * @throws IOException            en cas d'erreur d'entrée/sortie
      * @throws ClassNotFoundException si la classe n'est pas trouvée lors de la désérialisation
      */
-    static Festival Festival(File file) throws FestivalException {
+    public static Festival Festival(File file) throws FestivalException {
         try (
             FileInputStream fis = new FileInputStream(file.getAbsolutePath());
             ObjectInputStream ois = new ObjectInputStream(fis);
