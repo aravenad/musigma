@@ -1,4 +1,4 @@
-package com.musigma.modele.exception;
+package com.musigma.models.exception;
 
 /**
  * La classe TypeTicketException représente une erreur spécifique liée aux opérations sur les types de tickets.

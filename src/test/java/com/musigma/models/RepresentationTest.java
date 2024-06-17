@@ -1,9 +1,7 @@
-package com.musigma.modele;
+package com.musigma.models;
 
-import com.musigma.modele.Artiste;
-import com.musigma.modele.Representation;
-import com.musigma.modele.exception.ArtisteException;
-import com.musigma.modele.exception.RepresentationException;
+import com.musigma.models.exception.ArtisteException;
+import com.musigma.models.exception.RepresentationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

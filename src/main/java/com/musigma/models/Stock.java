@@ -1,6 +1,6 @@
-package com.musigma.modele;
+package com.musigma.models;
 
-import com.musigma.modele.exception.StockException;
+import com.musigma.models.exception.StockException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 import static fr.uga.iut2.musigma.util.Log.getLogger;
-import static java.util.logging.Level.INFO;
 
 /**
  * La classe Stock représente un stock avec un nom, une quantité absolue,

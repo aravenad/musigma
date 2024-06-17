@@ -1,13 +1,12 @@
-package com.musigma.modele;
+package com.musigma.models;
 
-import com.musigma.modele.exception.AvantageException;
+import com.musigma.models.exception.AvantageException;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.logging.Logger;
 
 import static fr.uga.iut2.musigma.util.Log.getLogger;
-import static java.util.logging.Level.INFO;
 
 /**
  * La classe Avantage représente un avantage associé à un type de ticket 

@@ -1,13 +1,10 @@
-package com.musigma.modele;
+package com.musigma.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.musigma.modele.Avantage;
-import com.musigma.modele.Stock;
-import com.musigma.modele.TypeTicket;
-import com.musigma.modele.exception.AvantageException;
-import com.musigma.modele.exception.StockException;
-import com.musigma.modele.exception.TypeTicketException;
+import com.musigma.models.exception.AvantageException;
+import com.musigma.models.exception.StockException;
+import com.musigma.models.exception.TypeTicketException;
 import org.junit.jupiter.api.*;
 
 class StockTest {

@@ -1,14 +1,12 @@
-package com.musigma.modele;
+package com.musigma.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.musigma.modele.*;
-import com.musigma.modele.exception.*;
+import com.musigma.models.exception.*;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicReference;
 
 class FestivalTest {
 

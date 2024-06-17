@@ -1,4 +1,4 @@
-package com.musigma.modele.exception;
+package com.musigma.models.exception;
 
 /**
  * La classe ArtisteException représente une erreur spécifique liée aux opérations sur les artistes.

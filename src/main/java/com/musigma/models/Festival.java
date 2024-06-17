@@ -1,6 +1,6 @@
-package com.musigma.modele;
+package com.musigma.models;
 
-import com.musigma.modele.exception.FestivalException;
+import com.musigma.models.exception.FestivalException;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -10,7 +10,6 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import static fr.uga.iut2.musigma.util.Log.getLogger;
-import static java.util.logging.Level.*;
 
 /**
  * La classe Festival représente un festival avec un nom, une date de début, un prix de location,

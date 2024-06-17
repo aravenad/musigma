@@ -1,9 +1,6 @@
-package com.musigma.modele;
+package com.musigma.models;
 
-import com.musigma.modele.Avantage;
-import com.musigma.modele.Stock;
-import com.musigma.modele.TypeTicket;
-import com.musigma.modele.exception.*;
+import com.musigma.models.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
