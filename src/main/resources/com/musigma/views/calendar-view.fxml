@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import com.calendarfx.view.*?>
 
-<CalendarView
-        style="-fx-background-color: rgba(48, 48, 77, 0.1);"
-        xmlns="http://javafx.com/javafx/17.0.2-ea"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="com.musigma.controllers.CalendarController"
-        layoutY="-1.0" prefHeight="697.0" prefWidth="965.0"
-/>
+
+<CalendarView layoutY="-1.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(48, 48, 77, 0.1);" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.CalendarController" />

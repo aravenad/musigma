@@ -53,7 +53,7 @@ public class MainController {
     }
 
     private void addHoverEffect(Button button, String color) {
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + color + ";"));
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + color + "; -fx-background-radius: " + 0 + ";"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent;"));
     }
 
