@@ -33,8 +33,8 @@ public class MainController {
         minimizeButton.setOnAction(this::handleButtonAction);
         closeButton.setOnAction(this::handleButtonAction);
 
-        addHoverEffect(minimizeButton, "lightgrey");
-        addHoverEffect(closeButton, "red");
+        addHoverEffect(minimizeButton, "darkgrey");
+        addHoverEffect(closeButton, "crimson");
     }
 
     private void handleButtonAction(ActionEvent event) {
@@ -85,6 +85,6 @@ public class MainController {
     public void setWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
-        ((WorkspaceController) fxmlLoader.getController()).setFestival(festival);
+//        ((WorkspaceController) fxmlLoader.getController()).setFestival(festival);
     }
 }
