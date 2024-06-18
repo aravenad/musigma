@@ -5,12 +5,16 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox prefHeight="720.0" prefWidth="1121.0" styleClass="window" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
-    <VBox prefHeight="720.0" prefWidth="64.0">
+<?import java.net.URL?>
+<HBox prefHeight="720.0" prefWidth="1121.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
+    <stylesheets>
+        <URL value="@../styles/default.css" />
+    </stylesheets>
+    <VBox prefHeight="720.0" prefWidth="64.0" styleClass="leftMenu">
         <children>
             <Pane maxWidth="1.7976931348623157E308">
                 <children>
-                    <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-color: #30304d;">
+                    <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity">
                         <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                             <Image url="@../images/logo.png" />
                         </ImageView>
@@ -20,7 +24,7 @@
                <Insets bottom="1.0" />
             </padding>
             </Pane>
-            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="114.0" style="-fx-background-color: #30304d;" VBox.vgrow="ALWAYS">
+            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="114.0" VBox.vgrow="ALWAYS">
             <padding>
                <Insets top="8.0" />
             </padding>
@@ -29,7 +33,7 @@
     </VBox>
     <VBox prefHeight="556.0" prefWidth="994.0" HBox.hgrow="ALWAYS">
         <children>
-            <GridPane alignment="CENTER" maxHeight="-Infinity" onMousePressed="#dragWindow" styleClass="windowBar">
+            <GridPane alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMousePressed="#dragWindow" styleClass="windowBar">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="583.0" minWidth="10.0" prefWidth="577.0" />
                     <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="200.0" />
@@ -37,40 +41,35 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <HBox prefHeight="63.0" prefWidth="581.0">
-                    <MenuBar prefHeight="27.0" prefWidth="280.0">
-                        <Menu mnemonicParsing="false" text="Fichier">
-                            <MenuItem mnemonicParsing="false" onAction="#newFestival" text="Nouveau" />
-                            <MenuItem mnemonicParsing="false" onAction="#openFestival" text="Ouvrir" />
-                            <Menu fx:id="recentFileMenu" mnemonicParsing="false" text="Ouvrir récents" />
-                            <SeparatorMenuItem />
-                            <MenuItem mnemonicParsing="false" onAction="#saveFestival" text="Sauvegarder" />
-                            <MenuItem mnemonicParsing="false" onAction="#saveFestivalAs" text="Enregistrer sous" />
-                            <SeparatorMenuItem />
-                            <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Quitter" />
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Help">
-                            <MenuItem mnemonicParsing="false" text="About" />
-                        </Menu>
-                        <padding>
-                            <Insets left="-5.0E-5" />
-                        </padding>
-                  <HBox.margin>
-                     <Insets />
-                  </HBox.margin>
-                    </MenuBar>
-                </HBox>
-                <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1">
+                 <MenuBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
+                     <Menu mnemonicParsing="false" text="Fichier">
+                         <MenuItem mnemonicParsing="false" onAction="#newFestival" text="Nouveau" />
+                         <MenuItem mnemonicParsing="false" onAction="#openFestival" text="Ouvrir" />
+                         <Menu fx:id="recentFileMenu" mnemonicParsing="false" text="Ouvrir récents" />
+                         <SeparatorMenuItem />
+                         <MenuItem mnemonicParsing="false" onAction="#saveFestival" text="Sauvegarder" />
+                         <MenuItem mnemonicParsing="false" onAction="#saveFestivalAs" text="Enregistrer sous" />
+                         <SeparatorMenuItem />
+                         <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Quitter" />
+                     </Menu>
+                     <Menu mnemonicParsing="false" text="Help">
+                         <MenuItem mnemonicParsing="false" text="About" />
+                     </Menu>
+                     <padding>
+                         <Insets left="-5.0E-5" />
+                     </padding>
+                 </MenuBar>
+                <HBox alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1">
                     <Button onAction="#minimizeWindow">
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true">
                                 <Image url="@../images/minimize.png" />
                             </ImageView>
                         </graphic>
                     </Button>
                     <Button onAction="#closeWindow" styleClass="close">
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true">
                                 <Image url="@../images/close.png" />
                             </ImageView>
                         </graphic>

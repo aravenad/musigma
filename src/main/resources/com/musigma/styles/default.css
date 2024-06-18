@@ -1,13 +1,4 @@
-/* General */
-
-* {
-}
-
 /* Window */
-
-.window {
-    -fx-background-color: rgba(48, 48, 77, 0.1);
-}
 
 .windowBar {
     -fx-background-color: rgba(48, 48, 77, 0.1);
@@ -28,6 +19,10 @@
 
 .windowBar .close:hover {
     -fx-background-color: crimson;
+}
+
+.leftMenu {
+    -fx-background-color: #30304d;
 }
 
 #pageMenu VBox * {

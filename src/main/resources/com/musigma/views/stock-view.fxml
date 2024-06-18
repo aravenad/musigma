@@ -4,8 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="697.0" prefWidth="1058.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
-    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10" style="-fx-background-color: rgba(48, 48, 77, 0.2);">
+<VBox prefHeight="697.0" prefWidth="1058.0"  xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
+    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10">
         <opaqueInsets>
             <Insets />
         </opaqueInsets>

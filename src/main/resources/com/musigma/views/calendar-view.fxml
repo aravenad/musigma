@@ -8,6 +8,6 @@
     <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                AnchorPane.topAnchor="0">
         <CalendarView prefHeight="697" prefWidth="1058" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                      minWidth="-Infinity" style="-fx-background-color: rgba(48, 48, 77, 0.1);"/>
+                      minWidth="-Infinity"/>
     </StackPane>
 </AnchorPane>
