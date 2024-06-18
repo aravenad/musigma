@@ -3,10 +3,14 @@ package com.musigma.controllers.workspaces;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Stock;
 import com.musigma.models.exception.StockException;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+
 
 public class StockController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
@@ -23,6 +27,12 @@ public class StockController extends WorkspaceController {
 
     @FXML
     TableView<Stock> tableView;
+    @FXML
+    TableColumn<Stock, String> nameColumn;
+    @FXML
+    TableColumn<Stock, Integer> quantityColumn;
+    @FXML
+    TableColumn<Stock, Double> priceColumn;
 
     /**
      * Initialise le contrôleur.
@@ -38,8 +48,11 @@ public class StockController extends WorkspaceController {
                 throw new RuntimeException(ex);
             }
         });
-
+        nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
+        quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
+        priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
     }
+
 
     /**
      * Définit les listeners pour les champs de texte.
@@ -132,11 +145,14 @@ public class StockController extends WorkspaceController {
             textFieldQuantite.setStyle("-fx-border-color: crimson;");
         } else {
             Stock stock = new Stock(textFieldObjet.getText(), Integer.parseInt(textFieldQuantite.getText()), true, Double.parseDouble(textFieldPrix.getText()));
+            tableView.getItems().add(stock);
+            System.out.println(textFieldPrix.getText() + " " + textFieldQuantite.getText() + " " + textFieldObjet.getText());
             textFieldObjet.setText("Objet");
             textFieldQuantite.setText("Quantité");
             textFieldPrix.setText("Prix");
-            tableView.getItems().add(stock);
-            System.out.println("Stock ajouté");
+            textFieldObjet.setStyle("-fx-border-color: transparent;");
+            textFieldPrix.setStyle("-fx-border-color: transparent;");
+            textFieldQuantite.setStyle("-fx-border-color: transparent;");
         }
     }
 
