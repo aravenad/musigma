@@ -38,7 +38,7 @@ public class HomeController extends WorkspaceController {
 
     @Override
     public void initialize(Festival festival) {
-        super.initialize(festival);
+        System.out.println(festival);
         useNotEmptyText(festivalName, festival.getName(), (String v) -> festival.setName(v));
         useNotEmptyText(festivalLocation, festival.getLocation(), (String v) -> festival.setLocation(v));
         usePositiveNotNull(festivalArea, festival.getArea(), (v) -> festival.setArea(v));

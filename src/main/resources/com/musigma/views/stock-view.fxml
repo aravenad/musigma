@@ -15,13 +15,13 @@
         <VBox.margin>
             <Insets />
         </VBox.margin>
-        <TextField fx:id="textFieldObjet" text="Objet">
+        <TextField fx:id="textFieldObjet" promptText="ex : Boisson">
             <opaqueInsets>
                 <Insets />
             </opaqueInsets>
         </TextField>
-        <TextField fx:id="textFieldQuantite" text="Quantité" />
-        <TextField fx:id="textFieldPrix" text="Prix" />
+        <TextField fx:id="textFieldQuantite" promptText="ex : 1" />
+        <TextField fx:id="textFieldPrix" promptText="ex : 2.99" />
         <Button fx:id="ajouterButton" mnemonicParsing="false" text="Ajouter" />
     </HBox>
     <TableView fx:id="tableView" prefHeight="700.0" prefWidth="967.0">

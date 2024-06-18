@@ -1,7 +1,9 @@
 package com.musigma.controllers.workspaces;
 
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.models.Festival;
 import com.musigma.models.Stock;
+import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.StockException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -42,13 +44,16 @@ public class StockController extends WorkspaceController {
      * Initialise le contrôleur.
      */
     @FXML
-    public void initialize() {
-        handleTextField();
+    public void initialize(Festival festival) {
+        super.initialize(festival);
+        tableView.getItems().addAll(festival.getStocks());
         addListener();
         ajouterButton.setOnAction(e -> {
             try {
                 onAjouterPressed();
             } catch (StockException ex) {
+                throw new RuntimeException(ex);
+            } catch (FestivalException ex) {
                 throw new RuntimeException(ex);
             }
         });
@@ -125,53 +130,13 @@ public class StockController extends WorkspaceController {
         });
     }
 
-    /**
-     * Gère les champs de texte.
-     */
-    private void handleTextField() {
-        textFieldObjet.setOnMouseClicked(e -> {
-            if (textFieldObjet.getText().equals("Objet")) {
-                textFieldObjet.setText("");
-            }
-        });
-
-        textFieldObjet.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue && textFieldObjet.getText().isEmpty()) {
-                textFieldObjet.setText("Objet");
-            }
-        });
-
-        textFieldQuantite.setOnMouseClicked(e -> {
-            if (textFieldQuantite.getText().equals("Quantité")) {
-                textFieldQuantite.setText("");
-            }
-        });
-
-        textFieldQuantite.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue && textFieldQuantite.getText().isEmpty()) {
-                textFieldQuantite.setText("Quantité");
-            }
-        });
-
-        textFieldPrix.setOnMouseClicked(e -> {
-            if (textFieldPrix.getText().equals("Prix")) {
-                textFieldPrix.setText("");
-            }
-        });
-
-        textFieldPrix.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue && textFieldPrix.getText().isEmpty()) {
-                textFieldPrix.setText("Prix");
-            }
-        });
-    }
 
     /**
      * Ajoute un stock à la table.
      *
      * @throws StockException si le stock n'est pas valide
      */
-    private void onAjouterPressed() throws StockException {
+    private void onAjouterPressed() throws StockException, FestivalException {
         textFieldObjet.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
         textFieldQuantite.setStyle("-fx-border-color: transparent;");
@@ -187,10 +152,8 @@ public class StockController extends WorkspaceController {
             textFieldQuantite.setStyle("-fx-border-color: crimson;");
         } else {
             Stock stock = new Stock(textFieldObjet.getText(), Integer.parseInt(textFieldQuantite.getText()), true, Double.parseDouble(textFieldPrix.getText()));
+            festival.addStock(stock);
             tableView.getItems().add(stock);
-            textFieldObjet.setText("Objet");
-            textFieldQuantite.setText("Quantité");
-            textFieldPrix.setText("Prix");
             textFieldObjet.setStyle("-fx-border-color: transparent;");
             textFieldPrix.setStyle("-fx-border-color: transparent;");
             textFieldQuantite.setStyle("-fx-border-color: transparent;");
