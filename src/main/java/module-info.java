@@ -7,6 +7,7 @@ module com.musigma {
     requires org.kordamp.bootstrapfx.core;
     requires java.logging;
     requires java.desktop;
+    requires atlantafx.base;
 
     opens com.musigma to javafx.fxml;
     exports com.musigma;
