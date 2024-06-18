@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import static com.musigma.util.Log.getLogger;
+import static com.musigma.utils.Log.getLogger;
 
 /**
  * La classe Avantage représente un avantage associé à un type de ticket 

@@ -45,7 +45,7 @@
                             <Menu fx:id="recentFileMenu" mnemonicParsing="false" text="Ouvrir récents" />
                             <SeparatorMenuItem />
                             <MenuItem mnemonicParsing="false" onAction="#saveFestival" text="Sauvegarder" />
-                            <MenuItem mnemonicParsing="false" onAction="#saveFestivalAs" text="Sauvegarder sous" />
+                            <MenuItem mnemonicParsing="false" onAction="#saveFestivalAs" text="Enregistrer sous" />
                             <SeparatorMenuItem />
                             <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Quitter" />
                         </Menu>

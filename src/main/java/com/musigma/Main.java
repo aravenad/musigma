@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.rmi.RemoteException;
+
 import atlantafx.base.theme.*;
 
 public class Main extends Application {
@@ -22,8 +24,8 @@ public class Main extends Application {
         stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         scene.getStylesheets().add(String.valueOf(getClass().getResource((STYLESHEET_PATH))));
         Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
-        stage.setScene(scene);
         stage.show();
+        stage.setScene(scene);
 
         MainController controller = fxmlLoader.getController();
         controller.initialize(stage);

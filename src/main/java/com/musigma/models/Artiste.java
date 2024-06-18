@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import static com.musigma.util.Log.getLogger;
+import static com.musigma.utils.Log.getLogger;
 
 /**
  * La classe Artiste représente un artiste avec un nom, un genre musical et un prix.

@@ -4,6 +4,7 @@ import com.calendarfx.view.TimeField;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
 import com.musigma.models.exception.FestivalException;
+import com.musigma.utils.exceptionMethods.Setter;
 import impl.com.calendarfx.view.NumericTextField;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -38,11 +39,10 @@ public class HomeController extends WorkspaceController {
 
     @Override
     public void initialize(Festival festival) {
-        System.out.println(festival);
-        useNotEmptyText(festivalName, festival.getName(), (String v) -> festival.setName(v));
-        useNotEmptyText(festivalLocation, festival.getLocation(), (String v) -> festival.setLocation(v));
-        usePositiveNotNull(festivalArea, festival.getArea(), (v) -> festival.setArea(v));
-        usePositive(festivalLocationPrice, festival.getLocationPrice(), (v) -> festival.setArea(v));
+        useNotEmptyText(festivalName, festival.getName(), festival::setName);
+        useNotEmptyText(festivalLocation, festival.getLocation(), festival::setLocation);
+        usePositiveNotNull(festivalArea, festival.getArea(), festival::setArea);
+        usePositive(festivalLocationPrice, festival.getLocationPrice(), festival::setArea);
         festivalStartDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -58,11 +58,6 @@ public class HomeController extends WorkspaceController {
                 throw new RuntimeException(ex);
             }
         });
-    }
-
-    @FunctionalInterface
-    public interface Setter<T> {
-        void accept(T t) throws Exception;
     }
 
     private void usePositive(NumericTextField tf, double defaultValue, Setter<Double> setter) {

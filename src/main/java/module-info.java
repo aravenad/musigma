@@ -9,6 +9,7 @@ module com.musigma {
     requires java.desktop;
     requires atlantafx.base;
     requires com.calendarfx.view;
+    requires java.rmi;
 
     opens com.musigma to javafx.fxml;
     exports com.musigma;
@@ -16,4 +17,8 @@ module com.musigma {
     opens com.musigma.controllers to javafx.fxml;
     exports com.musigma.controllers.workspaces;
     opens com.musigma.controllers.workspaces to javafx.fxml;
+    exports com.musigma.utils;
+    opens com.musigma.utils to javafx.fxml;
+    exports com.musigma.utils.exceptionMethods;
+    opens com.musigma.utils.exceptionMethods to javafx.fxml;
 }

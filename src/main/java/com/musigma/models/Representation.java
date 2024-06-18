@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import static com.musigma.util.Log.getLogger;
+import static com.musigma.utils.Log.getLogger;
 
 /**
  * La classe Representation représente une représentation d'un artiste lors d'un festival,

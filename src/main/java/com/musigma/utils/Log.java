@@ -1,4 +1,4 @@
-package com.musigma.util;
+package com.musigma.utils;
 
 import java.io.IOException;
 import java.util.logging.LogManager;

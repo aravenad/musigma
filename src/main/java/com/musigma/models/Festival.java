@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import static com.musigma.util.Log.getLogger;
+import static com.musigma.utils.Log.getLogger;
 
 /**
  * La classe Festival représente un festival avec un nom, une date de début, un prix de location,

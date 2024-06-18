@@ -6,7 +6,6 @@ import com.musigma.controllers.workspaces.StockController;
 import com.musigma.controllers.workspaces.TicketController;
 import com.musigma.models.Festival;
 import com.musigma.models.exception.FestivalException;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -20,28 +19,28 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import static com.musigma.utils.Dialogs.askFile;
+import static com.musigma.utils.Dialogs.tryCatch;
+
 public class MainController {
 
     private static final String APP_NAME = "Musigma";
-
-    private static final String EXT_NAME = "*.mgm";
 
     private static final int MAX_RECENT_FILES = 10;
 
     private static final String STATE_FILEPATH = "previousSession.ser";
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
-            HomeController.REGISTER,
-            CalendarController.REGISTER,
-            TicketController.REGISTER,
-            StockController.REGISTER
+        HomeController.REGISTER,
+        CalendarController.REGISTER,
+        TicketController.REGISTER,
+        StockController.REGISTER
     };
 
     private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER;
@@ -52,11 +51,11 @@ public class MainController {
 
     private ArrayList<File> recentFiles;
 
-    private Stage stage;
-
     private WorkspaceController.WorkspaceRegister currentWorkspace;
     
     private WorkspaceController currentWorkspaceController;
+
+    private Stage stage;
 
     @FXML
     private VBox pageMenu;
@@ -80,35 +79,39 @@ public class MainController {
     private void loadState() {
         File previousStateFile = new File(STATE_FILEPATH);
         if (previousStateFile.exists()) {
-            try (
-                FileInputStream fis = new FileInputStream(previousStateFile);
-                ObjectInputStream ois = new ObjectInputStream(fis);
-            ){
-                ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
-                if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
-                    recentFiles.addAll(
-                            previousRecentFiles
-                                    .stream()
-                                    .filter(file -> file != null && file.exists())
-                                    .collect(Collectors.toList())
-                    );
-                if (!recentFiles.isEmpty())
-                    loadFestival(Festival.Festival(recentFiles.get(0)));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            tryCatch(
+                "Chargement de l'état précédent de l'application impossible",
+                () -> {
+                    try (
+                        FileInputStream fis = new FileInputStream(previousStateFile);
+                        ObjectInputStream ois = new ObjectInputStream(fis);
+                    ){
+                        ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
+                        if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
+                            recentFiles.addAll(
+                                    previousRecentFiles
+                                            .stream()
+                                            .filter(file -> file != null && file.exists())
+                                            .collect(Collectors.toList())
+                            );
+                        if (!recentFiles.isEmpty())
+                            loadFestival(Festival.Festival(recentFiles.get(0)));
+                    }
+            });
         } else newFestival();
     }
 
     private void saveState() {
-        try (
-            FileOutputStream fos = new FileOutputStream(STATE_FILEPATH);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            oos.writeObject(recentFiles);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            tryCatch(
+        "Sauvegarde de l'état actuel de l'application impossible",
+            () -> {
+                try (
+                    FileOutputStream fos = new FileOutputStream(STATE_FILEPATH);
+                    ObjectOutputStream oos = new ObjectOutputStream(fos);
+                ) {
+                    oos.writeObject(recentFiles);
+                }
+        });
     }
 
     @FXML
@@ -151,11 +154,11 @@ public class MainController {
 
     private boolean askToSaveFestival() {
         Alert alert = new Alert(
-                Alert.AlertType.CONFIRMATION,
-                String.format("Le festival \"%s\" à été modifié, voulez vous le sauvegarder ?", this.festival.getName()),
-                ButtonType.YES,
-                ButtonType.NO,
-                ButtonType.CANCEL
+            Alert.AlertType.CONFIRMATION,
+            String.format("Le festival \"%s\" à été modifié, voulez vous le sauvegarder ?", this.festival.getName()),
+            ButtonType.YES,
+            ButtonType.NO,
+            ButtonType.CANCEL
         );
         alert.showAndWait();
         ButtonType result = alert.getResult();
@@ -173,77 +176,71 @@ public class MainController {
         File file = festival.getFile();
         if (file != null)
             addRecentFile(file);
-        try {
-            this.festival = festival;
-            loadWorkspace(DEFAULT_WORKSPACE);
-        } catch (Exception e) {}
+        tryCatch(
+            "Chargement du festival impossible",
+            () -> {
+                this.festival = festival;
+                loadWorkspace(DEFAULT_WORKSPACE);
+        });
     }
 
     @FXML
     private void newFestival() {
-        try {
-            loadFestival(new Festival(
+        tryCatch(
+        "Création du nouveau festival impossible",
+            () -> loadFestival(new Festival(
                 "Nouveau festival",
                 LocalDateTime.now(),
                 0,
                 1,
                 "Quelque part sur Terre"
-            ));
-        } catch (Exception e) {}
+        )));
     }
 
     @FXML
     private void openFestival() {
-        try {
-            FileChooser fc = new FileChooser();
-            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(APP_NAME + " Files", EXT_NAME));
-            fc.setTitle("Open");
-            File file = fc.showOpenDialog(stage);
-            if (file == null)
-                return;
-            loadFestival(Festival.Festival(file));
-        } catch (FestivalException e) {
-            throw new RuntimeException(e);
-        }
+        tryCatch(
+    "Ouverture du fichier du festival impossible",
+            () -> {
+                File file = askFile("Open").showOpenDialog(stage);
+                if (file == null)
+                    return;
+                loadFestival(Festival.Festival(file));
+        });
     }
 
     private void openFestival(File file) {
-        try {
-            loadFestival(Festival.Festival(file));
-        } catch (FestivalException e) {
-            throw new RuntimeException(e);
-        }
+        tryCatch(
+    "Ouverture du fichier du festival impossible",
+            () -> loadFestival(Festival.Festival(file))
+        );
     }
 
     @FXML
     private void saveFestival() {
-        if (festival.getFile() == null) {
+        if (festival.getFile() == null)
             saveFestivalAs();
-        } else {
-            try {
-                festival.save();
-            } catch (FestivalException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        else
+            tryCatch(
+                "Sauvegarde du festival impossible",
+                "Festival sauvegardé",
+                festival::save
+            );
     }
 
     @FXML
     private void saveFestivalAs() {
-        FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(APP_NAME + " Files", EXT_NAME));
-        fc.setInitialFileName(festival.getName());
-        fc.setTitle("Save as");
-        File file = fc.showSaveDialog(stage);
+        File file = askFile("Enregistrer sous", festival.getName()).showSaveDialog(stage);
         if (file == null)
             return;
-        try {
-            festival.setFile(file);
-            addRecentFile(file);
-            festival.save();
-        } catch (FestivalException e) {
-            throw new RuntimeException(e);
-        }
+        tryCatch(
+            "Sauvegarde du festival impossible",
+            "Festival sauvegardé",
+            () -> {
+                festival.setFile(file);
+                addRecentFile(file);
+                festival.save();
+        });
     }
 
     public void addWorkspace(WorkspaceController.WorkspaceRegister register) {
@@ -267,13 +264,10 @@ public class MainController {
         pageButtonBox.setOnMouseClicked(ev -> {
             if (festival == null || currentWorkspace == register)
                 return;
-            try {
-                loadWorkspace(register);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (FestivalException e) {
-                throw new RuntimeException(e);
-            }
+            tryCatch(
+                "Accès à l'espace de travail impossible",
+                () -> loadWorkspace(register)
+            );
         });
     }
 
