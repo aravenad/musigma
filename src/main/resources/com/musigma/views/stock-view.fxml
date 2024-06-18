@@ -4,12 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox style="-fx-background-color: rgba(48, 48, 77, 0.1);"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.musigma.controllers.workspaces.StockController"
-      prefHeight="697.0"
-      prefWidth="967.0">
+<VBox prefHeight="697.0" prefWidth="1058.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
     <children>
         <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10" style="-fx-background-color: rgba(48, 48, 77, 0.2);">
             <children>
@@ -34,8 +29,8 @@
         <TableView prefHeight="700.0" prefWidth="967.0">
             <columns>
                 <TableColumn prefWidth="500.0" text="Objet" />
-                <TableColumn minWidth="230.0" prefWidth="239.0" text="QT" />
-                <TableColumn prefWidth="227.0" text="Prix" />
+                <TableColumn minWidth="230.0" prefWidth="286.0" text="QT" />
+                <TableColumn prefWidth="271.0" text="Prix" />
             </columns>
         </TableView>
     </children>
