@@ -8,6 +8,7 @@ import com.musigma.models.Festival;
 import com.musigma.models.exception.FestivalException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -183,6 +184,7 @@ public class MainController {
         VBox pageButtonBox = new VBox();
         pageButtonBox.setAlignment(Pos.CENTER);
         pageButtonBox.getChildren().addAll(icon, pageLabel);
+        pageButtonBox.setPadding(new Insets(8));
 
         pageButtonBox.setOnMouseClicked(ev -> {
             if (festival == null)
