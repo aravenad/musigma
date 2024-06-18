@@ -4,39 +4,34 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox style="-fx-background-color: rgba(48, 48, 77, 0.1);"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.musigma.controllers.workspaces.StockController"
-      prefHeight="697.0"
-      prefWidth="967.0">
-    <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10" style="-fx-background-color: rgba(48, 48, 77, 0.2);">
-            <children>
-                <TextField text="Objet">
-                    <opaqueInsets>
-                        <Insets />
-                    </opaqueInsets>
-                </TextField>
-                <TextField text="Quantité" />
-                <TextField text="Prix" />
-                <Button mnemonicParsing="false" text="Ajouté" />
-            </children>
+<VBox prefHeight="697.0" prefWidth="967.0" style="-fx-background-color: rgba(48, 48, 77, 0.1);"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.musigma.controllers.workspaces.StockController">
+    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10"
+          style="-fx-background-color: rgba(48, 48, 77, 0.2);">
+        <opaqueInsets>
+            <Insets/>
+        </opaqueInsets>
+        <padding>
+            <Insets left="10.0"/>
+        </padding>
+        <VBox.margin>
+            <Insets/>
+        </VBox.margin>
+        <TextField fx:id="textFieldObjet" text="Objet">
             <opaqueInsets>
-                <Insets />
+                <Insets/>
             </opaqueInsets>
-            <padding>
-                <Insets left="10.0" />
-            </padding>
-            <VBox.margin>
-                <Insets />
-            </VBox.margin></HBox>
-        <TableView prefHeight="700.0" prefWidth="967.0">
-            <columns>
-                <TableColumn prefWidth="500.0" text="Objet" />
-                <TableColumn minWidth="230.0" prefWidth="239.0" text="QT" />
-                <TableColumn prefWidth="227.0" text="Prix" />
-            </columns>
-        </TableView>
-    </children>
+        </TextField>
+        <TextField fx:id="textFieldQuantite" text="Quantité"/>
+        <TextField fx:id="textFieldPrix" text="Prix"/>
+        <Button fx:id="ajouterButton" mnemonicParsing="false" text="Ajouter"/>
+    </HBox>
+    <TableView fx:id="tableView" prefHeight="700.0" prefWidth="967.0">
+        <columns>
+            <TableColumn prefWidth="500.0" text="Objet"/>
+            <TableColumn minWidth="230.0" prefWidth="239.0" text="Quantité"/>
+            <TableColumn prefWidth="227.0" text="Prix"/>
+        </columns>
+    </TableView>
 </VBox>
