@@ -1,6 +1,7 @@
 package com.musigma.controllers;
 
 import com.musigma.controllers.workspaces.CalendarController;
+import com.musigma.controllers.workspaces.HomeController;
 import com.musigma.controllers.workspaces.StockController;
 import com.musigma.controllers.workspaces.TicketController;
 import com.musigma.models.Festival;
@@ -12,12 +13,14 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class MainController {
@@ -28,11 +31,14 @@ public class MainController {
 
     private static final String STATE_FILEPATH = "old_state.ser";
 
-    private static final WorkspaceController.WorkspaceRegister[] WORKSPACE_REGISTERS = {
+    private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
+            HomeController.REGISTER,
             CalendarController.REGISTER,
             TicketController.REGISTER,
             StockController.REGISTER
     };
+
+    private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER;
 
     private static final String CURRENT_WORKSPACE_STYLECLASS = "currentWorkspace";
 
@@ -53,11 +59,11 @@ public class MainController {
     @FXML
     public void initialize(Stage stage) throws IOException {
         this.stage = stage;
-        for (WorkspaceController.WorkspaceRegister register: WORKSPACE_REGISTERS) {
-            addWorkspace(register);
-        }
         loadState();
         stage.setOnHiding(e -> saveState());
+        for (WorkspaceController.WorkspaceRegister workspace: WORKSPACES)
+            addWorkspace(workspace);
+        loadWorkspace(DEFAULT_WORKSPACE);
     }
 
     private void loadState() {
@@ -71,6 +77,13 @@ public class MainController {
                 if (recentFiles != null && recentFiles.length > 0) {
                     recentFiles = Arrays.stream(recentFiles).filter(file -> file != null && file.exists()).toArray(File[]::new);
                 }
+                festival = recentFiles.length > 0 ? Festival.Festival(recentFiles[0]) : new Festival(
+                    "Nouveau festival",
+                    LocalDateTime.now().plusDays(1),
+                    0,
+                    1,
+                    "Somewhere on Earth"
+                );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -88,6 +101,19 @@ public class MainController {
             throw new RuntimeException(e);
         }
     }
+
+    private void loadFestival() {
+
+    }
+
+    @FXML
+    private void dragWindow(MouseEvent pressEvent) {
+        Node node = (Node) pressEvent.getSource();
+        node.setOnMouseDragged(dragEvent -> {
+            stage.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
+            stage.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
+        });
+    };
 
     @FXML
     private void closeWindow() {

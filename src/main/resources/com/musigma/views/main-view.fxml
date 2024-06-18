@@ -38,7 +38,7 @@
     </VBox>
     <VBox prefHeight="556.0" prefWidth="994.0" HBox.hgrow="ALWAYS">
         <children>
-            <GridPane styleClass="windowBar" maxHeight="-Infinity" prefHeight="25.0" prefWidth="903.0">
+            <GridPane onMousePressed="#dragWindow" styleClass="windowBar" maxHeight="-Infinity" prefHeight="25.0" prefWidth="903.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="583.0" minWidth="10.0" prefWidth="577.0" />
                     <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="200.0" />
