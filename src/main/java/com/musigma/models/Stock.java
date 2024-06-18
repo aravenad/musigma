@@ -27,6 +27,9 @@ public class Stock implements Serializable {
     // Si la quantité du stock est fixe
     private boolean fixed;
 
+    // Prix du stock
+    private double prix;
+
     // Liste des avantages associés à ce stock
     private final ArrayList<Avantage> avantages;
 
@@ -37,12 +40,13 @@ public class Stock implements Serializable {
      * @param quantity Quantité absolue du stock
      * @param quantity Si la quantité du stock est fixe
      */
-    public Stock(String name, int quantity, boolean fixed) throws StockException {
+    public Stock(String name, int quantity, boolean fixed, double prix) throws StockException {
         LOGGER.info(String.format("Initialized Stock 0x%x", super.hashCode()));
         avantages = new ArrayList<>();
         setName(name);
         setQuantity(quantity);
         setFixed(fixed);
+        setPrix(prix);
         LOGGER.info(String.format("Created Stock 0x%x", super.hashCode()));
     }
 
@@ -111,6 +115,29 @@ public class Stock implements Serializable {
         }
         this.quantity = quantity;
         LOGGER.info(String.format("Set Stock.quantity 0x%x", super.hashCode()));
+    }
+
+    /**
+     * Retourne le prix du stock.
+     *
+     * @return le prix du stock
+     */
+    public double getPrix() {
+        return prix;
+    }
+
+    /**
+     * Définit le prix du stock.
+     *
+     * @param prix le prix du stock
+     * @throws StockException si le prix est négatif ou nul (0)
+     */
+    public void setPrix(double prix) throws StockException {
+        if (prix <= 0) {
+            throw new StockException("Le prix est négatif ou nul (0), doit être défini");
+        }
+        this.prix = prix;
+        LOGGER.info(String.format("Set Stock.prix 0x%x", super.hashCode()));
     }
 
     /**
