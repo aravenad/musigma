@@ -6,14 +6,13 @@ import com.musigma.controllers.workspaces.StockController;
 import com.musigma.controllers.workspaces.TicketController;
 import com.musigma.models.Festival;
 import com.musigma.models.exception.FestivalException;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -21,13 +20,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
-import java.awt.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class MainController {
@@ -74,7 +71,7 @@ public class MainController {
     public void initialize(Stage stage) {
         this.stage = stage;
         recentFiles = new ArrayList<>();
-        stage.setOnHiding(e -> saveState());
+        stage.setOnCloseRequest(e -> saveState());
         for (WorkspaceController.WorkspaceRegister workspace: WORKSPACES)
             addWorkspace(workspace);
         loadState();
@@ -125,7 +122,9 @@ public class MainController {
 
     @FXML
     private void closeWindow() {
-        stage.close();
+        // TODO: use this dialog only when festival really changed
+        if (!askToSaveFestival())
+            stage.close();
     }
 
     @FXML
@@ -150,7 +149,27 @@ public class MainController {
         }
     }
 
+    private boolean askToSaveFestival() {
+        Alert alert = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                String.format("Le festival \"%s\" à été modifié, voulez vous le sauvegarder ?", this.festival.getName()),
+                ButtonType.YES,
+                ButtonType.NO,
+                ButtonType.CANCEL
+        );
+        alert.showAndWait();
+        ButtonType result = alert.getResult();
+        if (result.equals(ButtonType.YES))
+            saveFestival();
+        else if (result.equals(ButtonType.CANCEL))
+            return true;
+        return false;
+    }
+
     private void loadFestival(Festival festival) {
+        // TODO: use this dialog only when festival really changed
+        if (this.festival != null && askToSaveFestival())
+            return;
         File file = festival.getFile();
         if (file != null)
             addRecentFile(file);
