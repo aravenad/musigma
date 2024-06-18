@@ -48,6 +48,8 @@ public class MainController {
 
     private Festival festival;
 
+    private int festivalHash;
+
     private ArrayList<File> recentFiles;
 
     private WorkspaceController.WorkspaceRegister currentWorkspace;
@@ -124,8 +126,7 @@ public class MainController {
 
     @FXML
     private void closeWindow() {
-        // TODO: use this dialog only when festival really changed
-        if (!askToSaveFestival())
+        if (askToSaveFestival())
             stage.close();
     }
 
@@ -152,6 +153,8 @@ public class MainController {
     }
 
     private boolean askToSaveFestival() {
+        if (festival.getFile() != null && festivalHash == festival.hashCode())
+            return true;
         Alert alert = new Alert(
             Alert.AlertType.CONFIRMATION,
             String.format("Le festival \"%s\" à été modifié, voulez vous le sauvegarder ?", this.festival.getName()),
@@ -164,13 +167,12 @@ public class MainController {
         if (result.equals(ButtonType.YES))
             saveFestival();
         else if (result.equals(ButtonType.CANCEL))
-            return true;
-        return false;
+            return false;
+        return true;
     }
 
     private void loadFestival(Festival festival) {
-        // TODO: use this dialog only when festival really changed
-        if (this.festival != null && askToSaveFestival())
+        if (this.festival != null && !askToSaveFestival())
             return;
         File file = festival.getFile();
         if (file != null)
@@ -179,6 +181,7 @@ public class MainController {
             "Chargement du festival impossible",
             () -> {
                 this.festival = festival;
+                festivalHash = festival.hashCode();
                 loadWorkspace(DEFAULT_WORKSPACE);
         });
     }
@@ -223,7 +226,10 @@ public class MainController {
             tryCatch(
                 "Sauvegarde du festival impossible",
                 "Festival sauvegardé",
-                festival::save
+                () -> {
+                    festival.save();
+                    festivalHash = festival.hashCode();
+                }
             );
     }
 
@@ -239,6 +245,7 @@ public class MainController {
                 festival.setFile(file);
                 addRecentFile(file);
                 festival.save();
+                festivalHash = festival.hashCode();
         });
     }
 
