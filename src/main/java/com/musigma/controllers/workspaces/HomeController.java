@@ -11,6 +11,7 @@ public class HomeController extends WorkspaceController {
         "/com/musigma/images/icons/home.png",
         "/com/musigma/views/home-view.fxml"
     );
+    public DatePicker festivalStart;
 
     @FXML
     TextField festivalName;
