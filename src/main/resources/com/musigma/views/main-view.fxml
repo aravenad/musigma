@@ -20,10 +20,10 @@
                <Insets bottom="1.0" />
             </padding>
             </Pane>
-            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="114.0" spacing="20" style="-fx-background-color: #30304d;" VBox.vgrow="ALWAYS">
-                <padding>
-                   <Insets top="20.0" />
-                </padding>
+            <VBox fx:id="pageMenu" alignment="TOP_CENTER" prefHeight="685.0" prefWidth="114.0" style="-fx-background-color: #30304d;" VBox.vgrow="ALWAYS">
+            <padding>
+               <Insets top="8.0" />
+            </padding>
             </VBox>
         </children>
     </VBox>
