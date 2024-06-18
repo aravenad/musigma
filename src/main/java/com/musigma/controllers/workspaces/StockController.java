@@ -9,7 +9,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 
+/**
+ * Contrôleur pour l'espace de travail Stock.
+ */
 public class StockController extends WorkspaceController {
+    /**
+     * Enregistrement de l'espace de travail.
+     */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Stock",
             "/com/musigma/images/icons/stock.png",
@@ -51,7 +57,9 @@ public class StockController extends WorkspaceController {
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
         addDeleteButtonToTable();
     }
-
+    /**
+     * Ajoute un bouton de suppression à la table, crée une colonne d'action avec le bouton de suppression.
+     */
     private void addDeleteButtonToTable() {
         actionColumn = new TableColumn<>("Action");
 
@@ -89,7 +97,7 @@ public class StockController extends WorkspaceController {
 
 
     /**
-     * Définit les listeners pour les champs de texte.
+     * Définit les listeners pour les champs de saisie.
      */
     private void addListener(){
         textFieldObjet.textProperty().addListener((observable, oldValue, newValue) -> {
