@@ -3,6 +3,7 @@ package com.musigma.models;
 import com.musigma.models.exception.FestivalException;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -179,7 +180,7 @@ public class Festival implements Serializable {
      * @throws FestivalException si la date est antérieure à la date actuelle
      */
     public void setStart(LocalDateTime start) throws FestivalException {
-        if (start.isBefore(LocalDateTime.now())) {
+        if (LocalDate.now().isAfter(start.toLocalDate())) {
             throw new FestivalException("La date est antérieure à la date d'aujourd'hui, doit précéder la date d'aujourd'hui");
         }
         this.start = start;
