@@ -38,7 +38,7 @@ public class MainController {
 
     private static final int MAX_RECENT_FILES = 10;
 
-    private static final String STATE_FILEPATH = "old_state.ser";
+    private static final String STATE_FILEPATH = "previousSession.ser";
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
             HomeController.REGISTER,
@@ -72,12 +72,13 @@ public class MainController {
 
     @FXML
     public void initialize(Stage stage) throws IOException {
+        recentFiles = new ArrayList<>();
         this.stage = stage;
         loadState();
         stage.setOnHiding(e -> saveState());
+        loadRecentFileMenu();
         for (WorkspaceController.WorkspaceRegister workspace: WORKSPACES)
             addWorkspace(workspace);
-        loadRecentFileMenu();
         loadWorkspace(DEFAULT_WORKSPACE);
     }
 
@@ -97,20 +98,29 @@ public class MainController {
                 ObjectInputStream ois = new ObjectInputStream(fis);
             ){
                 ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
-                recentFiles = new ArrayList<>();
                 if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
-                    recentFiles.addAll(previousRecentFiles.stream().filter(file -> file != null && file.exists()).collect(Collectors.toList()));
-                festival = !recentFiles.isEmpty() ? Festival.Festival(recentFiles.get(0)) : new Festival(
-                    "Nouveau festival",
-                    LocalDateTime.now(),
-                    0,
-                    1,
-                    "Quelque part sur Terre"
-                );
+                    recentFiles.addAll(
+                            previousRecentFiles
+                                    .stream()
+                                    .filter(file -> file != null && file.exists())
+                                    .collect(Collectors.toList())
+                    );
+                if (!recentFiles.isEmpty())
+                    festival =Festival.Festival(recentFiles.get(0));
+                return;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+        try {
+            festival = new Festival(
+                "Nouveau festival",
+                LocalDateTime.now(),
+                0,
+                1,
+                "Quelque part sur Terre"
+            );
+        } catch (FestivalException e) {}
     }
 
     private void saveState() {
