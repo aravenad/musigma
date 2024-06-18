@@ -1,19 +1,15 @@
 package com.musigma.controllers.workspaces;
 
+import com.calendarfx.view.TimeField;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
+import com.musigma.models.exception.FestivalException;
 import impl.com.calendarfx.view.NumericTextField;
-import impl.com.calendarfx.view.TimeFieldSkin;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class HomeController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
@@ -21,13 +17,16 @@ public class HomeController extends WorkspaceController {
         "/com/musigma/images/icons/home.png",
         "/com/musigma/views/home-view.fxml"
     );
-    public DatePicker festivalStart;
 
     @FXML
     TextField festivalName;
 
     @FXML
-    DatePicker festivalStart;
+    DatePicker festivalStartDate;
+
+    // TODO: Use that field
+    @FXML
+    TimeField festivalStartTime;
 
     @FXML
     TextField festivalLocation;
@@ -44,31 +43,46 @@ public class HomeController extends WorkspaceController {
         useNotEmptyText(festivalName, festival.getName(), (String v) -> festival.setName(v));
         useNotEmptyText(festivalLocation, festival.getLocation(), (String v) -> festival.setLocation(v));
         usePositiveNotNull(festivalArea, festival.getArea(), (v) -> festival.setArea(v));
-        usePositive(festivalLocationPrice, (double) festival.getLocationPrice(), (v) -> festival.setArea(v));
+        usePositive(festivalLocationPrice, festival.getLocationPrice(), (v) -> festival.setArea(v));
+        festivalStartDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.isBefore(LocalDate.now()));
+            }
+        });
+        festivalStartDate.setValue(festival.getStart().toLocalDate());
+        festivalStartDate.valueProperty().addListener(e -> {
+            try {
+                festival.setStart(festivalStartDate.getValue().atStartOfDay());
+            } catch (FestivalException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     @FunctionalInterface
-    public interface ExceptionConsumer<T> {
+    public interface Setter<T> {
         void accept(T t) throws Exception;
     }
 
-    private void usePositive(NumericTextField tf, Double defaultValue, ExceptionConsumer<Double> setter) {
-        useNotEmptyText(tf, String.format("%g", defaultValue), (vString) -> {
-            Double v = Double.parseDouble(vString);
+    private void usePositive(NumericTextField tf, double defaultValue, Setter<Double> setter) {
+        useNotEmptyText(tf, String.format("%d", (long) defaultValue), (vString) -> {
+            double v = Double.parseDouble(vString);
             if (v > 0)
                 setter.accept(v);
         });
     }
 
-    private void usePositiveNotNull(NumericTextField tf, Double defaultValue, ExceptionConsumer<Double> setter) {
-        useNotEmptyText(tf, String.format("%g", defaultValue), (vString) -> {
-            Double v = Double.parseDouble(vString);
-            if (v > 0)
+    private void usePositiveNotNull(NumericTextField tf, double defaultValue, Setter<Double> setter) {
+        useNotEmptyText(tf, String.format("%d", (long) defaultValue), (vString) -> {
+            double v = Double.parseDouble(vString);
+            if (v >= 0)
                 setter.accept(v);
         });
     }
 
-    private void useNotEmptyText(TextField tf, String defaultValue, ExceptionConsumer<String> setter) {
+    private void useNotEmptyText(TextField tf, String defaultValue, Setter<String> setter) {
         tf.setText(defaultValue);
         tf.textProperty().addListener(e -> {
             String value = tf.getText();

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.calendarfx.view.*?>
 <?import impl.com.calendarfx.view.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -23,7 +24,7 @@
     <GridPane hgap="16.0" maxHeight="-Infinity" maxWidth="-Infinity" vgap="16.0" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
       <columnConstraints>
         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
       </columnConstraints>
       <rowConstraints>
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -37,7 +38,14 @@
           <TextField fx:id="festivalName" promptText="ex: HellFest" GridPane.columnIndex="1" />
 
           <Label text="Date du festival :" GridPane.rowIndex="1" />
-           <DatePicker fx:id="festivalStart" maxWidth="1.7976931348623157E308" promptText="ex: 10/10/2010" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                 <DatePicker fx:id="festivalStartDate" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="ex: 10/10/2010" />
+                  <TimeField fx:id="festivalStartTime" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></TimeField>
+               </children></HBox>
 
           <Label text="Emplacement du festival :" GridPane.rowIndex="2" />
           <TextField fx:id="festivalLocation" promptText="ex: Lyon" GridPane.columnIndex="1" GridPane.rowIndex="2" />
