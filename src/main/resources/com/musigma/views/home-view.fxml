@@ -41,7 +41,7 @@
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
                  <DatePicker fx:id="festivalStartDate" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="ex: 10/10/2010" />
-                  <TimeField fx:id="festivalStartTime" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">
+                  <TimeField fx:id="festivalStartTime" disable="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin></TimeField>

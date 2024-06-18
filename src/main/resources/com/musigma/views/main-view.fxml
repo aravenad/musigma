@@ -29,7 +29,7 @@
     </VBox>
     <VBox prefHeight="556.0" prefWidth="994.0" HBox.hgrow="ALWAYS">
         <children>
-            <GridPane maxHeight="-Infinity" onMousePressed="#dragWindow" prefHeight="25.0" prefWidth="903.0" styleClass="windowBar">
+            <GridPane alignment="CENTER" maxHeight="-Infinity" onMousePressed="#dragWindow" styleClass="windowBar">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="583.0" minWidth="10.0" prefWidth="577.0" />
                     <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="200.0" />
@@ -40,13 +40,14 @@
                 <HBox prefHeight="63.0" prefWidth="581.0">
                     <MenuBar prefHeight="27.0" prefWidth="280.0">
                         <Menu mnemonicParsing="false" text="Fichier">
-                            <MenuItem onAction="#openFestival" mnemonicParsing="false" text="Ouvrir" />
+                            <MenuItem mnemonicParsing="false" onAction="#newFestival" text="Nouveau" />
+                            <MenuItem mnemonicParsing="false" onAction="#openFestival" text="Ouvrir" />
                             <Menu fx:id="recentFileMenu" mnemonicParsing="false" text="Ouvrir récents" />
                             <SeparatorMenuItem />
-                            <MenuItem onAction="#saveFestival" mnemonicParsing="false" text="Sauvegarder" />
-                            <MenuItem onAction="#saveFestivalAs" mnemonicParsing="false" text="Sauvegarder sous" />
+                            <MenuItem mnemonicParsing="false" onAction="#saveFestival" text="Sauvegarder" />
+                            <MenuItem mnemonicParsing="false" onAction="#saveFestivalAs" text="Sauvegarder sous" />
                             <SeparatorMenuItem />
-                            <MenuItem onAction="#closeWindow" mnemonicParsing="false" text="Quitter" />
+                            <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Quitter" />
                         </Menu>
                         <Menu mnemonicParsing="false" text="Help">
                             <MenuItem mnemonicParsing="false" text="About" />
@@ -59,7 +60,7 @@
                   </HBox.margin>
                     </MenuBar>
                 </HBox>
-                <HBox alignment="TOP_RIGHT" prefHeight="63.0" prefWidth="337.0" GridPane.columnIndex="1">
+                <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1">
                     <Button onAction="#minimizeWindow">
                         <graphic>
                             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">

@@ -71,23 +71,13 @@ public class MainController {
     private Pane workspace;
 
     @FXML
-    public void initialize(Stage stage) throws IOException {
-        recentFiles = new ArrayList<>();
+    public void initialize(Stage stage) {
         this.stage = stage;
-        loadState();
+        recentFiles = new ArrayList<>();
         stage.setOnHiding(e -> saveState());
-        loadRecentFileMenu();
         for (WorkspaceController.WorkspaceRegister workspace: WORKSPACES)
             addWorkspace(workspace);
-        loadWorkspace(DEFAULT_WORKSPACE);
-    }
-
-    private void loadRecentFileMenu() {
-        for (File file: recentFiles) {
-            MenuItem menu = new MenuItem(file.getName());
-            menu.setOnAction(e -> openFestival(file));
-            recentFileMenu.getItems().add(menu);
-        }
+        loadState();
     }
 
     private void loadState() {
@@ -106,21 +96,11 @@ public class MainController {
                                     .collect(Collectors.toList())
                     );
                 if (!recentFiles.isEmpty())
-                    festival =Festival.Festival(recentFiles.get(0));
-                return;
+                    loadFestival(Festival.Festival(recentFiles.get(0)));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }
-        try {
-            festival = new Festival(
-                "Nouveau festival",
-                LocalDateTime.now(),
-                0,
-                1,
-                "Quelque part sur Terre"
-            );
-        } catch (FestivalException e) {}
+        } else newFestival();
     }
 
     private void saveState() {
@@ -162,6 +142,37 @@ public class MainController {
         loadRecentFileMenu();
     }
 
+    private void loadRecentFileMenu() {
+        for (File file: recentFiles) {
+            MenuItem menu = new MenuItem(file.getName());
+            menu.setOnAction(e -> openFestival(file));
+            recentFileMenu.getItems().add(menu);
+        }
+    }
+
+    private void loadFestival(Festival festival) {
+        File file = festival.getFile();
+        if (file != null)
+            addRecentFile(file);
+        try {
+            this.festival = festival;
+            loadWorkspace(DEFAULT_WORKSPACE);
+        } catch (Exception e) {}
+    }
+
+    @FXML
+    private void newFestival() {
+        try {
+            loadFestival(new Festival(
+                "Nouveau festival",
+                LocalDateTime.now(),
+                0,
+                1,
+                "Quelque part sur Terre"
+            ));
+        } catch (Exception e) {}
+    }
+
     @FXML
     private void openFestival() {
         try {
@@ -171,9 +182,7 @@ public class MainController {
             File file = fc.showOpenDialog(stage);
             if (file == null)
                 return;
-            festival = Festival.Festival(file);
-            addRecentFile(file);
-            currentWorkspaceController.initialize(festival);
+            loadFestival(Festival.Festival(file));
         } catch (FestivalException e) {
             throw new RuntimeException(e);
         }
@@ -181,9 +190,7 @@ public class MainController {
 
     private void openFestival(File file) {
         try {
-            festival = Festival.Festival(file);
-            addRecentFile(file);
-            currentWorkspaceController.initialize(festival);
+            loadFestival(Festival.Festival(file));
         } catch (FestivalException e) {
             throw new RuntimeException(e);
         }

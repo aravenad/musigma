@@ -20,9 +20,9 @@ public class Main extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         scene.getStylesheets().add(String.valueOf(getClass().getResource((STYLESHEET_PATH))));
+        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
         stage.setScene(scene);
         stage.show();
-        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
 
         MainController controller = fxmlLoader.getController();
         controller.initialize(stage);
