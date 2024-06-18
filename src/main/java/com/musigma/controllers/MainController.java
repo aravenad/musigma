@@ -80,10 +80,10 @@ public class MainController {
                 }
                 festival = recentFiles.length > 0 ? Festival.Festival(recentFiles[0]) : new Festival(
                     "Nouveau festival",
-                    LocalDateTime.now().plusDays(1),
+                    LocalDateTime.now(),
                     0,
                     1,
-                    "Somewhere on Earth"
+                    "Quelque part sur Terre"
                 );
             } catch (Exception e) {
                 throw new RuntimeException(e);
