@@ -30,5 +30,8 @@
             <TableColumn fx:id="quantityColumn" minWidth="170.0" prefWidth="267.0" text="Quantité" />
             <TableColumn fx:id="priceColumn" minWidth="50.0" prefWidth="233.0" text="Prix (€)" />
         </columns>
+      <columnResizePolicy>
+         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+      </columnResizePolicy>
     </TableView>
 </VBox>
