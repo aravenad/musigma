@@ -188,7 +188,6 @@ public class StockController extends WorkspaceController {
         } else {
             Stock stock = new Stock(textFieldObjet.getText(), Integer.parseInt(textFieldQuantite.getText()), true, Double.parseDouble(textFieldPrix.getText()));
             tableView.getItems().add(stock);
-            System.out.println(textFieldPrix.getText() + " " + textFieldQuantite.getText() + " " + textFieldObjet.getText());
             textFieldObjet.setText("Objet");
             textFieldQuantite.setText("Quantité");
             textFieldPrix.setText("Prix");
