@@ -5,15 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.text.Text?>
-<HBox
-    prefHeight="720.0"
-    prefWidth="1121.0"
-    styleClass="window"
-    xmlns="http://javafx.com/javafx/17.0.2-ea"
-    xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.musigma.controllers.MainController"
->
+<HBox prefHeight="720.0" prefWidth="1121.0" styleClass="window" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.MainController">
     <VBox prefHeight="720.0" prefWidth="64.0">
         <children>
             <Pane maxWidth="1.7976931348623157E308">
@@ -37,7 +29,7 @@
     </VBox>
     <VBox prefHeight="556.0" prefWidth="994.0" HBox.hgrow="ALWAYS">
         <children>
-            <GridPane onMousePressed="#dragWindow" styleClass="windowBar" maxHeight="-Infinity" prefHeight="25.0" prefWidth="903.0">
+            <GridPane maxHeight="-Infinity" onMousePressed="#dragWindow" prefHeight="25.0" prefWidth="903.0" styleClass="windowBar">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="583.0" minWidth="10.0" prefWidth="577.0" />
                     <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="200.0" />
@@ -46,7 +38,7 @@
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
                 <HBox prefHeight="63.0" prefWidth="581.0">
-                    <MenuBar prefHeight="25.0" prefWidth="120.0">
+                    <MenuBar prefHeight="27.0" prefWidth="280.0">
                         <Menu mnemonicParsing="false" text="File">
                             <MenuItem mnemonicParsing="false" text="Close" />
                         </Menu>
@@ -59,6 +51,9 @@
                         <padding>
                             <Insets left="-5.0E-5" />
                         </padding>
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
                     </MenuBar>
                 </HBox>
                 <HBox alignment="TOP_RIGHT" prefHeight="63.0" prefWidth="337.0" GridPane.columnIndex="1">
