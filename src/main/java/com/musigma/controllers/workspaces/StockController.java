@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
+
 public class StockController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Stock",

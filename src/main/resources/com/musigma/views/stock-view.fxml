@@ -28,7 +28,7 @@
         <columns>
             <TableColumn fx:id="nameColumn" prefWidth="500.0" text="Objet" />
             <TableColumn fx:id="quantityColumn" minWidth="230.0" prefWidth="239.0" text="Quantité" />
-            <TableColumn fx:id="priceColumn" prefWidth="318.0" text="Prix" />
+            <TableColumn fx:id="priceColumn" prefWidth="318.0" text="Prix (€)" />
         </columns>
     </TableView>
 </VBox>
