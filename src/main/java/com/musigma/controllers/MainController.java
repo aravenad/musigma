@@ -12,21 +12,29 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class MainController {
 
     private static final String APP_NAME = "Musigma";
+
+    private static final String EXT_NAME = "*.mgm";
 
     private static final int MAX_RECENT_FILES = 10;
 
@@ -45,14 +53,19 @@ public class MainController {
 
     private Festival festival;
 
-    private File[] recentFiles;
+    private ArrayList<File> recentFiles;
 
     private Stage stage;
 
-    private Node activateWorkspaceButton;
+    private Node currentWorkspaceButton;
+    
+    private WorkspaceController currentWorkspaceController;
 
     @FXML
     private VBox pageMenu;
+
+    @FXML
+    private Menu recentFileMenu;
 
     @FXML
     private Pane workspace;
@@ -64,7 +77,16 @@ public class MainController {
         stage.setOnHiding(e -> saveState());
         for (WorkspaceController.WorkspaceRegister workspace: WORKSPACES)
             addWorkspace(workspace);
+        loadRecentFileMenu();
         loadWorkspace(DEFAULT_WORKSPACE);
+    }
+
+    private void loadRecentFileMenu() {
+        for (File file: recentFiles) {
+            MenuItem menu = new MenuItem(file.getName());
+            menu.setOnAction(e -> openFestival(file));
+            recentFileMenu.getItems().add(menu);
+        }
     }
 
     private void loadState() {
@@ -74,11 +96,11 @@ public class MainController {
                 FileInputStream fis = new FileInputStream(previousStateFile);
                 ObjectInputStream ois = new ObjectInputStream(fis);
             ){
-                recentFiles = (File[]) ois.readObject();
-                if (recentFiles != null && recentFiles.length > 0) {
-                    recentFiles = Arrays.stream(recentFiles).filter(file -> file != null && file.exists()).toArray(File[]::new);
-                }
-                festival = recentFiles.length > 0 ? Festival.Festival(recentFiles[0]) : new Festival(
+                ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
+                recentFiles = new ArrayList<>();
+                if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
+                    recentFiles.addAll(previousRecentFiles.stream().filter(file -> file != null && file.exists()).collect(Collectors.toList()));
+                festival = !recentFiles.isEmpty() ? Festival.Festival(recentFiles.get(0)) : new Festival(
                     "Nouveau festival",
                     LocalDateTime.now(),
                     0,
@@ -89,7 +111,6 @@ public class MainController {
                 throw new RuntimeException(e);
             }
         }
-        recentFiles = new File[MAX_RECENT_FILES];
     }
 
     private void saveState() {
@@ -101,10 +122,6 @@ public class MainController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void loadFestival() {
-
     }
 
     @FXML
@@ -126,28 +143,37 @@ public class MainController {
         stage.setIconified(true);
     }
 
-    private String getFile(String title, int mode) {
-        FileDialog fd = new FileDialog(new Frame(), title, mode);
-        fd.setFilenameFilter((dir, name) -> name.endsWith(".mgm"));
-        fd.setVisible(true);
-        return fd.getFile();
-    }
-
     private void addRecentFile(File file) {
-        File[] newRecentFiles = new File[MAX_RECENT_FILES];
-        newRecentFiles[0] = file;
-        System.arraycopy(recentFiles, 0, newRecentFiles, 1, MAX_RECENT_FILES);
+        recentFiles.remove(file);
+        recentFiles.add(0, file);
+        if (recentFiles.size() > MAX_RECENT_FILES)
+            recentFiles.remove(MAX_RECENT_FILES);
+        recentFileMenu.getItems().clear();
+        loadRecentFileMenu();
     }
 
     @FXML
     private void openFestival() {
         try {
-            String filepath = getFile("Open festival", FileDialog.LOAD);
-            if (filepath == null)
+            FileChooser fc = new FileChooser();
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(APP_NAME + " Files", EXT_NAME));
+            fc.setTitle("Open");
+            File file = fc.showOpenDialog(stage);
+            if (file == null)
                 return;
-            File file = new File(filepath);
             festival = Festival.Festival(file);
             addRecentFile(file);
+            currentWorkspaceController.initialize(festival);
+        } catch (FestivalException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void openFestival(File file) {
+        try {
+            festival = Festival.Festival(file);
+            addRecentFile(file);
+            currentWorkspaceController.initialize(festival);
         } catch (FestivalException e) {
             throw new RuntimeException(e);
         }
@@ -155,15 +181,29 @@ public class MainController {
 
     @FXML
     private void saveFestival() {
-        try {
-            if (festival.getFile() == null) {
-                String filepath = getFile("Save as", FileDialog.SAVE);
-                if (filepath == null)
-                    return;
-                File file = new File(filepath);
-                festival.setFile(file);
-                addRecentFile(file);
+        if (festival.getFile() == null) {
+            saveFestivalAs();
+        } else {
+            try {
+                festival.save();
+            } catch (FestivalException e) {
+                throw new RuntimeException(e);
             }
+        }
+    }
+
+    @FXML
+    private void saveFestivalAs() {
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(APP_NAME + " Files", EXT_NAME));
+        fc.setInitialFileName(festival.getName());
+        fc.setTitle("Save as");
+        File file = fc.showSaveDialog(stage);
+        if (file == null)
+            return;
+        try {
+            festival.setFile(file);
+            addRecentFile(file);
             festival.save();
         } catch (FestivalException e) {
             throw new RuntimeException(e);
@@ -191,10 +231,10 @@ public class MainController {
                 return;
             try {
                 loadWorkspace(register);
-                if (activateWorkspaceButton != null)
-                    activateWorkspaceButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
+                if (currentWorkspaceButton != null)
+                    currentWorkspaceButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
                 pageButtonBox.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
-                activateWorkspaceButton = pageButtonBox;
+                currentWorkspaceButton = pageButtonBox;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -205,7 +245,8 @@ public class MainController {
     public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
-        ((WorkspaceController) fxmlLoader.getController()).initialize(festival);
+        currentWorkspaceController = fxmlLoader.getController();
+        currentWorkspaceController.initialize(festival);
         stage.setTitle(String.format("%s - %s", APP_NAME, register.name));
     }
 }

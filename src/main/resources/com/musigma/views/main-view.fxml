@@ -39,11 +39,14 @@
                 </rowConstraints>
                 <HBox prefHeight="63.0" prefWidth="581.0">
                     <MenuBar prefHeight="27.0" prefWidth="280.0">
-                        <Menu mnemonicParsing="false" text="File">
-                            <MenuItem mnemonicParsing="false" text="Close" />
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Edit">
-                            <MenuItem mnemonicParsing="false" text="Delete" />
+                        <Menu mnemonicParsing="false" text="Fichier">
+                            <MenuItem onAction="#openFestival" mnemonicParsing="false" text="Ouvrir" />
+                            <Menu fx:id="recentFileMenu" mnemonicParsing="false" text="Ouvrir récents" />
+                            <SeparatorMenuItem />
+                            <MenuItem onAction="#saveFestival" mnemonicParsing="false" text="Sauvegarder" />
+                            <MenuItem onAction="#saveFestivalAs" mnemonicParsing="false" text="Sauvegarder sous" />
+                            <SeparatorMenuItem />
+                            <MenuItem onAction="#closeWindow" mnemonicParsing="false" text="Quitter" />
                         </Menu>
                         <Menu mnemonicParsing="false" text="Help">
                             <MenuItem mnemonicParsing="false" text="About" />
