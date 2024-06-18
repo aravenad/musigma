@@ -24,6 +24,9 @@ public class StockController extends WorkspaceController {
     @FXML
     TableView<Stock> tableView;
 
+    /**
+     * Initialise le contrôleur.
+     */
     @FXML
     public void initialize() {
         handleTextField();
@@ -38,7 +41,10 @@ public class StockController extends WorkspaceController {
 
     }
 
-    public void addListener(){
+    /**
+     * Définit les listeners pour les champs de texte.
+     */
+    private void addListener(){
         textFieldObjet.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.trim().equals("Objet") || newValue.trim().isEmpty() || newValue.trim().isBlank() || newValue.matches(".*[^a-zA-Z-\\s].*")) {
                 textFieldObjet.setStyle("-fx-border-color: crimson;");
@@ -64,6 +70,9 @@ public class StockController extends WorkspaceController {
         });
     }
 
+    /**
+     * Gère les champs de texte.
+     */
     private void handleTextField() {
         textFieldObjet.setOnMouseClicked(e -> {
             if (textFieldObjet.getText().equals("Objet")) {
@@ -102,6 +111,11 @@ public class StockController extends WorkspaceController {
         });
     }
 
+    /**
+     * Ajoute un stock à la table.
+     *
+     * @throws StockException si le stock n'est pas valide
+     */
     private void onAjouterPressed() throws StockException {
         textFieldObjet.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
@@ -126,7 +140,11 @@ public class StockController extends WorkspaceController {
         }
     }
 
-
+    /**
+     * Vérifie si une chaîne de caractères est numérique.
+     * @param str la chaîne de caractères
+     * @return true si la chaîne est numérique, false sinon
+     */
     private boolean isNumeric(String str) {
         try {
             Double.parseDouble(str);
