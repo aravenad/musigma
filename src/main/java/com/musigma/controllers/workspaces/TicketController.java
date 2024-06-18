@@ -47,9 +47,9 @@ public class TicketController extends WorkspaceController {
 
 
     @FXML
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws FestivalException {
         super.initialize(festival);
-
+        restoreTab();
         addListener();
         ajouterButton.setOnAction(e -> {
             try {
@@ -65,9 +65,6 @@ public class TicketController extends WorkspaceController {
             tableView.getColumns().add(new TableColumn<>(ticket.getType()));
         }
 
-        update.setOnAction(e -> {
-            tabPane.getSelectionModel().getSelectedItem().setText(textFieldType.getText());
-        });
     }
 
     private void addListener(){
@@ -116,10 +113,11 @@ public class TicketController extends WorkspaceController {
             // TO DO: Add a new tab to the tabPane
             // Cyril
             // Only get missing add
-            tabPane.getTabs().add(new Tab(ticket.getType()));
+            //tabPane.getTabs().add(new Tab(ticket.getType()));
+            //tabPane.getSelectionModel().selectLast();
+            createTab(ticket);
 
 
-            tabPane.getSelectionModel().selectLast();
             textFieldType.setStyle("-fx-border-color: transparent;");
             textFieldPrix.setStyle("-fx-border-color: transparent;");
             textFieldQuantite.setStyle("-fx-border-color: transparent;");
@@ -133,6 +131,25 @@ public class TicketController extends WorkspaceController {
             return true;
         } catch (NumberFormatException e) {
             return false;
+        }
+    }
+
+    private void createTab(TypeTicket ticket) throws FestivalException {
+        Tab newTab = new Tab(ticket.getType());
+        TableView<Stock> newTableView = new TableView<>();
+        // ajouter 2 colone pour les avantages et les quantités
+        TableColumn<Stock, Avantage> avantageColumn = new TableColumn<>("Avantage");
+        TableColumn<Stock, Integer> quantityColumn = new TableColumn<>("Quantité");
+        newTableView.getColumns().add(avantageColumn);
+        newTableView.getColumns().add(quantityColumn);
+        newTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        newTab.setContent(newTableView);
+        tabPane.getTabs().add(newTab);
+    }
+
+    private void restoreTab() throws FestivalException {
+        for (int i = 0; i < festival.getTicketTypes().size();i++) {
+            createTab(festival.getTicketTypes().get(i));
         }
     }
 

@@ -271,11 +271,13 @@ public class MainController {
                 loadWorkspace(register);
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } catch (FestivalException e) {
+                throw new RuntimeException(e);
             }
         });
     }
 
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
+    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         currentWorkspaceController = fxmlLoader.getController();

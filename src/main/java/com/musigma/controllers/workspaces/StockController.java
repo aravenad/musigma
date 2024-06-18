@@ -44,7 +44,7 @@ public class StockController extends WorkspaceController {
      * Initialise le contrôleur.
      */
     @FXML
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws FestivalException {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
         addListener();
