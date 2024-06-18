@@ -25,12 +25,14 @@ public class StockController extends WorkspaceController {
     @FXML
     Button ajouterButton;
 
-    @FXML TableView<Stock> tableView;
-    @FXML TableColumn<Stock, String> nameColumn;
-    @FXML TableColumn<Stock, Integer> quantityColumn;
-    @FXML TableColumn<Stock, Double> priceColumn;
-
-
+    @FXML
+    TableView<Stock> tableView;
+    @FXML
+    TableColumn<Stock, String> nameColumn;
+    @FXML
+    TableColumn<Stock, Integer> quantityColumn;
+    @FXML
+    TableColumn<Stock, Double> priceColumn;
 
     /**
      * Initialise le contrôleur.
@@ -46,15 +48,9 @@ public class StockController extends WorkspaceController {
                 throw new RuntimeException(ex);
             }
         });
-
-
         nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
-
-
-
-
     }
 
 
@@ -157,11 +153,6 @@ public class StockController extends WorkspaceController {
             textFieldObjet.setStyle("-fx-border-color: transparent;");
             textFieldPrix.setStyle("-fx-border-color: transparent;");
             textFieldQuantite.setStyle("-fx-border-color: transparent;");
-            System.out.println("Stock ajouté");
-
-
-
-
         }
     }
 
