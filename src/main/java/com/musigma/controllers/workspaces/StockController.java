@@ -6,13 +6,16 @@ import com.musigma.models.exception.StockException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.util.Callback;
 
-
+/**
+ * Contrôleur pour l'espace de travail Stock.
+ */
 public class StockController extends WorkspaceController {
+    /**
+     * Enregistrement de l'espace de travail.
+     */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Stock",
             "/com/musigma/images/icons/stock.png",
@@ -33,7 +36,8 @@ public class StockController extends WorkspaceController {
     TableColumn<Stock, Integer> quantityColumn;
     @FXML
     TableColumn<Stock, Double> priceColumn;
-
+    @FXML
+    TableColumn<Stock, Void> actionColumn;
     /**
      * Initialise le contrôleur.
      */
@@ -51,11 +55,49 @@ public class StockController extends WorkspaceController {
         nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
+        addDeleteButtonToTable();
+    }
+    /**
+     * Ajoute un bouton de suppression à la table, crée une colonne d'action avec le bouton de suppression.
+     */
+    private void addDeleteButtonToTable() {
+        actionColumn = new TableColumn<>("Action");
+
+        Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>>() {
+            @Override
+            public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
+                final TableCell<Stock, Void> cell = new TableCell<Stock, Void>() {
+
+                    private final Button btn = new Button("❌");
+
+                    {
+                        btn.setOnAction((e) -> {
+                            Stock stock = getTableView().getItems().get(getIndex());
+                            getTableView().getItems().remove(stock);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        actionColumn.setCellFactory(cellFactory);
+        tableView.getColumns().add(actionColumn);
     }
 
 
     /**
-     * Définit les listeners pour les champs de texte.
+     * Définit les listeners pour les champs de saisie.
      */
     private void addListener(){
         textFieldObjet.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -146,7 +188,6 @@ public class StockController extends WorkspaceController {
         } else {
             Stock stock = new Stock(textFieldObjet.getText(), Integer.parseInt(textFieldQuantite.getText()), true, Double.parseDouble(textFieldPrix.getText()));
             tableView.getItems().add(stock);
-            System.out.println(textFieldPrix.getText() + " " + textFieldQuantite.getText() + " " + textFieldObjet.getText());
             textFieldObjet.setText("Objet");
             textFieldQuantite.setText("Quantité");
             textFieldPrix.setText("Prix");
