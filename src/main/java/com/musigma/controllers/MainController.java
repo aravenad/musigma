@@ -83,7 +83,7 @@ public class MainController {
                     LocalDateTime.now().plusDays(1),
                     0,
                     1,
-                    "Somewhere on Earth"
+                    "Quelque part sur Terre"
                 );
             } catch (Exception e) {
                 throw new RuntimeException(e);
