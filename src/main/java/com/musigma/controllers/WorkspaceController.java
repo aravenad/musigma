@@ -1,6 +1,7 @@
 package com.musigma.controllers;
 
 import com.musigma.models.Festival;
+import javafx.scene.Node;
 
 public abstract class WorkspaceController {
 
@@ -8,6 +9,7 @@ public abstract class WorkspaceController {
         public String name;
         public String iconPath;
         public String viewPath;
+        public Node openButton;
 
         public WorkspaceRegister(String name, String iconPath, String viewPath) {
             this.name = name;

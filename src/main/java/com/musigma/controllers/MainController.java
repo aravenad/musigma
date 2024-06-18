@@ -57,7 +57,7 @@ public class MainController {
 
     private Stage stage;
 
-    private Node currentWorkspaceButton;
+    private WorkspaceController.WorkspaceRegister currentWorkspace;
     
     private WorkspaceController currentWorkspaceController;
 
@@ -236,20 +236,17 @@ public class MainController {
         pageButtonBox.getChildren().addAll(icon, pageLabel);
         pageButtonBox.setPadding(new Insets(8));
 
+        register.openButton = pageButtonBox;
+        pageMenu.getChildren().add(pageButtonBox);
         pageButtonBox.setOnMouseClicked(ev -> {
-            if (festival == null)
+            if (festival == null || currentWorkspace == register)
                 return;
             try {
                 loadWorkspace(register);
-                if (currentWorkspaceButton != null)
-                    currentWorkspaceButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
-                pageButtonBox.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
-                currentWorkspaceButton = pageButtonBox;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-        pageMenu.getChildren().add(pageButtonBox);
     }
 
     public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
@@ -258,5 +255,10 @@ public class MainController {
         currentWorkspaceController = fxmlLoader.getController();
         currentWorkspaceController.initialize(festival);
         stage.setTitle(String.format("%s - %s", APP_NAME, register.name));
+
+        if (currentWorkspace != null)
+            currentWorkspace.openButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
+        currentWorkspace = register;
+        register.openButton.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
     }
 }
