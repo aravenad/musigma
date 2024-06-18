@@ -15,7 +15,7 @@ class AvantageTest {
     @BeforeEach
     void setUp() throws StockException, TypeTicketException, AvantageException {
         ticket = new TypeTicket("Ticket Type", 40, 45);
-        stock = new Stock("Stock Name", 1000, true);
+        stock = new Stock("Stock Name", 1000, true, 1000);
         avantage = new Avantage(ticket, stock, 2);
     }
 

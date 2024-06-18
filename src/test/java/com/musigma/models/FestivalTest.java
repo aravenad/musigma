@@ -19,7 +19,7 @@ class FestivalTest {
     @BeforeEach
     void setUp() throws FestivalException, StockException, ArtisteException, TypeTicketException, AvantageException {
         festival = new Festival("Valid Festival", LocalDateTime.now().plusDays(1), 100.0f, 500.0, "Paris");
-        stock = new Stock("Bouteille Coca", 100, true);
+        stock = new Stock("Bouteille Coca", 100, true, 2.5);
         artiste = new Artiste("DCAC", "rock", 100f);
         ticketType = new TypeTicket("VIP",10,60);
         avantage = new Avantage(ticketType, stock, 2);
