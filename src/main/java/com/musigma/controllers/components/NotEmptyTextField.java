@@ -14,7 +14,7 @@ import javafx.scene.text.Text;
 
 import static com.musigma.utils.Dialogs.tryCatch;
 
-public class NotEmptyTextField extends Pane {
+public class NotEmptyTextField extends GridPane {
 
     private static final String VIEW_PATH = "/com/musigma/views/components/error-text-field.fxml";
 

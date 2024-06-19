@@ -26,8 +26,8 @@ public class HomeController extends WorkspaceController {
     DatePicker festivalStartDate;
 
     // TODO: Use that field
-    @FXML
-    TimeField festivalStartTime;
+//    @FXML
+//    TimeField festivalStartTime;
 
     @FXML
     FloatTextField festivalArea, festivalLocationPrice;
