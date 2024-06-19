@@ -63,7 +63,7 @@ public class FloatTextField extends NotEmptyTextField {
     }
 
     public void bindFloat(String errrorMsg, Float value, Setter<Float> setter) {
-        input.setText(String.format("%d", (long) (float) value));
+        input.setText(Float.toString(value).replaceAll("0*$", "").replaceAll("\\.$", ""));
         checkInput();
         bindFloat(errrorMsg, setter);
     }
