@@ -1,9 +1,11 @@
 package com.musigma.controllers.components;
 
 import com.musigma.utils.exceptionMethods.Setter;
+import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -21,6 +23,8 @@ public class NotEmptyTextField extends Pane {
     @FXML protected VBox errorBox;
     @FXML protected Label label;
 
+    protected boolean isValid = false;
+
     public NotEmptyTextField() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(VIEW_PATH));
         fxmlLoader.setRoot(this);
@@ -33,17 +37,26 @@ public class NotEmptyTextField extends Pane {
 
     protected void setError(String error) {
         this.error.setText("* " + error);
-        this.error.setVisible(true);
-        errorBox.setStyle("-fx-background-color: -color-bg-default");
+        input.getSkin().getNode().setStyle("-color-accent-emphasis: -color-danger-fg;-color-border-default: -color-danger-fg");
+        errorBox.setVisible(true);
+        isValid = false;
     }
 
     protected void unSetError() {
-        this.error.setVisible(false);
-        errorBox.setStyle("");
+        if (isValid) return;
+        Skin skin = input.getSkin();
+        if (skin != null)
+            skin.getNode().setStyle("");
+        errorBox.setVisible(false);
+        isValid = true;
     }
 
-    protected boolean checkInput() {
-        if (input.getText().isEmpty()){
+    protected boolean isEmpty() {
+        return isValid;
+    }
+
+    public boolean isValid() {
+        if (input.getText().isEmpty()) {
             setError("Valeur requise");
             return false;
         } else {
@@ -71,7 +84,7 @@ public class NotEmptyTextField extends Pane {
 
     public void bind(String errrorMsg, Setter<String> setter) {
         input.setOnKeyTyped(e -> {
-            if (checkInput())
+            if (isValid())
                 tryCatch(
                     errrorMsg,
                     () -> setter.accept(input.getText())
@@ -80,8 +93,8 @@ public class NotEmptyTextField extends Pane {
     }
 
     public void bind(String errrorMsg, String value, Setter<String> setter) {
-        input.setText(value);
-        checkInput();
         bind(errrorMsg, setter);
+        input.setText(value);
+        isValid();
     }
 }

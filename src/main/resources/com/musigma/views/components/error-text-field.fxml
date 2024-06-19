@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<fx:root type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefWidth="222.0" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-    <TextField fx:id="input" GridPane.columnIndex="1" />
-      <VBox fx:id="errorBox" layoutX="8.0" layoutY="24.0" maxHeight="-Infinity">
+    <TextField fx:id="input" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" />
+      <VBox fx:id="errorBox" layoutX="8.0" layoutY="24.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: -color-bg-default;">
          <children>
-          <Text fx:id="error" fill="#ff0f0f" strokeType="OUTSIDE" strokeWidth="0.0" text="Error">
+          <Text fx:id="error" fill="red" strokeType="OUTSIDE" strokeWidth="0.0" text="Error">
                <font>
                   <Font size="11.0" />
                </font>
           </Text>
          </children>
+         <padding>
+            <Insets left="4.0" right="4.0" />
+         </padding>
       </VBox>
   </children>
 </fx:root>

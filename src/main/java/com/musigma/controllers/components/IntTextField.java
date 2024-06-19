@@ -43,27 +43,23 @@ public class IntTextField extends NotEmptyTextField {
         this.positive = positive;
     }
 
-    protected boolean checkInput() {
-        if (!super.checkInput())
-            return false;
-        int value = Integer.parseInt(input.getText());
-        if (positive && value < 0){
-            setError("La valeur doit être positive");
-            return false;
-        }
-        if (notNull && value == 0){
-            setError("La valeur doit être non-nulle");
-            return false;
-        }
-        if (!super.checkInput())
-            return false;
-        unSetError();
-        return true;
+    public boolean isValid() {
+        if (super.isValid()) {
+            int value = Integer.parseInt(input.getText());
+            if (positive && value < 0){
+                setError("La valeur doit être positive");
+                return false;
+            }
+            else if (notNull && value == 0){
+                setError("La valeur doit être non-nulle");
+                return false;
+            }
+            return super.isValid();
+        } else return false;
     }
-
     public void bindInt(String errrorMsg, Setter<Integer> setter) {
         input.setOnKeyTyped(e -> {
-            if (checkInput())
+            if (isValid)
                 tryCatch(
                     errrorMsg,
                     () -> setter.accept(Integer.parseInt(input.getText()))
@@ -73,7 +69,7 @@ public class IntTextField extends NotEmptyTextField {
 
     public void bindInt(String errrorMsg, int value, Setter<Integer> setter) {
         input.setText(Integer.toString(value));
-        checkInput();
+        isValid();
         bindInt(errrorMsg, setter);
     }
 }
