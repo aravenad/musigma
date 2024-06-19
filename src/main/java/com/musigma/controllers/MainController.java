@@ -5,6 +5,7 @@ import com.musigma.controllers.workspaces.HomeController;
 import com.musigma.controllers.workspaces.StockController;
 import com.musigma.controllers.workspaces.TicketController;
 import com.musigma.models.Festival;
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -278,7 +279,7 @@ public class MainController {
         });
     }
 
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException {
+    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException, AvantageException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         currentWorkspaceController = fxmlLoader.getController();

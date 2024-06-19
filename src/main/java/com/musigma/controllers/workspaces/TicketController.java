@@ -1,17 +1,23 @@
 package com.musigma.controllers.workspaces;
 
+import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Avantage;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
+
+import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
  * Contrôleur pour l'espace de travail Ticket.
@@ -27,38 +33,34 @@ public class TicketController extends WorkspaceController {
     );
 
     @FXML
-    TextField textFieldType, textFieldQuantite, textFieldPrix;
+    TextField textFieldType, textFieldQuantite, textFieldPrix, textFieldAvantage;
 
     @FXML
-    Button ajouterButton;
+    Button buttonTicket, buttonAvantage;
 
 
     @FXML
     TabPane tabPane;
 
     @FXML
-    TableColumn<Avantage, String> avantageColumn;
+    ComboBox<Stock> comboAvantage;
+
 
     @FXML
-    TableColumn<Avantage, Integer> quantityColumn;
-
-    @FXML
-    TableColumn<Stock, Void> actionColumn;
-
-    @FXML
-    public void initialize(Festival festival) throws FestivalException {
+    public void initialize(Festival festival) throws FestivalException, AvantageException {
         super.initialize(festival);
         restoreTab();
         addListener();
-        ajouterButton.setOnAction(e -> {
+        addToComboBox();
+        checkTicket();
+        buttonTicket.setOnAction(e -> {
             try {
-                onAjouterPressed();
+                onAddTicketPressed();
             } catch (TypeTicketException | FestivalException ex) {
                 throw new RuntimeException(ex);
             }
         });
-
-
+        buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
 
     private void addListener() {
@@ -87,8 +89,7 @@ public class TicketController extends WorkspaceController {
         });
     }
 
-
-    private void onAjouterPressed() throws FestivalException, TypeTicketException {
+    private void onAddTicketPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
         textFieldQuantite.setStyle("-fx-border-color: transparent;");
@@ -110,6 +111,7 @@ public class TicketController extends WorkspaceController {
             textFieldType.setStyle("-fx-border-color: transparent;");
             textFieldPrix.setStyle("-fx-border-color: transparent;");
             textFieldQuantite.setStyle("-fx-border-color: transparent;");
+            checkTicket();
         }
     }
 
@@ -122,22 +124,76 @@ public class TicketController extends WorkspaceController {
         }
     }
 
-    private void createTab(TypeTicket ticket) throws FestivalException {
+    private void createTab(TypeTicket ticket) {
         Tab newTab = new Tab(ticket.getType());
-        TableView<Stock> newTableView = new TableView<>();
-        TableColumn<Stock, Avantage> avantageColumn = new TableColumn<>("Avantage");
-        TableColumn<Stock, Integer> quantityColumn = new TableColumn<>("Quantité");
+        TableView<Avantage> newTableView = new TableView<>();
+        TableColumn<Avantage, String> avantageColumn = new TableColumn<>("Avantage");
+        TableColumn<Avantage, Integer> quantityColumn = new TableColumn<>("Quantité");
         newTableView.getColumns().add(avantageColumn);
         newTableView.getColumns().add(quantityColumn);
         newTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         newTab.setContent(newTableView);
+        avantageColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getStock().getName()));
+        quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getTicketType().getQuantity()));
+
 
         tabPane.getTabs().add(newTab);
     }
 
-    private void restoreTab() throws FestivalException {
+    private void restoreTab() throws AvantageException {
         for (int i = 0; i < festival.getTicketTypes().size(); i++) {
             createTab(festival.getTicketTypes().get(i));
+            if(!festival.getTicketTypes().get(i).getAvantages().isEmpty()){
+
+                TypeTicket ticket = festival.getTicketTypes().get(i).getAvantages().get(i).getTicketType();
+                int quantity = festival.getTicketTypes().get(i).getAvantages().get(i).getQuantityByTicket();
+                Stock stock = festival.getTicketTypes().get(i).getAvantages().get(i).getStock();
+                Avantage avantage = new Avantage(ticket, stock, quantity);
+                // Accéder à la tableview du tab actuel pour y ajouter l'avantage
+                TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
+                tableView.getItems().add(avantage);
+            }
         }
+    }
+
+    private void addToComboBox() {
+        for (int i = 0; i < festival.getStocks().size(); i++) {
+            comboAvantage.getItems().add(festival.getStocks().get(i));
+        }
+    }
+
+    private void checkTicket() {
+        if (festival.getTicketTypes().isEmpty()) {
+            comboAvantage.setVisible(false);
+            textFieldAvantage.setVisible(false);
+            buttonAvantage.setVisible(false);
+        } else {
+            comboAvantage.setVisible(true);
+            textFieldAvantage.setVisible(true);
+            buttonAvantage.setVisible(true);
+        }
+    }
+
+    // Add avantage to the table view if an avantage is selected in the combo box and the quantity is not empty or blank
+    private void onAddAvantagePressed() {
+        if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
+            TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
+            // Récupère la quantité dans le textFieldAvantage
+            int quantity = Integer.parseInt(textFieldAvantage.getText());
+            // Récupère le stock sélectionné dans la comboAvantage
+            Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
+            try {
+                Avantage avantage = new Avantage(ticket, stock, quantity);
+                // Accéder à la tableview du tab actuel pour y ajouter l'avantage
+                TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
+                tableView.getItems().add(avantage);
+            } catch (AvantageException e) {
+                e.printStackTrace();
+            }
+        } else {
+            textFieldAvantage.requestFocus();
+            textFieldAvantage.setStyle("-fx-border-color: crimson;");
+        }
+        textFieldAvantage.clear();
     }
 }
