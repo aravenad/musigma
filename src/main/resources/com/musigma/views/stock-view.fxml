@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import impl.com.calendarfx.view.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import impl.com.calendarfx.view.NumericTextField?>
 <VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10">
         <opaqueInsets>
@@ -16,10 +16,15 @@
         <VBox.margin>
             <Insets />
         </VBox.margin>
-        <TextField fx:id="textFieldObjet" promptText="ex : Boisson"/>
+        <TextField fx:id="textFieldObjet" promptText="ex : Boisson" />
         <NumericTextField fx:id="textFieldQuantite" promptText="ex : 120" />
         <NumericTextField fx:id="textFieldPrix" promptText="ex : 2.99" />
         <Button fx:id="ajouterButton" mnemonicParsing="false" text="Ajouter" />
+      <Label fx:id="total" text="Total :">
+         <HBox.margin>
+            <Insets left="10.0" />
+         </HBox.margin>
+      </Label>
     </HBox>
     <TableView fx:id="tableView" prefHeight="700.0" prefWidth="967.0">
         <columns>

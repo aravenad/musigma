@@ -1,15 +1,18 @@
 package com.musigma.controllers.workspaces;
 
+import atlantafx.base.util.DoubleStringConverter;
+import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
 import impl.com.calendarfx.view.NumericTextField;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 
 import static com.musigma.utils.Dialogs.tryCatch;
@@ -20,6 +23,8 @@ import static com.musigma.utils.Dialogs.tryCatch;
 public class StockController extends WorkspaceController {
     /**
      * Enregistrement de l'espace de travail.
+     * Définit le nom, l'icône et la vue de l'espace de travail.
+     * @see com.musigma.controllers.WorkspaceController
      */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Stock",
@@ -50,38 +55,79 @@ public class StockController extends WorkspaceController {
 
     @FXML
     TableColumn<Stock, Void> actionColumn;
+
+    @FXML
+    Label total;
+
     /**
-     * Initialise le contrôleur.
+     * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
+     * Définit un bouton de suppression pour chaque ligne de la table. Définit la modification des noms, quantités et prix des stocks.
+     * @param festival le festival
+     * @throws FestivalException si le festival est invalide
      */
     @FXML
-    public void initialize(Festival festival) throws FestivalException {
+    public void initialize(Festival festival) throws FestivalException, AvantageException {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
-        addListener();
-        ajouterButton.setOnAction(e -> onAjouterPressed()
-        );
+        tableView.setEditable(true); // Permet l'édition de la TableView
+
         nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
+        nameColumn.setCellFactory(TextFieldTableCell.forTableColumn()); // Permet l'édition des noms
+        nameColumn.setOnEditCommit(event -> {
+            Stock stock = event.getRowValue();
+            tryCatch(
+                "Impossible de modifier le nom du stock",
+                () -> stock.setName(event.getNewValue()));
+        });
+
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
+        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); // Permet l'édition des quantités
+        quantityColumn.setOnEditCommit(event -> {
+            Stock stock = event.getRowValue();
+            tryCatch(
+                "Impossible de modifier la quantité du stock",
+                () -> stock.setQuantity(event.getNewValue()));
+        });
+
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
+        priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter())); // Permet l'édition des prix
+        priceColumn.setOnEditCommit(event -> {
+            Stock stock = event.getRowValue();
+            tryCatch(
+                "Impossible de modifier le prix du stock",
+                () -> stock.setPrix(event.getNewValue()));
+        });
+
+        addListener();
+        ajouterButton.setOnAction(e -> onAjouterPressed());
         addDeleteButtonToTable();
     }
+
+
     /**
      * Ajoute un bouton de suppression à la table, crée une colonne d'action avec le bouton de suppression.
+     * Lorsque le bouton est cliqué, la ligne correspondante est supprimée de la table.
+     * La méthode est appelée dans la méthode initialize.
+     * @see #initialize(Festival)
      */
     private void addDeleteButtonToTable() {
         actionColumn = new TableColumn<>("Action");
 
-        Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>>() {
+        Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<>() {
             @Override
             public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
-                final TableCell<Stock, Void> cell = new TableCell<>() {
+                return new TableCell<>() {
 
                     private final Button btn = new Button("Supprimer");
 
                     {
                         btn.setOnAction((e) -> {
                             Stock stock = getTableView().getItems().get(getIndex());
+                            tryCatch(
+                                "Impossible de supprimer le stock",
+                                () -> festival.removeStock(stock));
                             getTableView().getItems().remove(stock);
+                            totalPrix();
                         });
                     }
 
@@ -95,7 +141,6 @@ public class StockController extends WorkspaceController {
                         }
                     }
                 };
-                return cell;
             }
         };
 
@@ -106,6 +151,11 @@ public class StockController extends WorkspaceController {
 
     /**
      * Définit les listeners pour les champs de saisie.
+     * Si le champ est vide ou contient des caractères non autorisés, le champ est surligné en rouge.
+     * Si le champ est valide, le surlignage est retiré.
+     * La méthode est appelée dans la méthode initialize.
+     * @see #initialize(Festival)
+     * @see #onAjouterPressed()
      */
     private void addListener(){
         textFieldObjet.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -136,8 +186,10 @@ public class StockController extends WorkspaceController {
 
     /**
      * Ajoute un stock à la table.
-     *
-     * @throws StockException si le stock n'est pas valide
+     * Si les champs de saisie sont valides, un stock est créé et ajouté à la table.
+     * Sinon, les champs de saisie invalides sont surlignés en rouge.
+     * La méthode est appelée lorsqu'on clique sur le bouton "Ajouter".
+     * @see #addListener()
      */
     private void onAjouterPressed() {
         textFieldObjet.setStyle("-fx-border-color: transparent;");
@@ -167,8 +219,17 @@ public class StockController extends WorkspaceController {
                     textFieldObjet.setStyle("-fx-border-color: transparent;");
                     textFieldPrix.setStyle("-fx-border-color: transparent;");
                     textFieldQuantite.setStyle("-fx-border-color: transparent;");
+                    totalPrix();
                 }
             );
         }
+    }
+
+    private void totalPrix(){
+        double t = 0;
+        for (Stock stock : tableView.getItems()) {
+            t += stock.getPrix() * stock.getQuantity();
+        }
+        total.setText("Total : " + t + " €");
     }
 }

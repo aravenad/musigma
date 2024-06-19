@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import impl.com.calendarfx.view.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="697.0" prefWidth="1058.0"  xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.TicketController">
+<VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.TicketController">
     <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10" >
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10">
             <children>
-                <TextField fx:id="textFieldType" promptText="ex : VIP">
+                <TextField fx:id="textFieldType" prefHeight="25.0" prefWidth="125.0" promptText="ex : VIP">
                     <opaqueInsets>
                         <Insets />
                     </opaqueInsets>
                 </TextField>
-                <TextField fx:id="textFieldQuantite" promptText="ex : 100" />
-                <TextField fx:id="textFieldPrix" promptText="ex : 10.99" />
-                <Button fx:id="ajouterButton" mnemonicParsing="false" text="Ajouter" />
-                <Button fx:id="renommer" mnemonicParsing="false" text="Update" />
+                <TextField fx:id="textFieldQuantite" prefHeight="25.0" prefWidth="125.0" promptText="ex : 100" />
+                <TextField fx:id="textFieldPrix" prefHeight="25.0" prefWidth="125.0" promptText="ex : 10.99" />
+                <Button fx:id="buttonTicket" mnemonicParsing="false" text="Ajouter Ticket" />
+            <ComboBox fx:id="comboAvantage" prefWidth="125.0">
+               <HBox.margin>
+                  <Insets left="110.0" />
+               </HBox.margin></ComboBox>
+            <NumericTextField fx:id="textFieldAvantage" prefHeight="25.0" prefWidth="125.0" />
+            <Button fx:id="buttonAvantage" mnemonicParsing="false" text="Ajouter Avantage" />
 
             </children>
             <opaqueInsets>

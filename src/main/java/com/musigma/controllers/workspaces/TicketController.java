@@ -1,17 +1,23 @@
 package com.musigma.controllers.workspaces;
 
+import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Avantage;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
+
+import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
  * Contrôleur pour l'espace de travail Ticket.
@@ -27,50 +33,37 @@ public class TicketController extends WorkspaceController {
     );
 
     @FXML
-    TextField textFieldType, textFieldQuantite, textFieldPrix;
+    TextField textFieldType, textFieldQuantite, textFieldPrix, textFieldAvantage;
 
     @FXML
-    Button ajouterButton;
+    Button buttonTicket, buttonAvantage;
 
-    @FXML
-    Button update; //TODO: le bouton est casser depuis qu'on retire la tableView de base
 
     @FXML
     TabPane tabPane;
 
     @FXML
-    TableView<String> tableView;
+    ComboBox<Stock> comboAvantage;
+
 
     @FXML
-    TableColumn<Avantage, String> avantageColumn;
-
-    @FXML
-    TableColumn<Avantage, Integer> quantityColumn;
-
-    @FXML
-    TableColumn<Stock, Void> actionColumn;
-
-    @FXML
-    public void initialize(Festival festival) throws FestivalException {
+    public void initialize(Festival festival) throws FestivalException, AvantageException {
         super.initialize(festival);
         restoreTab();
         addListener();
-        ajouterButton.setOnAction(e -> {
+        addToComboBox();
+        checkTicket();
+        buttonTicket.setOnAction(e -> {
             try {
-                onAjouterPressed();
+                onAddTicketPressed();
             } catch (TypeTicketException | FestivalException ex) {
                 throw new RuntimeException(ex);
             }
         });
-
-        configureTableView();
-
-        for (TypeTicket ticket : festival.getTicketTypes()) {
-            tableView.getColumns().add(new TableColumn<>(ticket.getType()));
-        }
+        buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
 
-    private void addListener() { //duplicata
+    private void addListener() {
         textFieldType.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.trim().equals("Objet") || newValue.trim().isEmpty() || newValue.trim().isBlank() || newValue.matches(".*[^a-zA-Z-\\s].*")) {
                 textFieldType.setStyle("-fx-border-color: crimson;");
@@ -96,27 +89,7 @@ public class TicketController extends WorkspaceController {
         });
     }
 
-    private void configureTableView() {
-        if (tableView != null) {
-            tableView.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2) {
-                    Stock newRow = null;
-                    try {
-                        newRow = new Stock("Nouveau stock", 10, true, 10);
-                    } catch (StockException e) {
-                        throw new RuntimeException(e);
-                    }
-                    tableView.getItems().add("Nouveau stock");
-
-                    System.out.println("Double clicked, new row added");
-                }
-            });
-        } else {
-            System.err.println("tableView is null. Please check your FXML file.");
-        }
-    }
-
-    private void onAjouterPressed() throws FestivalException, TypeTicketException {
+    private void onAddTicketPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
         textFieldQuantite.setStyle("-fx-border-color: transparent;");
@@ -138,6 +111,7 @@ public class TicketController extends WorkspaceController {
             textFieldType.setStyle("-fx-border-color: transparent;");
             textFieldPrix.setStyle("-fx-border-color: transparent;");
             textFieldQuantite.setStyle("-fx-border-color: transparent;");
+            checkTicket();
         }
     }
 
@@ -150,36 +124,76 @@ public class TicketController extends WorkspaceController {
         }
     }
 
-    private void createTab(TypeTicket ticket) throws FestivalException {
+    private void createTab(TypeTicket ticket) {
         Tab newTab = new Tab(ticket.getType());
-        TableView<Stock> newTableView = new TableView<>();
-        // ajouter 2 colonnes pour les avantages et les quantités
-        TableColumn<Stock, Avantage> avantageColumn = new TableColumn<>("Avantage");
-        TableColumn<Stock, Integer> quantityColumn = new TableColumn<>("Quantité");
+        TableView<Avantage> newTableView = new TableView<>();
+        TableColumn<Avantage, String> avantageColumn = new TableColumn<>("Avantage");
+        TableColumn<Avantage, Integer> quantityColumn = new TableColumn<>("Quantité");
         newTableView.getColumns().add(avantageColumn);
         newTableView.getColumns().add(quantityColumn);
         newTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         newTab.setContent(newTableView);
+        avantageColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getStock().getName()));
+        quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getTicketType().getQuantity()));
 
-        // Event LIstener de l'autre
-        newTableView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                try {
-                    newTableView.getItems().add(new Stock("Nouveau stock", 10, true, 10));
-                    System.out.println("Double clicked, new row added to new table");
-                    //TODO: demander a bastien et damien de faire en sorte que le texte s'affiche
-                } catch (StockException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
 
         tabPane.getTabs().add(newTab);
     }
 
-    private void restoreTab() throws FestivalException {
+    private void restoreTab() throws AvantageException {
         for (int i = 0; i < festival.getTicketTypes().size(); i++) {
             createTab(festival.getTicketTypes().get(i));
+            if(!festival.getTicketTypes().get(i).getAvantages().isEmpty()){
+
+                TypeTicket ticket = festival.getTicketTypes().get(i).getAvantages().get(i).getTicketType();
+                int quantity = festival.getTicketTypes().get(i).getAvantages().get(i).getQuantityByTicket();
+                Stock stock = festival.getTicketTypes().get(i).getAvantages().get(i).getStock();
+                Avantage avantage = new Avantage(ticket, stock, quantity);
+                // Accéder à la tableview du tab actuel pour y ajouter l'avantage
+                TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
+                tableView.getItems().add(avantage);
+            }
         }
+    }
+
+    private void addToComboBox() {
+        for (int i = 0; i < festival.getStocks().size(); i++) {
+            comboAvantage.getItems().add(festival.getStocks().get(i));
+        }
+    }
+
+    private void checkTicket() {
+        if (festival.getTicketTypes().isEmpty()) {
+            comboAvantage.setVisible(false);
+            textFieldAvantage.setVisible(false);
+            buttonAvantage.setVisible(false);
+        } else {
+            comboAvantage.setVisible(true);
+            textFieldAvantage.setVisible(true);
+            buttonAvantage.setVisible(true);
+        }
+    }
+
+    // Add avantage to the table view if an avantage is selected in the combo box and the quantity is not empty or blank
+    private void onAddAvantagePressed() {
+        if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
+            TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
+            // Récupère la quantité dans le textFieldAvantage
+            int quantity = Integer.parseInt(textFieldAvantage.getText());
+            // Récupère le stock sélectionné dans la comboAvantage
+            Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
+            try {
+                Avantage avantage = new Avantage(ticket, stock, quantity);
+                // Accéder à la tableview du tab actuel pour y ajouter l'avantage
+                TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
+                tableView.getItems().add(avantage);
+            } catch (AvantageException e) {
+                e.printStackTrace();
+            }
+        } else {
+            textFieldAvantage.requestFocus();
+            textFieldAvantage.setStyle("-fx-border-color: crimson;");
+        }
+        textFieldAvantage.clear();
     }
 }
