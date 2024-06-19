@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import impl.com.calendarfx.view.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import com.musigma.controllers.components.FloatTextField?>
+<?import com.musigma.controllers.components.IntTextField?>
+<?import com.musigma.controllers.components.RequiredTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
-    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10">
-        <opaqueInsets>
-            <Insets />
-        </opaqueInsets>
+<VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
+    <HBox style="-color-danger-fg: -color-neutral-muted" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10">
         <padding>
             <Insets left="10.0" />
         </padding>
-        <VBox.margin>
-            <Insets />
-        </VBox.margin>
-        <TextField fx:id="textFieldObjet" promptText="ex : Boisson" />
-        <NumericTextField fx:id="textFieldQuantite" promptText="ex : 120" />
-        <NumericTextField fx:id="textFieldPrix" promptText="ex : 2.99" />
+        <Label text="Objet :"/>
+        <RequiredTextField fx:id="textFieldObjet" maxHeight="-Infinity" promptText="ex : Boisson" />
+        <Label text="Quantité :"/>
+        <IntTextField fx:id="textFieldQuantite" maxHeight="-Infinity" promptText="ex : 120" />
+        <Label text="Prix :"/>
+        <FloatTextField fx:id="textFieldPrix" maxHeight="-Infinity" promptText="ex : 2.99" />
         <Button fx:id="buttonStock" mnemonicParsing="false" text="Ajouter" />
-      <Label fx:id="total" text="Total :">
-         <HBox.margin>
-            <Insets left="10.0" />
-         </HBox.margin>
-      </Label>
+        <Label fx:id="total" text="Total :" />
     </HBox>
     <TableView fx:id="tableView" prefHeight="700.0" prefWidth="967.0">
         <columns>

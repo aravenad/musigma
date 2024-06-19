@@ -3,7 +3,7 @@ package com.musigma.controllers.workspaces;
 import com.calendarfx.view.TimeField;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.controllers.components.FloatTextField;
-import com.musigma.controllers.components.NotEmptyTextField;
+import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -20,14 +20,10 @@ public class HomeController extends WorkspaceController {
     );
 
     @FXML
-    NotEmptyTextField festivalName, festivalLocation;
+    RequiredTextField festivalName, festivalLocation;
 
     @FXML
     DatePicker festivalStartDate;
-
-    // TODO: Use that field
-//    @FXML
-//    TimeField festivalStartTime;
 
     @FXML
     FloatTextField festivalArea, festivalLocationPrice;

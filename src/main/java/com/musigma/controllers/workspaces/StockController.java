@@ -3,6 +3,9 @@ package com.musigma.controllers.workspaces;
 import atlantafx.base.util.DoubleStringConverter;
 import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.FloatTextField;
+import com.musigma.controllers.components.IntTextField;
+import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.exception.AvantageException;
@@ -13,6 +16,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
 import static com.musigma.utils.Dialogs.tryCatch;
@@ -32,32 +36,25 @@ public class StockController extends WorkspaceController {
             "/com/musigma/views/stock-view.fxml"
     );
 
-    @FXML
-    TextField textFieldObjet;
+    @FXML RequiredTextField textFieldObjet;
 
-    @FXML
-    NumericTextField textFieldQuantite, textFieldPrix;
+    @FXML IntTextField textFieldQuantite;
 
-    @FXML
-    Button buttonStock;
+    @FXML FloatTextField textFieldPrix;
 
-    @FXML
-    TableView<Stock> tableView;
+    @FXML Button buttonStock;
 
-    @FXML
-    TableColumn<Stock, String> nameColumn;
+    @FXML TableView<Stock> tableView;
 
-    @FXML
-    TableColumn<Stock, Integer> quantityColumn;
+    @FXML TableColumn<Stock, String> nameColumn;
 
-    @FXML
-    TableColumn<Stock, Double> priceColumn;
+    @FXML TableColumn<Stock, Integer> quantityColumn;
 
-    @FXML
-    TableColumn<Stock, Void> actionColumn;
+    @FXML TableColumn<Stock, Double> priceColumn;
 
-    @FXML
-    Label total;
+    @FXML TableColumn<Stock, Void> actionColumn;
+
+    @FXML Label total;
 
     /**
      * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
@@ -97,8 +94,6 @@ public class StockController extends WorkspaceController {
                 "Impossible de modifier le prix du stock",
                 () -> stock.setPrix(event.getNewValue()));
         });
-
-        addListener();
         buttonStock.setOnAction(e -> onAddStockPressed());
         addDeleteButtonToTable();
     }
@@ -111,33 +106,33 @@ public class StockController extends WorkspaceController {
      * @see #initialize(Festival)
      */
     private void addDeleteButtonToTable() {
-        actionColumn = new TableColumn<>("Action");
+        actionColumn = new TableColumn<>("Actions");
 
         Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<>() {
             @Override
             public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
                 return new TableCell<>() {
 
-                    private final Button btn = new Button("Supprimer");
-
-                    {
-                        btn.setOnAction((e) -> {
-                            Stock stock = getTableView().getItems().get(getIndex());
-                            tryCatch(
-                                "Impossible de supprimer le stock",
-                                () -> festival.removeStock(stock));
-                            getTableView().getItems().remove(stock);
-                            totalPrix();
-                        });
-                    }
-
                     @Override
-                    public void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
+                    public void updateItem(Void item, boolean isEmpty) {
+                        super.updateItem(item, isEmpty);
+                        Button btn = new Button("Supprimer");
+                        System.out.println(item);
+                        System.out.println(isEmpty);
+                        if (isEmpty) {
                             setGraphic(null);
                         } else {
                             setGraphic(btn);
+                            btn.setOnAction((e) -> {
+                                Stock stock = getTableView().getItems().get(getIndex());
+                                tryCatch(
+                            "Impossible de supprimer le stock",
+                                    () -> {
+                                        festival.removeStock(stock);
+                                        getTableView().getItems().remove(stock);
+                                        totalPrix();
+                                    });
+                            });
                         }
                     }
                 };
@@ -149,78 +144,31 @@ public class StockController extends WorkspaceController {
     }
 
     /**
-     * Définit les listeners pour les champs de saisie.
-     * Si le champ est vide ou contient des caractères non autorisés, le champ est surligné en rouge.
-     * Si le champ est valide, le surlignage est retiré.
-     * La méthode est appelée dans la méthode initialize.
-     * @see #initialize(Festival)
-     * @see #onAddStockPressed()
-     */
-    private void addListener(){
-        textFieldObjet.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().equals("Objet") || newValue.trim().isEmpty() || newValue.trim().isBlank() || newValue.matches(".*[^a-zA-Z-\\s].*")) {
-                textFieldObjet.setStyle("-fx-border-color: crimson;");
-            } else {
-                textFieldObjet.setStyle("-fx-border-color: transparent;");
-            }
-        });
-
-        textFieldPrix.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().isEmpty() || newValue.trim().isBlank()) {
-                textFieldPrix.setStyle("-fx-border-color: crimson;");
-            } else {
-                textFieldPrix.setStyle("-fx-border-color: transparent;");
-            }
-        });
-
-        textFieldQuantite.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().isEmpty() || newValue.trim().isBlank()) {
-                textFieldQuantite.setStyle("-fx-border-color: crimson;");
-            } else {
-                textFieldQuantite.setStyle("-fx-border-color: transparent;");
-            }
-        });
-    }
-
-    /**
      * Ajoute un stock à la table.
      * Si les champs de saisie sont valides, un stock est créé et ajouté à la table.
      * Sinon, les champs de saisie invalides sont surlignés en rouge.
      * La méthode est appelée lorsqu'on clique sur le bouton "Ajouter".
-     * @see #addListener()
      */
     private void onAddStockPressed() {
-        textFieldObjet.setStyle("-fx-border-color: transparent;");
-        textFieldPrix.setStyle("-fx-border-color: transparent;");
-        textFieldQuantite.setStyle("-fx-border-color: transparent;");
-
-        if (textFieldObjet.getText().trim().equals("Objet") || textFieldObjet.getText().trim().isEmpty() || textFieldObjet.getText().trim().isBlank() || textFieldObjet.getText().matches(".*[^a-zA-Z-\\s].*")) {
+        if (!textFieldObjet.isValid()) {
             textFieldObjet.requestFocus();
-            textFieldObjet.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldPrix.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank()) {
-            textFieldPrix.requestFocus();
-            textFieldPrix.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldQuantite.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank()) {
+        } else if (!textFieldQuantite.isValid()) {
             textFieldQuantite.requestFocus();
-            textFieldQuantite.setStyle("-fx-border-color: crimson;");
-        } else {
-            tryCatch(
-        "Ajout du stock impossible",
+        } else if (!textFieldPrix.isValid()) {
+            textFieldPrix.requestFocus();
+        } else tryCatch(
+                "Ajout du stock impossible",
                 () -> {
                     Stock stock = new Stock(
-                        textFieldObjet.getText(),
-                            Integer.parseInt(textFieldQuantite.getText()),
+                            textFieldObjet.getText(),
+                            textFieldQuantite.getValue(),
                             true,
-                            Double.parseDouble(textFieldPrix.getText()));
+                            textFieldPrix.getValue());
                     festival.addStock(stock);
                     tableView.getItems().add(stock);
-                    textFieldObjet.setStyle("-fx-border-color: transparent;");
-                    textFieldPrix.setStyle("-fx-border-color: transparent;");
-                    textFieldQuantite.setStyle("-fx-border-color: transparent;");
                     totalPrix();
                 }
-            );
-        }
+        );
     }
 
     private void totalPrix(){

@@ -3,7 +3,7 @@
 <?import atlantafx.base.controls.Card?>
 <?import com.calendarfx.view.TimeField?>
 <?import com.musigma.controllers.components.FloatTextField?>
-<?import com.musigma.controllers.components.NotEmptyTextField?>
+<?import com.musigma.controllers.components.RequiredTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -46,22 +46,13 @@
               </rowConstraints>
                <children>
                   <Label text="Nom :" />
-                  <NotEmptyTextField fx:id="festivalName" prefWidth="200.0" promptText="ex: HellFest" GridPane.columnIndex="1" />
+                  <RequiredTextField fx:id="festivalName" prefWidth="200.0" promptText="ex: HellFest" GridPane.columnIndex="1" />
 
                   <Label text="Date du début:" GridPane.rowIndex="1" />
                    <DatePicker fx:id="festivalStartDate" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="ex: 10/10/2010" />
 
-<!--                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">-->
-<!--                       <children>-->
-<!--                          <TimeField fx:id="festivalStartTime" disable="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">-->
-<!--                             <HBox.margin>-->
-<!--                                <Insets />-->
-<!--                             </HBox.margin></TimeField>-->
-<!--                       </children>-->
-<!--                    </HBox>-->
-
                   <Label text="Emplacement :" GridPane.rowIndex="2" />
-                  <NotEmptyTextField fx:id="festivalLocation" prefWidth="200.0" promptText="ex: Lyon" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <RequiredTextField fx:id="festivalLocation" prefWidth="200.0" promptText="ex: Lyon" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                   <Label text="Aire de l'emplacement :" GridPane.rowIndex="3" />
                   <FloatTextField fx:id="festivalArea" notNull="true" positive="true" prefWidth="200.0" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="3" />

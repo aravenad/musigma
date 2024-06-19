@@ -4,7 +4,7 @@ import com.musigma.utils.exceptionMethods.Setter;
 
 import static com.musigma.utils.Dialogs.tryCatch;
 
-public class FloatTextField extends NotEmptyTextField {
+public class FloatTextField extends RequiredTextField {
 
     private boolean positive;
     private boolean notNull;
@@ -16,6 +16,14 @@ public class FloatTextField extends NotEmptyTextField {
                 input.setText(newValue.replaceAll("[^(+|\\-|\\.|\\d)]*", ""));
             }
         });
+    }
+
+    public void setValue(float value) {
+        input.setText(Float.toString(value).replaceAll("0*$", "").replaceAll("\\.$", ""));
+    }
+
+    public float getValue() {
+        return Float.parseFloat(input.getText());
     }
 
     public boolean isNotNull() {
@@ -54,13 +62,13 @@ public class FloatTextField extends NotEmptyTextField {
             if (isValid())
                 tryCatch(
                     errrorMsg,
-                    () -> setter.accept(Float.parseFloat(input.getText()))
+                    () -> setter.accept(getValue())
                 );
         });
     }
 
     public void bindFloat(String errrorMsg, Float value, Setter<Float> setter) {
-        input.setText(Float.toString(value).replaceAll("0*$", "").replaceAll("\\.$", ""));
+        setValue(value);
         isValid();
         bindFloat(errrorMsg, setter);
     }

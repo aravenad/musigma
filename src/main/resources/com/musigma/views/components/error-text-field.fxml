@@ -5,19 +5,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<fx:root prefWidth="222.0" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
     <children>
     <TextField fx:id="input" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" />
       <VBox fx:id="errorBox" fillWidth="false" layoutX="8.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-color: -color-bg-default;" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.vgrow="NEVER">
          <children>
-          <Text fx:id="error" fill="red" strokeType="OUTSIDE" strokeWidth="0.0" text="Error">
-               <font>
-                  <Font size="11.0" />
-               </font>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-          </Text>
+             <Label fx:id="error" style="-fx-text-fill: -color-danger-fg" text="Error">
+                 <font>
+                     <Font size="11.0" />
+                 </font>
+             </Label>
          </children>
          <padding>
             <Insets left="4.0" right="4.0" />

@@ -13,7 +13,7 @@ import javafx.scene.text.Text;
 
 import static com.musigma.utils.Dialogs.tryCatch;
 
-public class IntTextField extends NotEmptyTextField {
+public class IntTextField extends RequiredTextField {
 
     private boolean positive;
     private boolean notNull;
@@ -22,9 +22,17 @@ public class IntTextField extends NotEmptyTextField {
         super();
         input.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[+-]?\\d+")) {
-                input.setText(newValue.replaceAll("[^(+|\\-|\\.|\\d)]*", ""));
+                input.setText(newValue.replaceAll("[^(+|\\-|\\d)]*", ""));
             }
         });
+    }
+
+    public void setValue(int value) {
+        input.setText(Integer.toString(value));
+    }
+
+    public int getValue() {
+        return Integer.parseInt(input.getText());
     }
 
     public boolean isNotNull() {
@@ -57,18 +65,19 @@ public class IntTextField extends NotEmptyTextField {
             return super.isValid();
         } else return false;
     }
+
     public void bindInt(String errrorMsg, Setter<Integer> setter) {
         input.setOnKeyTyped(e -> {
             if (isValid)
                 tryCatch(
                     errrorMsg,
-                    () -> setter.accept(Integer.parseInt(input.getText()))
+                    () -> setter.accept(getValue())
                 );
         });
     }
 
     public void bindInt(String errrorMsg, int value, Setter<Integer> setter) {
-        input.setText(Integer.toString(value));
+        setValue(value);
         isValid();
         bindInt(errrorMsg, setter);
     }
