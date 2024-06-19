@@ -71,7 +71,7 @@ public class MainController {
     public void initialize(Stage stage) {
         this.stage = stage;
         recentFiles = new ArrayList<>();
-        stage.setOnCloseRequest(e -> saveState());
+        stage.setOnHidden(e -> saveState());
         for (WorkspaceController.WorkspaceRegister workspace: WORKSPACES)
             addWorkspace(workspace);
         loadState();
@@ -97,6 +97,7 @@ public class MainController {
                             );
                         if (!recentFiles.isEmpty())
                             loadFestival(Festival.Festival(recentFiles.get(0)));
+                        else newFestival();
                     }
             });
         } else newFestival();
