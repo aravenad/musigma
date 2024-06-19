@@ -6,7 +6,6 @@ import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
 import impl.com.calendarfx.view.NumericTextField;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
+
 import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
@@ -60,7 +60,6 @@ public class StockController extends WorkspaceController {
      * Définit un bouton de suppression pour chaque ligne de la table. Définit la modification des noms, quantités et prix des stocks.
      * @param festival le festival
      * @throws FestivalException si le festival est invalide
-     * @throws StockException si le stock est invalide
      */
     @FXML
     public void initialize(Festival festival) throws FestivalException {
@@ -110,10 +109,10 @@ public class StockController extends WorkspaceController {
     private void addDeleteButtonToTable() {
         actionColumn = new TableColumn<>("Action");
 
-        Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>>() {
+        Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<>() {
             @Override
             public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
-                final TableCell<Stock, Void> cell = new TableCell<>() {
+                return new TableCell<>() {
 
                     private final Button btn = new Button("Supprimer");
 
@@ -134,7 +133,6 @@ public class StockController extends WorkspaceController {
                         }
                     }
                 };
-                return cell;
             }
         };
 
@@ -184,7 +182,6 @@ public class StockController extends WorkspaceController {
      * Sinon, les champs de saisie invalides sont surlignés en rouge.
      * La méthode est appelée lorsqu'on clique sur le bouton "Ajouter".
      * @see #addListener()
-     * @throws StockException si le stock n'est pas valide
      */
     private void onAjouterPressed() {
         textFieldObjet.setStyle("-fx-border-color: transparent;");
