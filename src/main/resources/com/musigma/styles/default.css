@@ -15,11 +15,14 @@
 
 .windowBar .button:hover {
     -fx-background-color: darkgrey;
+    -fx-padding: 1px 0.8em 0.5em 0.9em;
 }
 
 .windowBar .close:hover {
     -fx-background-color: crimson;
+    -fx-padding: 1px 0.8em 0.5em 0.9em;
 }
+
 
 .leftMenu {
     -fx-background-color: #30304d;
