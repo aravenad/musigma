@@ -55,6 +55,9 @@ public class StockController extends WorkspaceController {
     @FXML
     TableColumn<Stock, Void> actionColumn;
 
+    @FXML
+    Label total;
+
     /**
      * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
      * Définit un bouton de suppression pour chaque ligne de la table. Définit la modification des noms, quantités et prix des stocks.
@@ -211,8 +214,17 @@ public class StockController extends WorkspaceController {
                     textFieldObjet.setStyle("-fx-border-color: transparent;");
                     textFieldPrix.setStyle("-fx-border-color: transparent;");
                     textFieldQuantite.setStyle("-fx-border-color: transparent;");
+                    totalPrix();
                 }
             );
         }
+    }
+
+    private void totalPrix(){
+        double t = 0;
+        for (Stock stock : tableView.getItems()) {
+            t += stock.getPrix() * stock.getQuantity();
+        }
+        total.setText("Total : " + t + " €");
     }
 }
