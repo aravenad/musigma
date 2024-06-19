@@ -123,7 +123,11 @@ public class StockController extends WorkspaceController {
                     {
                         btn.setOnAction((e) -> {
                             Stock stock = getTableView().getItems().get(getIndex());
+                            tryCatch(
+                                "Impossible de supprimer le stock",
+                                () -> festival.removeStock(stock));
                             getTableView().getItems().remove(stock);
+                            totalPrix();
                         });
                     }
 
