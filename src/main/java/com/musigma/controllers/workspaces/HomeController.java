@@ -1,38 +1,48 @@
 package com.musigma.controllers.workspaces;
 
-import com.calendarfx.view.TimeField;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.controllers.components.FloatTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
 
 import java.time.LocalDate;
 
 import static com.musigma.utils.Dialogs.tryCatch;
 
+/**
+ * Contrôleur de l'espace de travail Home.
+ * Gère l'affichage et les interactions de la vue d'accueil pour le festival.
+ */
 public class HomeController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
-        "Home",
-        "/com/musigma/images/icons/home.png",
-        "/com/musigma/views/home-view.fxml"
+            "Home",
+            "/com/musigma/images/icons/home.png",
+            "/com/musigma/views/home-view.fxml"
     );
 
     @FXML
-    RequiredTextField festivalName, festivalLocation;
+    RequiredTextField festivalName, festivalLocation; // Champs de texte requis pour le nom et l'emplacement du festival
 
     @FXML
-    DatePicker festivalStartDate;
+    DatePicker festivalStartDate; // Sélecteur de date pour la date de début du festival
 
     @FXML
-    FloatTextField festivalArea, festivalLocationPrice;
+    FloatTextField festivalArea, festivalLocationPrice; // Champs de texte flottants pour la surface et le prix de l'emplacement du festival
 
+    /**
+     * Initialise le contrôleur avec les informations du festival.
+     *
+     * @param festival Le festival à initialiser
+     */
     @Override
     public void initialize(Festival festival) {
+        // Liaison des champs de texte avec les propriétés du festival
         festivalName.bind(
-    "Mise à jour du nom du festival impossible",
-            festival.getName(), festival::setName
+                "Mise à jour du nom du festival impossible",
+                festival.getName(), festival::setName
         );
         festivalLocation.bind(
                 "Mise à jour de l'emplacement du festival impossible",
@@ -47,6 +57,7 @@ public class HomeController extends WorkspaceController {
                 festival.getLocationPrice(), festival::setLocationPrice
         );
 
+        // Configuration du sélecteur de date pour désactiver les dates antérieures à aujourd'hui
         festivalStartDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -57,8 +68,8 @@ public class HomeController extends WorkspaceController {
         festivalStartDate.setValue(festival.getStart().toLocalDate());
         festivalStartDate.valueProperty().addListener(e -> {
             tryCatch(
-        "Changement de la date de départ impossible",
-                () -> festival.setStart(festivalStartDate.getValue().atStartOfDay())
+                    "Changement de la date de départ impossible",
+                    () -> festival.setStart(festivalStartDate.getValue().atStartOfDay())
             );
         });
     }

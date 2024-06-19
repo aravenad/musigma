@@ -1,12 +1,13 @@
 package com.musigma.models;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.musigma.models.exception.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class FestivalTest {
 
@@ -61,7 +62,7 @@ class FestivalTest {
     @Test
     void setArea() {
         assertDoesNotThrow(() -> festival.setArea(100), "L'aire du festival doit pouvoir être changé par une nouvelle valide");
-        assertEquals(1000.0, festival.getArea(), "L'aire du festival doit être changé par la nouvelle valide");
+        assertEquals(100, festival.getArea(), "L'aire du festival doit être changé par la nouvelle valide");
         assertThrows(FestivalException.class, () -> festival.setArea(-500), "L'aire du festival ne doit pas pouvoir être changé par une nouvelle invalide car négative");
         assertThrows(FestivalException.class, () -> festival.setArea(0), "L'aire du festival ne doit pas pouvoir être changé par une nouvelle invalide car nulle (0)");
     }

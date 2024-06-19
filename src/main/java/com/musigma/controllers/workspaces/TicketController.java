@@ -9,11 +9,9 @@ import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.util.StringConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 /**
  * Contrôleur pour l'espace de travail Ticket.
@@ -53,7 +51,7 @@ public class TicketController extends WorkspaceController {
      * @see #onAddTicketPressed()
      */
     @FXML
-    public void initialize(Festival festival) throws FestivalException, AvantageException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
         restoreTab();
         addListener();

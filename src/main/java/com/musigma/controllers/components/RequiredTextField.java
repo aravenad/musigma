@@ -4,7 +4,6 @@ import com.musigma.utils.exceptionMethods.Setter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -32,9 +31,6 @@ public class RequiredTextField extends GridPane {
         input.setOnKeyTyped(e -> isValid());
         isValid();
     }
-
-    @FXML
-    private void initialize() {}
 
     public void requestFocus() {
         input.requestFocus();

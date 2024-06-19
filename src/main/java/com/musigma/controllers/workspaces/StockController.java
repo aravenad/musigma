@@ -8,15 +8,12 @@ import com.musigma.controllers.components.IntTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
-import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
-import impl.com.calendarfx.view.NumericTextField;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
 import static com.musigma.utils.Dialogs.tryCatch;
@@ -63,7 +60,7 @@ public class StockController extends WorkspaceController {
      * @throws FestivalException si le festival est invalide
      */
     @FXML
-    public void initialize(Festival festival) throws FestivalException, AvantageException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
         tableView.setEditable(true); // Permet l'édition de la TableView
