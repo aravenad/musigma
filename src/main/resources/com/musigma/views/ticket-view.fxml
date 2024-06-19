@@ -10,19 +10,16 @@
         <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10">
             <children>
                 <TextField fx:id="textFieldType" prefHeight="25.0" prefWidth="125.0" promptText="ex : VIP">
-                    <opaqueInsets>
-                        <Insets />
-                    </opaqueInsets>
                 </TextField>
-                <TextField fx:id="textFieldQuantite" prefHeight="25.0" prefWidth="125.0" promptText="ex : 100" />
-                <TextField fx:id="textFieldPrix" prefHeight="25.0" prefWidth="125.0" promptText="ex : 10.99" />
-                <Button fx:id="buttonTicket" mnemonicParsing="false" text="Ajouter Ticket" />
-            <ComboBox fx:id="comboAvantage" prefWidth="125.0">
+                <NumericTextField fx:id="textFieldQuantite" prefHeight="25.0" prefWidth="125.0" promptText="ex : 100" />
+                <NumericTextField fx:id="textFieldPrix" prefHeight="25.0" prefWidth="125.0" promptText="ex : 10.99" />
+                <Button fx:id="buttonTicket" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Ticket" />
+            <ComboBox fx:id="comboAvantage" prefWidth="135.0" promptText="Sélectionner...">
                <HBox.margin>
-                  <Insets left="110.0" />
+                  <Insets left="70.0" />
                </HBox.margin></ComboBox>
-            <NumericTextField fx:id="textFieldAvantage" prefHeight="25.0" prefWidth="125.0" />
-            <Button fx:id="buttonAvantage" mnemonicParsing="false" text="Ajouter Avantage" />
+            <NumericTextField fx:id="textFieldAvantage" prefHeight="25.0" prefWidth="125.0" promptText="ex : 10.99" />
+            <Button fx:id="buttonAvantage" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Avantage" />
 
             </children>
             <opaqueInsets>

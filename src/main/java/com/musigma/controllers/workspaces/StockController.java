@@ -39,7 +39,7 @@ public class StockController extends WorkspaceController {
     NumericTextField textFieldQuantite, textFieldPrix;
 
     @FXML
-    Button ajouterButton;
+    Button buttonStock;
 
     @FXML
     TableView<Stock> tableView;
@@ -99,7 +99,7 @@ public class StockController extends WorkspaceController {
         });
 
         addListener();
-        ajouterButton.setOnAction(e -> onAjouterPressed());
+        buttonStock.setOnAction(e -> onAddStockPressed());
         addDeleteButtonToTable();
     }
 
@@ -148,14 +148,13 @@ public class StockController extends WorkspaceController {
         tableView.getColumns().add(actionColumn);
     }
 
-
     /**
      * Définit les listeners pour les champs de saisie.
      * Si le champ est vide ou contient des caractères non autorisés, le champ est surligné en rouge.
      * Si le champ est valide, le surlignage est retiré.
      * La méthode est appelée dans la méthode initialize.
      * @see #initialize(Festival)
-     * @see #onAjouterPressed()
+     * @see #onAddStockPressed()
      */
     private void addListener(){
         textFieldObjet.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -183,7 +182,6 @@ public class StockController extends WorkspaceController {
         });
     }
 
-
     /**
      * Ajoute un stock à la table.
      * Si les champs de saisie sont valides, un stock est créé et ajouté à la table.
@@ -191,7 +189,7 @@ public class StockController extends WorkspaceController {
      * La méthode est appelée lorsqu'on clique sur le bouton "Ajouter".
      * @see #addListener()
      */
-    private void onAjouterPressed() {
+    private void onAddStockPressed() {
         textFieldObjet.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
         textFieldQuantite.setStyle("-fx-border-color: transparent;");
