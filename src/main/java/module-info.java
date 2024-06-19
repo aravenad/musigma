@@ -10,6 +10,7 @@ module com.musigma {
     requires atlantafx.base;
     requires com.calendarfx.view;
     requires java.rmi;
+    requires ojalgo;
 
     opens com.musigma to javafx.fxml;
     exports com.musigma;

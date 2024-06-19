@@ -38,12 +38,12 @@ public class TypeTicket implements Serializable {
      * @param price Prix unitaire du ticket
      */
     public TypeTicket(String type, int quantity, float price) throws TypeTicketException {
-        LOGGER.info(String.format("Initialized TypeTicket 0x%x", super.hashCode()));
+        LOGGER.info("Initialized TypeTicket");
         avantages = new ArrayList<>();
         setType(type);
         setQuantity(quantity);
         setPrice(price);
-        LOGGER.info(String.format("Created TypeTicket 0x%x", super.hashCode()));
+        LOGGER.info("Created TypeTicket");
     }
 
     /**
@@ -65,7 +65,7 @@ public class TypeTicket implements Serializable {
         if (type == null || type.isBlank())
             throw new TypeTicketException("Le type est null ou vide, doit être défini");
         this.type = type;
-        LOGGER.info(String.format("Set TypeTicket.type 0x%x", super.hashCode()));
+        LOGGER.info("Set TypeTicket.type");
     }
 
     /**
@@ -92,7 +92,7 @@ public class TypeTicket implements Serializable {
                 throw new TypeTicketException("La quantité de ticket multiplé par le nombre d'avantage par ticket surpasse le stock limité");
         }
         this.quantity = quantity;
-        LOGGER.info(String.format("Set TypeTicket.quantity 0x%x", super.hashCode()));
+        LOGGER.info("Set TypeTicket.quantity");
     }
 
     /**
@@ -114,7 +114,7 @@ public class TypeTicket implements Serializable {
         if (price < 0)
             throw new TypeTicketException("Le prix est négatif, doit être positif");
         this.price = price;
-        LOGGER.info(String.format("Set TypeTicket.price 0x%x", super.hashCode()));
+        LOGGER.info("Set TypeTicket.price");
     }
 
     /**
@@ -136,7 +136,7 @@ public class TypeTicket implements Serializable {
         if (avantage == null)
             throw new TypeTicketException("L'avantage est null, doit être défini");
         avantages.add(avantage);
-        LOGGER.info(String.format("Added Avantage to TypeTicket.avantages 0x%x", super.hashCode()));
+        LOGGER.info("Added Avantage to TypeTicket.avantages");
     }
 
     /**
@@ -148,7 +148,7 @@ public class TypeTicket implements Serializable {
     public void removeAvantage(Avantage avantage) throws TypeTicketException {
         if (!avantages.remove(avantage))
             throw new TypeTicketException("L'avantage n'a pas été trouvé");
-        LOGGER.info(String.format("Removed Avantage from TypeTicket.avantages 0x%x", super.hashCode()));
+        LOGGER.info("Removed Avantage from TypeTicket.avantages");
     }
 
     @Override

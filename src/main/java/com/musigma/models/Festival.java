@@ -1,11 +1,18 @@
 package com.musigma.models;
 
 import com.musigma.models.exception.FestivalException;
+import com.musigma.models.exception.TypeTicketException;
+import org.ojalgo.optimisation.Expression;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -18,6 +25,8 @@ import static com.musigma.utils.Log.getLogger;
  * des types de tickets, de stocks et de représentations.
  */
 public class Festival implements Serializable {
+
+    private static final float AVERAGE_AREA_BY_PEOPLE = .42f;
 
     // Logger de la class
     private static final Logger LOGGER = getLogger(Festival.class);
@@ -63,7 +72,7 @@ public class Festival implements Serializable {
      * @throws FestivalException si les valeurs des paramètres ne sont pas valides
      */
     public Festival(String name, LocalDateTime start, float locationPrice, float area, String location) throws FestivalException {
-        LOGGER.info(String.format("Initialize Festival 0x%x", super.hashCode()));
+        LOGGER.info("Initialize Festival");
         artistes = new ArrayList<>();
         ticketTypes = new ArrayList<>();
         stocks = new ArrayList<>();
@@ -73,7 +82,7 @@ public class Festival implements Serializable {
         setLocationPrice(locationPrice);
         setArea(area);
         setLocation(location);
-        LOGGER.info(String.format("Created Festival 0x%x", super.hashCode()));
+        LOGGER.info("Created Festival");
     }
 
     /**
@@ -92,7 +101,7 @@ public class Festival implements Serializable {
             LOGGER.info(String.format("Reading file %s", file.getAbsolutePath()));
             Festival festival = (Festival) ois.readObject();
             festival.file = file;
-            LOGGER.info(String.format("Loaded festival 0x%x from file %s", festival.hashCode(), file.getAbsolutePath()));
+            LOGGER.info(String.format("Loaded festival \"%s\" from file %s", festival.getName(), file.getAbsolutePath()));
             return festival;
         } catch (IOException e) {
             throw new FestivalException("Le fichier du festival ne peut pas être lu");
@@ -139,7 +148,7 @@ public class Festival implements Serializable {
         if (file == null)
             throw new FestivalException("Le fichier du festival est null, doit être défini");
         this.file = file;
-        LOGGER.info(String.format("Set Festival.file 0x%x", super.hashCode()));
+        LOGGER.info("Set Festival.file");
     }
 
     /**
@@ -161,7 +170,7 @@ public class Festival implements Serializable {
         if (name == null || name.isEmpty())
             throw new FestivalException("Le nom est null ou vide, doit être défini");
         this.name = name;
-        LOGGER.info(String.format("Set Festival.name 0x%x", super.hashCode()));
+        LOGGER.info("Set Festival.name");
     }
 
     /**
@@ -184,7 +193,7 @@ public class Festival implements Serializable {
             throw new FestivalException("La date est antérieure à la date d'aujourd'hui, doit précéder la date d'aujourd'hui");
         }
         this.start = start;
-        LOGGER.info(String.format("Set Festival.name 0x%x", super.hashCode()));
+        LOGGER.info("Set Festival.name");
     }
 
     /**
@@ -206,7 +215,7 @@ public class Festival implements Serializable {
         if (locationPrice < 0)
             throw new FestivalException("Le prix de location est négatif, doit être positif");
         this.locationPrice = locationPrice;
-        LOGGER.info(String.format("Set Festival.locationPrice 0x%x", super.hashCode()));
+        LOGGER.info("Set Festival.locationPrice");
     }
 
     /**
@@ -228,7 +237,7 @@ public class Festival implements Serializable {
         if (area <= 0)
             throw new FestivalException("La superficie est négative ou nulle (0), doit être positive");
         this.area = area;
-        LOGGER.info(String.format("Set Festival.area 0x%x", super.hashCode()));
+        LOGGER.info("Set Festival.area");
     }
 
     /**
@@ -250,7 +259,7 @@ public class Festival implements Serializable {
         if (location == null || location.isEmpty())
             throw new FestivalException("L'emplacement de location est null ou vide, doit être défini");
         this.location = location;
-        LOGGER.info(String.format("Set Festival.location 0x%x", super.hashCode()));
+        LOGGER.info("Set Festival.location");
     }
 
     /**
@@ -263,7 +272,7 @@ public class Festival implements Serializable {
         if (artiste == null)
             throw new FestivalException("L'artiste est null, doit être défini");
         artistes.add(artiste);
-        LOGGER.info(String.format("Added Artiste to Festival.artistes 0x%x", super.hashCode()));
+        LOGGER.info("Added Artiste to Festival.artistes");
     }
 
     /**
@@ -275,7 +284,7 @@ public class Festival implements Serializable {
     public void removeArtiste(Artiste artiste) throws FestivalException {
         if (!artistes.remove(artiste))
             throw new FestivalException("L'artiste n'a pas été trouvé");
-        LOGGER.info(String.format("Removed Artiste from Festival.artistes 0x%x", super.hashCode()));
+        LOGGER.info("Removed Artiste from Festival.artistes");
     }
 
     /**
@@ -309,7 +318,7 @@ public class Festival implements Serializable {
             throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifié", bottom));
 
         representations.add(representation);
-        LOGGER.info(String.format("Added Representation to Festival.representations 0x%x", super.hashCode()));
+        LOGGER.info("Added Representation to Festival.representations");
     }
 
     /**
@@ -321,7 +330,7 @@ public class Festival implements Serializable {
     public void removeRepresentation(Representation representation) throws FestivalException {
         if (!representations.remove(representation))
             throw new FestivalException("La représentation n'a pas été trouvée");
-        LOGGER.info(String.format("Removed Representation from Festival.representations 0x%x", super.hashCode()));
+        LOGGER.info("Removed Representation from Festival.representations");
     }
 
     /**
@@ -343,7 +352,7 @@ public class Festival implements Serializable {
         if (ticketType == null)
             throw new FestivalException("Le type de ticket est null, doit être défini");
         ticketTypes.add(ticketType);
-        LOGGER.info(String.format("Added TypeTicket to Festival.ticketTypes 0x%x", super.hashCode()));
+        LOGGER.info("Added TypeTicket to Festival.ticketTypes");
     }
 
     /**
@@ -355,7 +364,7 @@ public class Festival implements Serializable {
     public void removeTicketType(TypeTicket ticketType) throws FestivalException {
         if (!ticketTypes.remove(ticketType))
             throw new FestivalException("Le type de ticket n'a pas été trouvé");
-        LOGGER.info(String.format("Removed TypeTicket from.ticketTypes 0x%x", super.hashCode()));
+        LOGGER.info("Removed TypeTicket from.ticketTypes");
     }
 
     /**
@@ -377,7 +386,7 @@ public class Festival implements Serializable {
         if (stock == null)
             throw new FestivalException("Le stock est null, doit être défini");
         stocks.add(stock);
-        LOGGER.info(String.format("Added Stock to Festival.stocks 0x%x", super.hashCode()));
+        LOGGER.info("Added Stock to Festival.stocks");
     }
 
     /**
@@ -389,7 +398,7 @@ public class Festival implements Serializable {
     public void removeStock(Stock stock) throws FestivalException {
         if (!stocks.remove(stock))
             throw new FestivalException("Le stock n'a pas été trouvé");
-        LOGGER.info(String.format("Removed Stock from Festival.stocks 0x%x", super.hashCode()));
+        LOGGER.info("Removed Stock from Festival.stocks");
     }
 
     /**
@@ -399,6 +408,51 @@ public class Festival implements Serializable {
      */
     public ArrayList<Stock> getStocks() {
         return stocks;
+    }
+
+    /**
+     * Optimise les coûts du festival en calculant les quantités respectives
+     * de tickets à vendre les plus rentables avec le modèle d'optimisation d'Ojalgo.
+     *
+     * @throws FestivalException si un ticket ne veux pas changer de quantité
+     */
+    public double calcMaxTicket() throws TypeTicketException {
+        LOGGER.info("Calculated best quantity of ticket to sold");
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        HashMap<Stock, Expression> constraints = new HashMap<>();
+
+        for (Stock stock: stocks)
+            if (stock.isFixed()) {
+                Expression constraint = model.addExpression(stock.getName())
+                        .upper(stock.getQuantity())
+                        .lower(0);
+                constraints.put(stock, constraint);
+            }
+
+        Expression areaConstraint = model.addExpression("Area")
+                .upper(area)
+                .lower(0);
+
+        for (TypeTicket ticketType : ticketTypes) {
+            Variable x = model.addVariable(ticketType.getType()).weight(ticketType.getPrice());
+            for (Avantage avantage : ticketType.getAvantages()) {
+                Stock stock = avantage.getStock();
+                if (stock.isFixed()) {
+                    constraints.get(stock).set(x, avantage.getQuantityByTicket());
+                }
+                areaConstraint.set(x, AVERAGE_AREA_BY_PEOPLE);
+            }
+        }
+
+        Optimisation.Result results = model.maximise();
+
+        for (int i = 0; i < ticketTypes.size(); i++) {
+            ticketTypes.get(i).setQuantity(results.get(i).intValueExact());
+        }
+
+        LOGGER.info("Calculated best quantity of ticket to sold");
+        return results.getValue();
     }
 
     /**

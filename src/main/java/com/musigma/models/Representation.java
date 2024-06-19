@@ -38,12 +38,12 @@ public class Representation implements Comparable<Representation>, Serializable 
      * @param artiste l'artiste associé à la représentation
      */
     public Representation(int startDelta, int duration, String scene, Artiste artiste) {
-        LOGGER.info(String.format("Initialized Representation 0x%x", super.hashCode()));
+        LOGGER.info("Initialized Representation");
         this.startDelta = startDelta;
         this.duration = duration;
         this.scene = scene;
         this.artiste = artiste;
-        LOGGER.info(String.format("Created Representation 0x%x", super.hashCode()));
+        LOGGER.info("Created Representation");
     }
 
     /**
@@ -65,7 +65,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (artiste == null)
             throw new RepresentationException("Artiste null, doit être défini");
         this.artiste = artiste;
-        LOGGER.info(String.format("Set Representation.artiste 0x%x", super.hashCode()));
+        LOGGER.info("Set Representation.artiste");
     }
 
     /**
@@ -87,7 +87,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (startDelta < 0)
             throw new RepresentationException("La différence avec la date de début du festival est négative, doit être positif");
         this.startDelta = startDelta;
-        LOGGER.info(String.format("Set Representation.startDelta 0x%x", super.hashCode()));
+        LOGGER.info("Set Representation.startDelta");
     }
 
     /**
@@ -108,7 +108,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (duration <= 0)
             throw new RepresentationException("La durée est négative ou nulle, doit être positif et non nulle");
         this.duration = duration;
-        LOGGER.info(String.format("Set Representation.duration 0x%x", super.hashCode()));
+        LOGGER.info("Set Representation.duration");
     }
 
     /**
@@ -129,7 +129,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (scene == null || scene.isBlank())
             throw new RepresentationException("La scene est null ou vide, doit être définie");
         this.scene = scene;
-        LOGGER.info(String.format("Set Representation.scene 0x%x", super.hashCode()));
+        LOGGER.info("Set Representation.scene");
     }
 
     /**

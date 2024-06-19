@@ -34,11 +34,11 @@ public class Avantage implements Serializable {
      * @param quantityByTicket la quantité de cet avantage par ticket
      */
     public Avantage(TypeTicket ticketType, Stock stock, int quantityByTicket) throws AvantageException {
-        LOGGER.info(String.format("Initialized Avantage 0x%x", super.hashCode()));
+        LOGGER.info("Initialized Avantage");
         this.ticketType = ticketType;
         this.stock = stock;
         setQuantityByTicket(quantityByTicket);
-        LOGGER.info(String.format("Created Avantage 0x%x", super.hashCode()));
+        LOGGER.info("Created Avantage");
     }
 
     /**
@@ -62,7 +62,7 @@ public class Avantage implements Serializable {
         if (stock.isFixed() && quantityByTicket * ticketType.getQuantity() > stock.getQuantity())
             throw new AvantageException("La quantité par ticket multipié par le nombre de ticket surpasse les stocks");
         this.quantityByTicket = quantityByTicket;
-        LOGGER.info(String.format("Set Avantage.quantityByTicket 0x%x", super.hashCode()));
+        LOGGER.info("Set Avantage.quantityByTicket");
     }
 
     /**

@@ -41,13 +41,13 @@ public class Stock implements Serializable {
      * @param quantity Si la quantité du stock est fixe
      */
     public Stock(String name, int quantity, boolean fixed, double prix) throws StockException {
-        LOGGER.info(String.format("Initialized Stock 0x%x", super.hashCode()));
+        LOGGER.info("Initialized Stock");
         avantages = new ArrayList<>();
         setName(name);
         setQuantity(quantity);
         setFixed(fixed);
         setPrix(prix);
-        LOGGER.info(String.format("Created Stock 0x%x", super.hashCode()));
+        LOGGER.info("Created Stock");
     }
 
     /**
@@ -69,7 +69,7 @@ public class Stock implements Serializable {
         if (name == null || name.isBlank())
             throw new StockException("Le nom est null ou vide, doit être défini");
         this.name = name;
-        LOGGER.info(String.format("Set Stock.name 0x%x", super.hashCode()));
+        LOGGER.info("Set Stock.name");
     }
 
     /**
@@ -88,7 +88,7 @@ public class Stock implements Serializable {
      */
     public void setFixed(boolean fixed) {
         this.fixed = fixed;
-        LOGGER.info(String.format("Set Stock.fixed 0x%x", super.hashCode()));
+        LOGGER.info("Set Stock.fixed");
     }
 
     /**
@@ -114,7 +114,7 @@ public class Stock implements Serializable {
             throw new StockException("La quantité absolue est négative ou nulle (0), doit être défini");
         }
         this.quantity = quantity;
-        LOGGER.info(String.format("Set Stock.quantity 0x%x", super.hashCode()));
+        LOGGER.info("Set Stock.quantity");
     }
 
     /**
@@ -137,7 +137,7 @@ public class Stock implements Serializable {
             throw new StockException("Le prix est négatif ou nul (0), doit être défini");
         }
         this.prix = prix;
-        LOGGER.info(String.format("Set Stock.prix 0x%x", super.hashCode()));
+        LOGGER.info("Set Stock.prix");
     }
 
     /**
@@ -159,7 +159,7 @@ public class Stock implements Serializable {
         if (avantage == null)
             throw new StockException("L'avantage est null, doit être défini");
         avantages.add(avantage);
-        LOGGER.info(String.format("Added Avantage to Stock.avantages 0x%x", super.hashCode()));
+        LOGGER.info("Added Avantage to Stock.avantages");
     }
 
     /**
@@ -171,7 +171,7 @@ public class Stock implements Serializable {
     public void removeAvantage(Avantage avantage) throws StockException {
         if (!avantages.remove(avantage))
             throw new StockException("L'avantage n'a pas été trouvé");
-        LOGGER.info(String.format("Removed Avantage from Stock.avantages 0x%x", super.hashCode()));
+        LOGGER.info("Removed Avantage from Stock.avantages");
     }
 
     @Override
