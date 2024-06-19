@@ -6,16 +6,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import static com.musigma.utils.Dialogs.tryCatch;
 
-public class NotEmptyTextField extends GridPane {
+public class NotEmptyTextField extends Pane {
 
     private static final String VIEW_PATH = "/com/musigma/views/components/error-text-field.fxml";
 
     @FXML protected TextField input;
     @FXML protected Text error;
+    @FXML protected VBox errorBox;
     @FXML protected Label label;
 
     public NotEmptyTextField() {
@@ -28,14 +31,25 @@ public class NotEmptyTextField extends GridPane {
         );
     }
 
+    protected void setError(String error) {
+        this.error.setText("* " + error);
+        this.error.setVisible(true);
+        errorBox.setStyle("-fx-background-color: -color-bg-default");
+    }
+
+    protected void unSetError() {
+        this.error.setVisible(false);
+        errorBox.setStyle("");
+    }
+
     protected boolean checkInput() {
         if (input.getText().isEmpty()){
-            error.setText("*Le champ doit être non-vide");
-            error.setVisible(true);
+            setError("Valeur requise");
             return false;
+        } else {
+            unSetError();
+            return true;
         }
-        error.setVisible(false);
-        return true;
     }
 
     public void setLabel(String promptText) {

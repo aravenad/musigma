@@ -48,18 +48,16 @@ public class IntTextField extends NotEmptyTextField {
             return false;
         int value = Integer.parseInt(input.getText());
         if (positive && value < 0){
-            error.setText("*La valeur doit être positive");
-            error.setVisible(true);
+            setError("La valeur doit être positive");
             return false;
         }
         if (notNull && value == 0){
-            error.setText("*La valeur doit être non-nulle");
-            error.setVisible(true);
+            setError("La valeur doit être non-nulle");
             return false;
         }
         if (!super.checkInput())
             return false;
-        error.setVisible(false);
+        unSetError();
         return true;
     }
 

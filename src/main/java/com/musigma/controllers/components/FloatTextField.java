@@ -39,18 +39,16 @@ public class FloatTextField extends NotEmptyTextField {
             return false;
         float value = Float.parseFloat(input.getText());
         if (positive && value < 0){
-            error.setText("*La valeur doit être positive");
-            error.setVisible(true);
+            setError("La valeur doit être positive");
             return false;
         }
         if (notNull && value == 0){
-            error.setText("*La valeur doit être non-nulle");
-            error.setVisible(true);
+            setError("La valeur doit être non-nulle");
             return false;
         }
         if (!super.checkInput())
             return false;
-        error.setVisible(false);
+        unSetError();
         return true;
     }
 
@@ -65,7 +63,7 @@ public class FloatTextField extends NotEmptyTextField {
     }
 
     public void bindFloat(String errrorMsg, Float value, Setter<Float> setter) {
-        input.setText(Float.toString(value));
+        input.setText(String.format("%d", (long) (float) value));
         checkInput();
         bindFloat(errrorMsg, setter);
     }

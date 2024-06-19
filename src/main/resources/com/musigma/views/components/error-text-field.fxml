@@ -5,8 +5,16 @@
 <?import javafx.scene.text.*?>
 
 <fx:root maxHeight="-Infinity" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
-  <children>
+    <children>
     <TextField fx:id="input" GridPane.columnIndex="1" />
-    <Text fx:id="error" fill="#ff0c0c" layoutX="1.0" layoutY="37.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Error" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <VBox fx:id="errorBox" layoutX="8.0" layoutY="24.0" maxHeight="-Infinity">
+         <children>
+          <Text fx:id="error" fill="#ff0f0f" strokeType="OUTSIDE" strokeWidth="0.0" text="Error">
+               <font>
+                  <Font size="11.0" />
+               </font>
+          </Text>
+         </children>
+      </VBox>
   </children>
 </fx:root>
