@@ -401,6 +401,13 @@ public class Festival implements Serializable {
         return stocks;
     }
 
+    /**
+     * Retourne le prix total du festival.
+     * Le prix total est calculé en additionnant le prix de location et le prix des stocks.
+     *
+     * @param o l'objet à comparer
+     * @return true si les objets sont égaux, false sinon
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -409,6 +416,11 @@ public class Festival implements Serializable {
         return Float.compare(locationPrice, festival.locationPrice) == 0 && Double.compare(area, festival.area) == 0 && Objects.equals(file, festival.file) && Objects.equals(name, festival.name) && Objects.equals(start, festival.start) && Objects.equals(location, festival.location) && Objects.equals(artistes, festival.artistes) && Objects.equals(ticketTypes, festival.ticketTypes) && Objects.equals(stocks, festival.stocks) && Objects.equals(representations, festival.representations);
     }
 
+    /**
+     * Retourne le hashcode du festival.
+     *
+     * @return le hashcode du festival
+     */
     @Override
     public int hashCode() {
         return Objects.hash(file, name, start, locationPrice, location, area, artistes, ticketTypes, stocks, representations);

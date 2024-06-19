@@ -40,6 +40,12 @@ public class TicketController extends WorkspaceController {
     @FXML
     ComboBox<Stock> comboAvantage;
 
+    /**
+     * Initialise le contrôleur de l'espace de travail Ticket.
+     * @param festival
+     * @throws FestivalException
+     * @throws AvantageException
+     */
     @FXML
     public void initialize(Festival festival) throws FestivalException, AvantageException {
         super.initialize(festival);
@@ -57,6 +63,9 @@ public class TicketController extends WorkspaceController {
         buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
 
+    /**
+     * Ajoute un écouteur sur les champs de texte.
+     */
     private void addListener() {
         textFieldType.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.trim().equals("Objet") || newValue.trim().isEmpty() || newValue.trim().isBlank() || newValue.matches(".*[^a-zA-Z-\\s].*")) {
@@ -81,6 +90,11 @@ public class TicketController extends WorkspaceController {
         });
     }
 
+    /**
+     * Ajoute un ticket à la liste des tickets.
+     * @throws FestivalException
+     * @throws TypeTicketException
+     */
     private void onAddTicketPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
@@ -105,6 +119,10 @@ public class TicketController extends WorkspaceController {
         }
     }
 
+    /**
+     * Crée un onglet pour un ticket.
+     * @param ticket
+     */
     private void createTab(TypeTicket ticket) {
         Tab newTab = new Tab(ticket.getType());
         TableView<Avantage> newTableView = new TableView<>();
@@ -119,7 +137,9 @@ public class TicketController extends WorkspaceController {
         tabPane.getTabs().add(newTab);
     }
 
-
+    /**
+     * Restaure les onglets des tickets.
+     */
     private void restoreTab() {
         for (int i = 0; i < festival.getTicketTypes().size(); i++) {
             TypeTicket ticketType = festival.getTicketTypes().get(i);
@@ -132,7 +152,9 @@ public class TicketController extends WorkspaceController {
         }
     }
 
-
+    /**
+     * Initialise la liste déroulante des stocks.
+     */
     private void initializeComboBox() {
         comboAvantage.setConverter(new StringConverter<>() {
             @Override
@@ -147,6 +169,9 @@ public class TicketController extends WorkspaceController {
         comboAvantage.getItems().addAll(festival.getStocks());
     }
 
+    /**
+     * Vérifie si le festival contient des tickets.
+     */
     private void checkTicket() {
         if (festival.getTicketTypes().isEmpty()) {
             comboAvantage.setVisible(false);
@@ -159,6 +184,9 @@ public class TicketController extends WorkspaceController {
         }
     }
 
+    /**
+     * Ajoute un avantage à un ticket.
+     */
     private void onAddAvantagePressed() {
         if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
             try {
@@ -174,7 +202,6 @@ public class TicketController extends WorkspaceController {
             } catch (TypeTicketException e) {
                 throw new RuntimeException(e);
             } catch (NumberFormatException e) {
-                // Gérer les cas où la conversion de textFieldAvantage en entier échoue
                 textFieldAvantage.requestFocus();
                 textFieldAvantage.setStyle("-fx-border-color: crimson;");
                 return;
@@ -183,9 +210,7 @@ public class TicketController extends WorkspaceController {
             textFieldAvantage.requestFocus();
             textFieldAvantage.setStyle("-fx-border-color: crimson;");
         }
-        // Réinitialiser la bordure du champ texte et effacer le texte
         textFieldAvantage.setStyle("-fx-border-color: transparent;");
         textFieldAvantage.clear();
     }
-
 }
