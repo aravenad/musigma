@@ -38,8 +38,8 @@ public class MainController {
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
         HomeController.REGISTER,
         CalendarController.REGISTER,
+        StockController.REGISTER,
         TicketController.REGISTER,
-        StockController.REGISTER
     };
 
     private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER;
@@ -259,6 +259,7 @@ public class MainController {
 
         Label pageLabel = new Label();
         pageLabel.setText(register.name);
+        pageLabel.setStyle("-fx-font-size: 8pt;");
 
         VBox pageButtonBox = new VBox();
         pageButtonBox.setAlignment(Pos.CENTER);
