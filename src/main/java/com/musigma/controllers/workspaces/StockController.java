@@ -5,6 +5,7 @@ import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import impl.com.calendarfx.view.NumericTextField;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -65,7 +66,7 @@ public class StockController extends WorkspaceController {
      * @throws FestivalException si le festival est invalide
      */
     @FXML
-    public void initialize(Festival festival) throws FestivalException {
+    public void initialize(Festival festival) throws FestivalException, AvantageException {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
         tableView.setEditable(true); // Permet l'édition de la TableView

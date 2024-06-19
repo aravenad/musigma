@@ -1,6 +1,7 @@
 package com.musigma.controllers;
 
 import com.musigma.models.Festival;
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import javafx.scene.Node;
 
@@ -21,7 +22,7 @@ public abstract class WorkspaceController {
 
     protected Festival festival;
 
-    public void initialize(Festival festival) throws FestivalException {
+    public void initialize(Festival festival) throws FestivalException, AvantageException {
         this.festival = festival;
     }
 }
