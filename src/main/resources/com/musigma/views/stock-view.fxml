@@ -19,7 +19,7 @@
         <TextField fx:id="textFieldObjet" promptText="ex : Boisson" />
         <NumericTextField fx:id="textFieldQuantite" promptText="ex : 120" />
         <NumericTextField fx:id="textFieldPrix" promptText="ex : 2.99" />
-        <Button fx:id="ajouterButton" mnemonicParsing="false" text="Ajouter" />
+        <Button fx:id="buttonStock" mnemonicParsing="false" text="Ajouter" />
       <Label fx:id="total" text="Total :">
          <HBox.margin>
             <Insets left="10.0" />

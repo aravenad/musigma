@@ -187,4 +187,9 @@ public class Stock implements Serializable {
         return Objects.hash(name, quantity, fixed, avantages);
     }
 
+    @Override
+    public String toString(){
+        return this.getName();
+    }
+
 }
