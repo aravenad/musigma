@@ -15,6 +15,7 @@ module com.musigma {
     exports com.musigma;
     exports com.musigma.controllers;
     opens com.musigma.controllers to javafx.fxml;
+    opens com.musigma.controllers.components to javafx.fxml;
     exports com.musigma.controllers.workspaces;
     opens com.musigma.controllers.workspaces to javafx.fxml;
     exports com.musigma.utils;

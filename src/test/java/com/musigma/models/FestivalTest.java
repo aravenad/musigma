@@ -18,7 +18,7 @@ class FestivalTest {
 
     @BeforeEach
     void setUp() throws FestivalException, StockException, ArtisteException, TypeTicketException, AvantageException {
-        festival = new Festival("Valid Festival", LocalDateTime.now().plusDays(1), 100.0f, 500.0, "Paris");
+        festival = new Festival("Valid Festival", LocalDateTime.now().plusDays(1), 100, 500, "Paris");
         stock = new Stock("Bouteille Coca", 100, true, 2.5);
         artiste = new Artiste("DCAC", "rock", 100f);
         ticketType = new TypeTicket("VIP",10,60);
@@ -60,7 +60,7 @@ class FestivalTest {
 
     @Test
     void setArea() {
-        assertDoesNotThrow(() -> festival.setArea(1000.0), "L'aire du festival doit pouvoir être changé par une nouvelle valide");
+        assertDoesNotThrow(() -> festival.setArea(100), "L'aire du festival doit pouvoir être changé par une nouvelle valide");
         assertEquals(1000.0, festival.getArea(), "L'aire du festival doit être changé par la nouvelle valide");
         assertThrows(FestivalException.class, () -> festival.setArea(-500), "L'aire du festival ne doit pas pouvoir être changé par une nouvelle invalide car négative");
         assertThrows(FestivalException.class, () -> festival.setArea(0), "L'aire du festival ne doit pas pouvoir être changé par une nouvelle invalide car nulle (0)");
