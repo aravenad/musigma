@@ -2,10 +2,9 @@ package com.musigma.controllers.workspaces;
 
 import com.calendarfx.view.TimeField;
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.FloatTextField;
+import com.musigma.controllers.components.NotEmptyTextField;
 import com.musigma.models.Festival;
-import com.musigma.models.exception.FestivalException;
-import com.musigma.utils.exceptionMethods.Setter;
-import impl.com.calendarfx.view.NumericTextField;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -21,7 +20,7 @@ public class HomeController extends WorkspaceController {
     );
 
     @FXML
-    TextField festivalName;
+    NotEmptyTextField festivalName, festivalLocation;
 
     @FXML
     DatePicker festivalStartDate;
@@ -31,20 +30,27 @@ public class HomeController extends WorkspaceController {
     TimeField festivalStartTime;
 
     @FXML
-    TextField festivalLocation;
-
-    @FXML
-    NumericTextField festivalArea;
-
-    @FXML
-    NumericTextField festivalLocationPrice;
+    FloatTextField festivalArea, festivalLocationPrice;
 
     @Override
     public void initialize(Festival festival) {
-        useNotEmptyText(festivalName, festival.getName(), festival::setName);
-        useNotEmptyText(festivalLocation, festival.getLocation(), festival::setLocation);
-        usePositiveNotNull(festivalArea, festival.getArea(), festival::setArea);
-        usePositive(festivalLocationPrice, festival.getLocationPrice(), festival::setArea);
+        festivalName.bind(
+    "Mise à jour du nom du festival impossible",
+            festival.getName(), festival::setName
+        );
+        festivalLocation.bind(
+                "Mise à jour de l'emplacement du festival impossible",
+                festival.getLocation(), festival::setLocation
+        );
+        festivalArea.bindFloat(
+                "Mise à jour de l'aire de l'emplacement du festival impossible",
+                festival.getArea(), festival::setArea
+        );
+        festivalLocationPrice.bindFloat(
+                "Mise à jour du prix de l'emplacement du festival impossible",
+                festival.getLocationPrice(), festival::setLocationPrice
+        );
+
         festivalStartDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -58,35 +64,6 @@ public class HomeController extends WorkspaceController {
         "Changement de la date de départ impossible",
                 () -> festival.setStart(festivalStartDate.getValue().atStartOfDay())
             );
-        });
-    }
-
-    private void usePositive(NumericTextField tf, double defaultValue, Setter<Double> setter) {
-        useNotEmptyText(tf, String.format("%d", (long) defaultValue), (vString) -> {
-            double v = Double.parseDouble(vString);
-            if (v > 0)
-                setter.accept(v);
-        });
-    }
-
-    private void usePositiveNotNull(NumericTextField tf, double defaultValue, Setter<Double> setter) {
-        useNotEmptyText(tf, String.format("%d", (long) defaultValue), (vString) -> {
-            double v = Double.parseDouble(vString);
-            if (v >= 0)
-                setter.accept(v);
-        });
-    }
-
-    private void useNotEmptyText(TextField tf, String defaultValue, Setter<String> setter) {
-        tf.setText(defaultValue);
-        tf.textProperty().addListener(e -> {
-            String value = tf.getText();
-            if (!value.isEmpty()) {
-                tryCatch(
-                "Impossible de mettre à jour ",
-                    () -> setter.accept(value)
-                );
-            }
         });
     }
 }

@@ -38,7 +38,7 @@ public class Festival implements Serializable {
     private String location;
 
     // Aire de l'emplacement
-    private double area;
+    private float area;
 
     // Liste des artistes embauchés pour le festival
     private final ArrayList<Artiste> artistes;
@@ -62,7 +62,7 @@ public class Festival implements Serializable {
      * @param location l'emplacement du festival
      * @throws FestivalException si les valeurs des paramètres ne sont pas valides
      */
-    public Festival(String name, LocalDateTime start, float locationPrice, double area, String location) throws FestivalException {
+    public Festival(String name, LocalDateTime start, float locationPrice, float area, String location) throws FestivalException {
         LOGGER.info(String.format("Initialize Festival 0x%x", super.hashCode()));
         artistes = new ArrayList<>();
         ticketTypes = new ArrayList<>();
@@ -214,7 +214,7 @@ public class Festival implements Serializable {
      *
      * @return la superficie du festival
      */
-    public double getArea() {
+    public float getArea() {
         return area;
     }
 
@@ -224,7 +224,7 @@ public class Festival implements Serializable {
      * @param area la superficie du festival
      * @throws FestivalException si la superficie est négative
      */
-    public void setArea(double area) throws FestivalException {
+    public void setArea(float area) throws FestivalException {
         if (area <= 0)
             throw new FestivalException("La superficie est négative ou nulle (0), doit être positive");
         this.area = area;
@@ -401,6 +401,13 @@ public class Festival implements Serializable {
         return stocks;
     }
 
+    /**
+     * Retourne le prix total du festival.
+     * Le prix total est calculé en additionnant le prix de location et le prix des stocks.
+     *
+     * @param o l'objet à comparer
+     * @return true si les objets sont égaux, false sinon
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -409,6 +416,11 @@ public class Festival implements Serializable {
         return Float.compare(locationPrice, festival.locationPrice) == 0 && Double.compare(area, festival.area) == 0 && Objects.equals(file, festival.file) && Objects.equals(name, festival.name) && Objects.equals(start, festival.start) && Objects.equals(location, festival.location) && Objects.equals(artistes, festival.artistes) && Objects.equals(ticketTypes, festival.ticketTypes) && Objects.equals(stocks, festival.stocks) && Objects.equals(representations, festival.representations);
     }
 
+    /**
+     * Retourne le hashcode du festival.
+     *
+     * @return le hashcode du festival
+     */
     @Override
     public int hashCode() {
         return Objects.hash(file, name, start, locationPrice, location, area, artistes, ticketTypes, stocks, representations);

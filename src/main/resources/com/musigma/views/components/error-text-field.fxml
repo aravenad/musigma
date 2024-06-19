@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<fx:root maxHeight="-Infinity" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+    <TextField fx:id="input" GridPane.columnIndex="1" />
+    <Text fx:id="error" fill="#ff0c0c" layoutX="1.0" layoutY="37.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Error" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+  </children>
+</fx:root>

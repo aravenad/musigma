@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import com.musigma.controllers.components.*?>
 <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.HomeController">
 <columnConstraints>
   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -40,7 +41,8 @@
               </rowConstraints>
                <children>
                   <Label text="Nom :" />
-                  <TextField fx:id="festivalName" promptText="ex: HellFest" GridPane.columnIndex="1" />
+                  <NotEmptyTextField fx:id="festivalName" promptText="ex: HellFest" GridPane.columnIndex="1" />
+
                   <Label text="Date du début:" GridPane.rowIndex="1" />
                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                        <children>
@@ -52,13 +54,13 @@
                        </children></HBox>
 
                   <Label text="Emplacement :" GridPane.rowIndex="2" />
-                  <TextField fx:id="festivalLocation" promptText="ex: Lyon" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <NotEmptyTextField fx:id="festivalLocation" promptText="ex: Lyon" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                   <Label text="Aire de l'emplacement :" GridPane.rowIndex="3" />
-                  <NumericTextField fx:id="festivalArea" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <FloatTextField fx:id="festivalArea" positive="true" notNull="true" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
                   <Label text="Prix de l'emplacement :" GridPane.rowIndex="4" />
-                  <NumericTextField fx:id="festivalLocationPrice" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <FloatTextField fx:id="festivalLocationPrice" positive="true" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                </children>
             </GridPane>
          </body>

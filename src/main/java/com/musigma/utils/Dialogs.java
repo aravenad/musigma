@@ -4,6 +4,7 @@ import com.musigma.utils.exceptionMethods.Runner;
 import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 
@@ -19,7 +20,8 @@ public class Dialogs {
         try {
             function.run();
         } catch (Exception e) {
-            LOGGER.severe(String.format("%s : %s", errorMsg, e.getMessage()));
+            for (StackTraceElement error : e.getStackTrace())
+                LOGGER.severe(String.format("%s : %s", errorMsg, error));
             Alert alert = new Alert(
                 Alert.AlertType.ERROR,
                 String.format("L'application a rencontré une erreur :\n%s :\n%s", errorMsg, e.getMessage())
@@ -34,7 +36,8 @@ public class Dialogs {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, succesMsg);
             alert.showAndWait();
         } catch (Exception e) {
-            LOGGER.severe(String.format("%s : %s", errorMsg, e.getMessage()));
+            for (StackTraceElement error : e.getStackTrace())
+                LOGGER.severe(String.format("%s : %s", errorMsg, error));
             Alert alert = new Alert(
                 Alert.AlertType.ERROR,
                 String.format("L'application a rencontré une erreur :\n%s :\n%s", errorMsg, e.getMessage())
