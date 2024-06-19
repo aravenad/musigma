@@ -11,6 +11,8 @@ import javafx.scene.control.*;
 
 import java.time.LocalDate;
 
+import static com.musigma.utils.Dialogs.tryCatch;
+
 public class HomeController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
         "Home",
@@ -52,11 +54,10 @@ public class HomeController extends WorkspaceController {
         });
         festivalStartDate.setValue(festival.getStart().toLocalDate());
         festivalStartDate.valueProperty().addListener(e -> {
-            try {
-                festival.setStart(festivalStartDate.getValue().atStartOfDay());
-            } catch (FestivalException ex) {
-                throw new RuntimeException(ex);
-            }
+            tryCatch(
+        "Changement de la date de départ impossible",
+                () -> festival.setStart(festivalStartDate.getValue().atStartOfDay())
+            );
         });
     }
 
@@ -81,11 +82,10 @@ public class HomeController extends WorkspaceController {
         tf.textProperty().addListener(e -> {
             String value = tf.getText();
             if (!value.isEmpty()) {
-                try {
-                    setter.accept(value);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+                tryCatch(
+                "Impossible de mettre à jour ",
+                    () -> setter.accept(value)
+                );
             }
         });
     }

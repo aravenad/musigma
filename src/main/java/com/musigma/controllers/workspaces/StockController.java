@@ -5,11 +5,14 @@ import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.StockException;
+import impl.com.calendarfx.view.NumericTextField;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+
+import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
  * Contrôleur pour l'espace de travail Stock.
@@ -25,19 +28,26 @@ public class StockController extends WorkspaceController {
     );
 
     @FXML
-    TextField textFieldObjet, textFieldQuantite, textFieldPrix;
+    TextField textFieldObjet;
+
+    @FXML
+    NumericTextField textFieldQuantite, textFieldPrix;
 
     @FXML
     Button ajouterButton;
 
     @FXML
     TableView<Stock> tableView;
+
     @FXML
     TableColumn<Stock, String> nameColumn;
+
     @FXML
     TableColumn<Stock, Integer> quantityColumn;
+
     @FXML
     TableColumn<Stock, Double> priceColumn;
+
     @FXML
     TableColumn<Stock, Void> actionColumn;
     /**
@@ -48,15 +58,8 @@ public class StockController extends WorkspaceController {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
         addListener();
-        ajouterButton.setOnAction(e -> {
-            try {
-                onAjouterPressed();
-            } catch (StockException ex) {
-                throw new RuntimeException(ex);
-            } catch (FestivalException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        ajouterButton.setOnAction(e -> onAjouterPressed()
+        );
         nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
@@ -71,9 +74,9 @@ public class StockController extends WorkspaceController {
         Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>>() {
             @Override
             public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
-                final TableCell<Stock, Void> cell = new TableCell<Stock, Void>() {
+                final TableCell<Stock, Void> cell = new TableCell<>() {
 
-                    private final Button btn = new Button("❌");
+                    private final Button btn = new Button("Supprimer");
 
                     {
                         btn.setOnAction((e) -> {
@@ -114,7 +117,7 @@ public class StockController extends WorkspaceController {
         });
 
         textFieldPrix.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().isEmpty() || newValue.trim().isBlank() || !isNumeric(newValue.trim())) {
+            if (newValue.trim().isEmpty() || newValue.trim().isBlank()) {
                 textFieldPrix.setStyle("-fx-border-color: crimson;");
             } else {
                 textFieldPrix.setStyle("-fx-border-color: transparent;");
@@ -122,7 +125,7 @@ public class StockController extends WorkspaceController {
         });
 
         textFieldQuantite.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().isEmpty() || newValue.trim().isBlank() || !isNumeric(newValue.trim())) {
+            if (newValue.trim().isEmpty() || newValue.trim().isBlank()) {
                 textFieldQuantite.setStyle("-fx-border-color: crimson;");
             } else {
                 textFieldQuantite.setStyle("-fx-border-color: transparent;");
@@ -136,7 +139,7 @@ public class StockController extends WorkspaceController {
      *
      * @throws StockException si le stock n'est pas valide
      */
-    private void onAjouterPressed() throws StockException, FestivalException {
+    private void onAjouterPressed() {
         textFieldObjet.setStyle("-fx-border-color: transparent;");
         textFieldPrix.setStyle("-fx-border-color: transparent;");
         textFieldQuantite.setStyle("-fx-border-color: transparent;");
@@ -144,33 +147,28 @@ public class StockController extends WorkspaceController {
         if (textFieldObjet.getText().trim().equals("Objet") || textFieldObjet.getText().trim().isEmpty() || textFieldObjet.getText().trim().isBlank() || textFieldObjet.getText().matches(".*[^a-zA-Z-\\s].*")) {
             textFieldObjet.requestFocus();
             textFieldObjet.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldPrix.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank() || !isNumeric(textFieldPrix.getText().trim())) {
+        } else if (textFieldPrix.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank()) {
             textFieldPrix.requestFocus();
             textFieldPrix.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldQuantite.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank() || !isNumeric(textFieldQuantite.getText().trim())) {
+        } else if (textFieldQuantite.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank()) {
             textFieldQuantite.requestFocus();
             textFieldQuantite.setStyle("-fx-border-color: crimson;");
         } else {
-            Stock stock = new Stock(textFieldObjet.getText(), Integer.parseInt(textFieldQuantite.getText()), true, Double.parseDouble(textFieldPrix.getText()));
-            festival.addStock(stock);
-            tableView.getItems().add(stock);
-            textFieldObjet.setStyle("-fx-border-color: transparent;");
-            textFieldPrix.setStyle("-fx-border-color: transparent;");
-            textFieldQuantite.setStyle("-fx-border-color: transparent;");
-        }
-    }
-
-    /**
-     * Vérifie si une chaîne de caractères est numérique.
-     * @param str la chaîne de caractères
-     * @return true si la chaîne est numérique, false sinon
-     */
-    private boolean isNumeric(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
+            tryCatch(
+        "Ajout du stock impossible",
+                () -> {
+                    Stock stock = new Stock(
+                        textFieldObjet.getText(),
+                            Integer.parseInt(textFieldQuantite.getText()),
+                            true,
+                            Double.parseDouble(textFieldPrix.getText()));
+                    festival.addStock(stock);
+                    tableView.getItems().add(stock);
+                    textFieldObjet.setStyle("-fx-border-color: transparent;");
+                    textFieldPrix.setStyle("-fx-border-color: transparent;");
+                    textFieldQuantite.setStyle("-fx-border-color: transparent;");
+                }
+            );
         }
     }
 }
