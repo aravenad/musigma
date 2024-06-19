@@ -41,10 +41,16 @@ public class TicketController extends WorkspaceController {
     ComboBox<Stock> comboAvantage;
 
     /**
-     * Initialise le contrôleur de l'espace de travail Ticket.
-     * @param festival
-     * @throws FestivalException
-     * @throws AvantageException
+     * Initialisation de l'espace de travail, restauration des onglets et ajout des écouteurs , definition des actions des boutons
+     * definition de la comboBox et verification des tickets
+     * @param festival Festival
+     * @throws FestivalException si le festival est invalide
+     * @throws AvantageException si l'avantage est invalide
+     * @see #restoreTab()
+     * @see #addListener()
+     * @see #initializeComboBox()
+     * @see #checkTicket()
+     * @see #onAddTicketPressed()
      */
     @FXML
     public void initialize(Festival festival) throws FestivalException, AvantageException {
@@ -62,9 +68,9 @@ public class TicketController extends WorkspaceController {
         });
         buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
-
     /**
-     * Ajoute un écouteur sur les champs de texte.
+     * Ajoute un écouteur sur les champs de texte pour vérifier si les valeurs sont valides
+     * @see #onAddTicketPressed()
      */
     private void addListener() {
         textFieldType.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -91,9 +97,12 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Ajoute un ticket à la liste des tickets.
-     * @throws FestivalException
-     * @throws TypeTicketException
+     * Ajoute un ticket à la liste des tickets. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
+     * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket. Vérifie si la liste des tickets est vide.
+     * Sinon, les champs de saisie invalides sont surlignés en rouge.
+     * @throws FestivalException si le festival est invalide
+     * @throws TypeTicketException si le ticket est invalide
+     * @see #addListener()
      */
     private void onAddTicketPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
@@ -120,8 +129,12 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Crée un onglet pour un ticket.
-     * @param ticket
+     * Crée un onglet pour un ticket. Crée un TableView pour les avantages du ticket.
+     * Ajoute les colonnes "Avantage" et "Quantité" au TableView.
+     * Ajoute l'avantage au TableView.
+     * Ajoute le TableView à l'onglet. Ajoute l'onglet au TabPane.
+     * @param ticket TypeTicket Ticket a ajouter
+     *
      */
     private void createTab(TypeTicket ticket) {
         Tab newTab = new Tab(ticket.getType());
@@ -138,7 +151,8 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Restaure les onglets des tickets.
+     * Restaure les onglets pour les tickets. Ajoute les avantages des tickets aux TableView.
+     * @see #createTab(TypeTicket)
      */
     private void restoreTab() {
         for (int i = 0; i < festival.getTicketTypes().size(); i++) {
@@ -153,7 +167,9 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Initialise la liste déroulante des stocks.
+     * Initialise la ComboBox pour les avantages. Convertit les objets Stock en chaînes de caractères.
+     * Ajoute les stocks du festival à la ComboBox.
+     * @see #initialize(Festival)
      */
     private void initializeComboBox() {
         comboAvantage.setConverter(new StringConverter<>() {
@@ -170,7 +186,10 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Vérifie si le festival contient des tickets.
+     * Vérifie si la liste des tickets est vide.
+     * Si la liste est vide, la ComboBox, le champ de texte et le bouton pour les avantages sont masqués.
+     * Sinon, la ComboBox, le champ de texte et le bouton pour les avantages sont affichés.
+     * @see #initialize(Festival)
      */
     private void checkTicket() {
         if (festival.getTicketTypes().isEmpty()) {
@@ -185,7 +204,10 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Ajoute un avantage à un ticket.
+     * Ajoute un avantage à un ticket. Si les champs de saisie sont valides, un avantage est créé et ajouté à la liste.
+     * Sauvegarde l'avantage dans la liste des avantages du ticket. Ajoute l'avantage au TableView.
+     * @see #initialize(Festival)
+     * @see #addListener()
      */
     private void onAddAvantagePressed() {
         if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
@@ -202,6 +224,7 @@ public class TicketController extends WorkspaceController {
             } catch (TypeTicketException e) {
                 throw new RuntimeException(e);
             } catch (NumberFormatException e) {
+                // Gérer les cas où la conversion de textFieldAvantage en entier échoue
                 textFieldAvantage.requestFocus();
                 textFieldAvantage.setStyle("-fx-border-color: crimson;");
                 return;
@@ -210,7 +233,9 @@ public class TicketController extends WorkspaceController {
             textFieldAvantage.requestFocus();
             textFieldAvantage.setStyle("-fx-border-color: crimson;");
         }
+        // Réinitialiser la bordure du champ texte et effacer le texte
         textFieldAvantage.setStyle("-fx-border-color: transparent;");
         textFieldAvantage.clear();
     }
+
 }
