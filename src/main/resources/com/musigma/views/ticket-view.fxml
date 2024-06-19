@@ -4,9 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="697.0" prefWidth="1058.0"  xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.TicketController">
+<VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.TicketController">
     <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10" >
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10">
             <children>
                 <TextField fx:id="textFieldType" promptText="ex : VIP">
                     <opaqueInsets>
@@ -16,7 +16,6 @@
                 <TextField fx:id="textFieldQuantite" promptText="ex : 100" />
                 <TextField fx:id="textFieldPrix" promptText="ex : 10.99" />
                 <Button fx:id="ajouterButton" mnemonicParsing="false" text="Ajouter" />
-                <Button fx:id="renommer" mnemonicParsing="false" text="Update" />
 
             </children>
             <opaqueInsets>

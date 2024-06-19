@@ -32,14 +32,9 @@ public class TicketController extends WorkspaceController {
     @FXML
     Button ajouterButton;
 
-    @FXML
-    Button update; //TODO: le bouton est casser depuis qu'on retire la tableView de base
 
     @FXML
     TabPane tabPane;
-
-    @FXML
-    TableView<String> tableView;
 
     @FXML
     TableColumn<Avantage, String> avantageColumn;
@@ -63,14 +58,10 @@ public class TicketController extends WorkspaceController {
             }
         });
 
-        configureTableView();
 
-        for (TypeTicket ticket : festival.getTicketTypes()) {
-            tableView.getColumns().add(new TableColumn<>(ticket.getType()));
-        }
     }
 
-    private void addListener() { //duplicata
+    private void addListener() {
         textFieldType.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.trim().equals("Objet") || newValue.trim().isEmpty() || newValue.trim().isBlank() || newValue.matches(".*[^a-zA-Z-\\s].*")) {
                 textFieldType.setStyle("-fx-border-color: crimson;");
@@ -96,25 +87,6 @@ public class TicketController extends WorkspaceController {
         });
     }
 
-    private void configureTableView() {
-        if (tableView != null) {
-            tableView.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2) {
-                    Stock newRow = null;
-                    try {
-                        newRow = new Stock("Nouveau stock", 10, true, 10);
-                    } catch (StockException e) {
-                        throw new RuntimeException(e);
-                    }
-                    tableView.getItems().add("Nouveau stock");
-
-                    System.out.println("Double clicked, new row added");
-                }
-            });
-        } else {
-            System.err.println("tableView is null. Please check your FXML file.");
-        }
-    }
 
     private void onAjouterPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
@@ -153,26 +125,12 @@ public class TicketController extends WorkspaceController {
     private void createTab(TypeTicket ticket) throws FestivalException {
         Tab newTab = new Tab(ticket.getType());
         TableView<Stock> newTableView = new TableView<>();
-        // ajouter 2 colonnes pour les avantages et les quantités
         TableColumn<Stock, Avantage> avantageColumn = new TableColumn<>("Avantage");
         TableColumn<Stock, Integer> quantityColumn = new TableColumn<>("Quantité");
         newTableView.getColumns().add(avantageColumn);
         newTableView.getColumns().add(quantityColumn);
         newTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         newTab.setContent(newTableView);
-
-        // Event LIstener de l'autre
-        newTableView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                try {
-                    newTableView.getItems().add(new Stock("Nouveau stock", 10, true, 10));
-                    System.out.println("Double clicked, new row added to new table");
-                    //TODO: demander a bastien et damien de faire en sorte que le texte s'affiche
-                } catch (StockException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
 
         tabPane.getTabs().add(newTab);
     }
