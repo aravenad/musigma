@@ -40,13 +40,14 @@ public class Avantage implements Serializable {
         LOGGER.info("Initialized Avantage");
         this.ticketType = ticketType;
         this.stock = stock;
-        ticketType.addAvantage(this);
-        stock.addAvantage(this);
         setQuantityByTicket(quantityByTicket);
         LOGGER.info("Created Avantage");
     }
 
-    public void add() throws TypeTicketException, StockException {
+    public void add() throws TypeTicketException, StockException, AvantageException {
+        if (ticketType.getAvantages().stream().anyMatch(av -> av.getStock().equals(stock))) {
+            throw new AvantageException("Un avantage identique existe déjà pour ce stock");
+        }
         ticketType.addAvantage(this);
         stock.addAvantage(this);
     }

@@ -5,6 +5,6 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.CalendarController">
     <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0">
-        <CalendarView fx:id="calendarView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="697" prefWidth="1058" />
+        <WeekView fx:id="weekView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="697" prefWidth="1058" />
     </StackPane>
 </AnchorPane>

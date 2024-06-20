@@ -11,7 +11,6 @@ import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
@@ -38,10 +37,10 @@ public class TicketController extends WorkspaceController {
     RequiredTextField textFieldType;
 
     @FXML
-    IntTextField textFieldQuantite;
+    IntTextField textFieldQuantite, textFieldAvantage;
 
     @FXML
-    FloatTextField textFieldPrix, textFieldAvantage;
+    FloatTextField textFieldPrix;
 
     @FXML
     Button buttonTicket, buttonAvantage;
@@ -63,7 +62,6 @@ public class TicketController extends WorkspaceController {
      * @throws AvantageException si l'avantage est invalide
      * @see #restoreTab()
      * @see #initializeComboBox()
-     * @see #checkTicket()
      * @see #onAddTicketPressed()
      */
     @FXML
@@ -71,14 +69,7 @@ public class TicketController extends WorkspaceController {
         super.initialize(festival);
         restoreTab();
         initializeComboBox();
-        checkTicket();
-        buttonTicket.setOnAction(e -> {
-            try {
-                onAddTicketPressed();
-            } catch (TypeTicketException | FestivalException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        buttonTicket.setOnAction(e -> onAddTicketPressed());
         buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
 
@@ -86,31 +77,23 @@ public class TicketController extends WorkspaceController {
      * Ajoute un ticket à la liste des tickets. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
      * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket. Vérifie si la liste des tickets est vide.
      * Sinon, les champs de saisie invalides sont surlignés en rouge.
-     * @throws FestivalException si le festival est invalide
-     * @throws TypeTicketException si le ticket est invalide
      */
-    private void onAddTicketPressed() throws FestivalException, TypeTicketException {
-        textFieldType.setStyle("-fx-border-color: transparent;");
-        textFieldPrix.setStyle("-fx-border-color: transparent;");
-        textFieldQuantite.setStyle("-fx-border-color: transparent;");
-        if (textFieldType.getText().trim().equals("Objet") || textFieldType.getText().trim().isEmpty() || textFieldType.getText().trim().isBlank() || textFieldType.getText().matches(".*[^a-zA-Z-\\s].*")) {
-            textFieldType.requestFocus();
-            textFieldType.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldPrix.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank()) {
-            textFieldPrix.requestFocus();
-            textFieldPrix.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldQuantite.getText().trim().isEmpty() || textFieldQuantite.getText().trim().isBlank()) {
-            textFieldQuantite.requestFocus();
-            textFieldQuantite.setStyle("-fx-border-color: crimson;");
-        } else {
-            TypeTicket ticket = new TypeTicket(textFieldType.getText(), Integer.parseInt(textFieldQuantite.getText()), Float.parseFloat(textFieldPrix.getText()));
-            festival.addTicketType(ticket);
-            createTab(ticket);
-            textFieldType.setStyle("-fx-border-color: transparent;");
-            textFieldPrix.setStyle("-fx-border-color: transparent;");
-            textFieldQuantite.setStyle("-fx-border-color: transparent;");
-            checkTicket();
-        }
+    private void onAddTicketPressed() {
+        tryCatch(
+    "Ajout du type de ticket impossible",
+            () -> {
+                if (textFieldType.isValid())
+                    textFieldType.requestFocus();
+                else if (textFieldPrix.isValid())
+                    textFieldPrix.requestFocus();
+                else if (textFieldQuantite.isValid())
+                    textFieldQuantite.requestFocus();
+                else {
+                    TypeTicket ticket = new TypeTicket(textFieldType.getText(), Integer.parseInt(textFieldQuantite.getText()), Float.parseFloat(textFieldPrix.getText()));
+                    festival.addTicketType(ticket);
+                }
+            }
+        );
     }
 
     /**
@@ -141,8 +124,8 @@ public class TicketController extends WorkspaceController {
         quantityColumn.setOnEditCommit(event -> {
             Avantage avantage = event.getRowValue();
             tryCatch(
-                    "Impossible de modifier la quantité du stock",
-                    () -> avantage.setQuantityByTicket(event.getNewValue()));
+                "Impossible de modifier la quantité du stock",
+                () -> avantage.setQuantityByTicket(event.getNewValue()));
         });
     }
 
@@ -166,11 +149,12 @@ public class TicketController extends WorkspaceController {
                             btn.setOnAction((e) -> {
                                 Avantage avantage = getTableView().getItems().get(getIndex());
                                 tryCatch(
-                                        "Impossible de supprimer l'avantage",
-                                        () -> {
-                                            festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).removeAvantage(avantage);
-                                            getTableView().getItems().remove(avantage);
-                                        });
+                            "Impossible de supprimer l'avantage",
+                                    () -> {
+                                        festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).removeAvantage(avantage);
+                                        getTableView().getItems().remove(avantage);
+                                        System.out.println(getTableView().getItems());
+                                    });
                             });
                         }
                     }
@@ -217,41 +201,18 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Vérifie si la liste des tickets est vide.
-     * Si la liste est vide, la ComboBox, le champ de texte et le bouton pour les avantages sont masqués.
-     * Sinon, la ComboBox, le champ de texte et le bouton pour les avantages sont affichés.
-     * @see #initialize(Festival)
-     */
-    private void checkTicket() {
-        if (festival.getTicketTypes().isEmpty()) {
-            comboAvantage.setVisible(false);
-            textFieldAvantage.setVisible(false);
-            buttonAvantage.setVisible(false);
-            labelAvantage.setVisible(false);
-            labelQuantiteAvantage.setVisible(false);
-        } else {
-            comboAvantage.setVisible(true);
-            textFieldAvantage.setVisible(true);
-            buttonAvantage.setVisible(true);
-            labelAvantage.setVisible(true);
-            labelQuantiteAvantage.setVisible(true);
-        }
-    }
-
-    /**
      * Ajoute un avantage à un ticket. Si les champs de saisie sont valides, un avantage est créé et ajouté à la liste.
      * Sauvegarde l'avantage dans la liste des avantages du ticket. Ajoute l'avantage au TableView.
      * @see #initialize(Festival)
      */
     private void onAddAvantagePressed() {
-        if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
+        if (comboAvantage.getSelectionModel().getSelectedItem() != null && textFieldAvantage.isValid()) {
             tryCatch(
         "Ajout de l'avantage impossible",
                 () -> {
                     TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
                     Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
-                    int quantity = Integer.parseInt(textFieldAvantage.getText());
-                    Avantage avantage = new Avantage(ticket, stock, quantity);
+                    Avantage avantage = new Avantage(ticket, stock, textFieldAvantage.getValue());
                     avantage.add();
                     TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
                     tableView.getItems().add(avantage);
