@@ -1,7 +1,6 @@
 package com.musigma.controllers.workspaces;
 
 import com.musigma.controllers.WorkspaceController;
-import com.musigma.controllers.components.CustomValidField;
 import com.musigma.controllers.components.FloatTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
@@ -11,7 +10,6 @@ import javafx.scene.control.DatePicker;
 
 import java.time.LocalDate;
 
-import static com.musigma.utils.Dialogs.askValidForm;
 import static com.musigma.utils.Dialogs.tryCatch;
 
 /**

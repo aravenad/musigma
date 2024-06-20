@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.calendarfx.view.*?>
-<?import javafx.scene.layout.*?>
+<?import com.calendarfx.view.DetailedWeekView?>
+<?import com.musigma.controllers.components.IntTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.CalendarController">
-    <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0">
-        <WeekView fx:id="weekView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="697" prefWidth="1058" />
-    </StackPane>
+<?import javafx.scene.control.TextField?>
+<?import com.calendarfx.view.CalendarView?>
+<AnchorPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.CalendarController">
+    <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0" />
+   <VBox prefHeight="200.0" prefWidth="100.0">
+      <children>
+         <HBox alignment="CENTER_LEFT" prefHeight="51.0" prefWidth="1058.0" spacing="10" style="-color-danger-fg: -color-neutral-muted">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+            <children>
+               <Label text="date debut:" />
+               <IntTextField fx:id="dateDebut" maxHeight="-Infinity" promptText="ex :  2" />
+               <Label text="date fin" />
+               <IntTextField fx:id="dateFin" maxHeight="-Infinity" promptText="ex : 4" />
+               <Label text="nom:" />
+               <TextField fx:id="nomEvent" maxHeight="-Infinity" promptText="ex : didier chatant" />
+               <TextField fx:id="scene" maxHeight="-Infinity" promptText="ex : scene 1" />
+               <Button fx:id="addEventButton" mnemonicParsing="false" text="Ajouter" />
+            </children>
+            <VBox.margin>
+               <Insets bottom="10.0" />
+            </VBox.margin>
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets>
+         </HBox>
+           <CalendarView fx:id="calendarView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="697" prefWidth="1058" />
+      </children>
+   </VBox>
 </AnchorPane>
