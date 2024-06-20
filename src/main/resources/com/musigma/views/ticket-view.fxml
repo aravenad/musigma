@@ -6,24 +6,31 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.TicketController">
     <children>
-        <HBox style="-color-danger-fg: -color-neutral-muted" alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10">
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
             <children>
-            <RequiredTextField fx:id="textFieldType" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="125.0" promptText="ex : VIP" />
-            <IntTextField fx:id="textFieldQuantite" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" notNull="true" positive="true" prefHeight="25.0" prefWidth="125.0" promptText="ex : 100" />
-            <FloatTextField fx:id="textFieldPrix" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" notNull="true" positive="true" prefHeight="25.0" prefWidth="125.0" promptText="ex : 10.99" />
-                <Button fx:id="buttonTicket" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Ticket" />
-            <ComboBox fx:id="comboAvantage" prefWidth="135.0" promptText="Sélectionner...">
+            <Label text="Type :" />
+            <RequiredTextField fx:id="textFieldType" alignment="CENTER" promptText="ex : VIP">
                <HBox.margin>
-                  <Insets left="70.0" />
-               </HBox.margin></ComboBox>
-            <FloatTextField fx:id="textFieldAvantage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="125.0" promptText="ex : 10.99" />
-            <Button fx:id="buttonAvantage" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Avantage" />
+                  <Insets />
+               </HBox.margin></RequiredTextField>
+            <Label text="Quantité :" />
+            <IntTextField fx:id="textFieldQuantite" alignment="CENTER" notNull="true" positive="true" promptText="ex : 100">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></IntTextField>
+            <Label text="Prix :" />
+            <FloatTextField fx:id="textFieldPrix" alignment="CENTER" notNull="true" positive="true" promptText="ex : 10.99">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></FloatTextField>
+                <Button fx:id="buttonTicket" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Ticket" />
 
             </children>
             <opaqueInsets>
@@ -36,6 +43,36 @@
                 <Insets />
             </VBox.margin>
         </HBox>
-      <TabPane fx:id="tabPane" prefHeight="648.0" prefWidth="1058.0" tabClosingPolicy="UNAVAILABLE" />
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
+         <children>
+            <Label text="Avantage :" />
+            <ComboBox fx:id="comboAvantage1" prefWidth="135.0" promptText="Sélectionner...">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </ComboBox>
+            <Label text="Quantité :" />
+            <FloatTextField fx:id="textFieldAvantage1" alignment="CENTER" promptText="ex : 100">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </FloatTextField>
+            <Button fx:id="buttonAvantage1" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Avantage">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <TabPane fx:id="tabPane" prefHeight="615.0" prefWidth="1058.0" tabClosingPolicy="UNAVAILABLE" />
     </children>
 </VBox>
