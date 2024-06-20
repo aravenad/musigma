@@ -5,6 +5,7 @@ import com.calendarfx.model.CalendarEvent;
 import com.calendarfx.model.CalendarSource;
 import com.calendarfx.view.CalendarView;
 import com.calendarfx.model.Entry;
+import com.calendarfx.view.WeekView;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
@@ -31,13 +32,13 @@ public class CalendarController extends WorkspaceController {
     );
 
     @FXML
-    CalendarView calendarView; // (1)
+    WeekView weekView;
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
     public void initialize(Festival festival) throws TypeTicketException {
         super.initialize(festival);
-        calendarView.setEntryFactory(createEntryParameter -> {
+        weekView.setEntryFactory(createEntryParameter -> {
             Entry<?> entry = new Entry<>();
             entry.changeStartDate(LocalDate.now());
             entry.changeEndDate(LocalDate.now().plusDays(1));
@@ -47,7 +48,7 @@ public class CalendarController extends WorkspaceController {
         calendar.addEntry(new Entry<>());
         CalendarSource calendarSource = new CalendarSource("Festival");
         calendarSource.getCalendars().add(calendar);
-        calendarView.getCalendarSources().add(calendarSource);
+        weekView.getCalendarSources().add(calendarSource);
         EventHandler<CalendarEvent> handler = this::addToModel;
         calendar.addEventHandler(handler);
     }
