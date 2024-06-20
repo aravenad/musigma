@@ -2,16 +2,19 @@ package com.musigma.controllers.workspaces;
 
 import com.calendarfx.model.Calendar;
 import com.calendarfx.model.CalendarEvent;
-import com.calendarfx.model.Entry;
+import com.calendarfx.model.CalendarSource;
 import com.calendarfx.view.CalendarView;
+import com.calendarfx.model.Entry;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Artiste;
+import com.musigma.models.Festival;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
-import com.musigma.models.exception.FestivalException;
-import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,31 +27,30 @@ public class CalendarController extends WorkspaceController {
     );
 
     @FXML
-    private CalendarView calendarView;
+    CalendarView calendarView; // (1)
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
-    private Calendar calendar = new Calendar("My Calendar");
 
+    public void initialize(Festival festival) {
+        super.initialize(festival);
+        calendarView.setEntryFactory(createEntryParameter -> {
+            Entry<?> entry = new Entry<>();
+            entry.changeStartDate(LocalDate.now());
+            entry.changeEndDate(LocalDate.now().plusDays(1));
+            return entry;
+        });
+        Calendar calendar = new Calendar("Planning");
+        calendar.addEntry(new Entry<>());
+        CalendarSource calendarSource = new CalendarSource("Festival");
+        calendarSource.getCalendars().add(calendar);
+        calendarView.getCalendarSources().add(calendarSource);
+        EventHandler<CalendarEvent> handler = this::addToModel;
+        calendar.addEventHandler(handler);
+    }
 
-    private void handleCalendarEvent(Event event) {
-        if (event instanceof CalendarEvent) {
-            CalendarEvent calendarEvent = (CalendarEvent) event;
-            if (calendarEvent.getEventType() == CalendarEvent.ENTRY_CALENDAR_CHANGED && calendarEvent.getEntry().getCalendar() == calendar) {
-                Entry<?> entry = calendarEvent.getEntry();
-                try {
-                    entries.add(entry);
-                    festival.addRepresentation(
-                            new Representation(
-                                    ((entry.getStartAsLocalDateTime().getHour() * 60) + entry.getStartAsLocalDateTime().getMinute()) - ((festival.getStart().getHour() * 60) + festival.getStart().getMinute()),
-                                    10,
-                                    "ogr",
-                                    new Artiste("Rodrigo", "Rock", 10))
-                    );
-                    System.out.println("New entry added: " + entry.getTitle());
-                } catch (ArtisteException | FestivalException e) {
-                    e.printStackTrace();
-                }
-            }
+    private void addToModel(CalendarEvent calendarEvent) {
+        if(calendarEvent.getEventType() == CalendarEvent.ANY){
+            System.out.println("mofiqh");
         }
     }
 
@@ -62,7 +64,6 @@ public class CalendarController extends WorkspaceController {
                 new Artiste("Rodrigo", "Rock", 10)
         );
         entry.setUserObject(representation);
-        calendar.addEntry(entry);
         entries.add(entry);
     }
 
