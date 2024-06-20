@@ -10,6 +10,7 @@ import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
+import com.musigma.models.exception.TypeTicketException;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -34,7 +35,7 @@ public class CalendarController extends WorkspaceController {
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws TypeTicketException {
         super.initialize(festival);
         calendarView.setEntryFactory(createEntryParameter -> {
             Entry<?> entry = new Entry<>();
