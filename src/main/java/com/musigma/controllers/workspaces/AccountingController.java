@@ -2,9 +2,10 @@ package com.musigma.controllers.workspaces;
 
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+
+import static com.musigma.utils.Dialogs.tryCatch;
 
 
 /**
@@ -24,11 +25,15 @@ public class AccountingController extends WorkspaceController {
     Label labelValue, labelCapa, labelSecu;
 
     @FXML
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
-        labelValue.setText(String.valueOf(festival.optimizeResult()));
-        labelCapa.setText(String.valueOf(getRecommandedPerson()) + " personnes");
-        labelSecu.setText(String.valueOf(getRecommandedSecurity()) + " agents de sécurité");
+        tryCatch(
+    "Erreur lors de l'optimisation de la prévision.",
+            () -> {
+                labelValue.setText(String.valueOf(festival.optimizeResult()));
+                labelCapa.setText(String.valueOf(getRecommandedPerson()) + " personnes");
+                labelSecu.setText(String.valueOf(getRecommandedSecurity()) + " agents de sécurité");
+        });
     }
 
     public int getRecommandedPerson() {

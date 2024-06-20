@@ -1,7 +1,6 @@
 package com.musigma.controllers.workspaces;
 
 import com.calendarfx.view.CalendarView;
-import com.calendarfx.view.DetailedWeekView;
 import com.calendarfx.model.Calendar;
 import com.calendarfx.model.CalendarEvent;
 import com.calendarfx.model.CalendarSource;
@@ -55,13 +54,13 @@ public class CalendarController extends WorkspaceController {
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
         Calendar calendar = new Calendar("Planning");
         CalendarSource calendarSource = new CalendarSource("Festival");
         calendarSource.getCalendars().add(calendar);
         calendarView.getCalendarSources().add(calendarSource);
-        EventHandler<CalendarEvent> handler = this::addToModel; // tentée de faire des events lorsque le calendrier est modifier
+        EventHandler<CalendarEvent> handler = this::addToModel;
         calendar.addEventHandler(handler);
 
         //ajoutes des Entrée dans la liste entries pour ensuite les ajouter dans le planning
@@ -96,7 +95,6 @@ public class CalendarController extends WorkspaceController {
                 throw new RuntimeException(ex);
             }
         });
-
     }
 
     //Est censé etre la methode appelé lors ce que le calendrier est modifié

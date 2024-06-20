@@ -19,7 +19,7 @@ public abstract class WorkspaceController {
      *
      * @param festival le festival à initialiser
      */
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         this.festival = festival;
     }
 

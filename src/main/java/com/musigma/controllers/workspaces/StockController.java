@@ -63,7 +63,6 @@ public class StockController extends WorkspaceController {
      * @param festival le festival
      * @throws FestivalException si le festival est invalide
      */
-    @FXML
     public void initialize(Festival festival) {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());

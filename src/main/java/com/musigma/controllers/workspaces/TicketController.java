@@ -46,7 +46,7 @@ public class TicketController extends WorkspaceController {
      * @see #restoreTab()
      */
     @FXML
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
         restoreTab();
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
