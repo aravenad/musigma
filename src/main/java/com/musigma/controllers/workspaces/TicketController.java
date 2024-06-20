@@ -38,10 +38,10 @@ public class TicketController extends WorkspaceController {
     RequiredTextField textFieldType;
 
     @FXML
-    IntTextField textFieldQuantite;
+    IntTextField textFieldQuantite,textFieldAvantage;
 
     @FXML
-    FloatTextField textFieldPrix, textFieldAvantage;
+    FloatTextField textFieldPrix;
 
     @FXML
     Button buttonTicket, buttonAvantage;
