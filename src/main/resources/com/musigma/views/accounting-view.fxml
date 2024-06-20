@@ -2,51 +2,17 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
-<VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.AccountingController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.AccountingController">
    <children>
-      <HBox prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <Label text="Prévision : ">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-            <Label fx:id="labelValue" layoutX="10.0" layoutY="10.0">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <Label text="Capacité Max : ">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-            <Label fx:id="labelCapa" layoutX="10.0" layoutY="10.0">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="110.0" prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <Label text="Agents de sécurité: ">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-            <Label fx:id="labelSecu" layoutX="10.0" layoutY="10.0">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
+      <TableView fx:id="tableview" prefHeight="697.0" prefWidth="1058.0">
+         <columns>
+            <TableColumn fx:id="previsionColumn" prefWidth="470.0" text="Prevision" />
+            <TableColumn fx:id="montantColumn" prefWidth="586.0" text="Montant" />
+         </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
    </children>
 </VBox>
