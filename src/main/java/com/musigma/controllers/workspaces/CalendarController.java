@@ -1,5 +1,6 @@
 package com.musigma.controllers.workspaces;
 
+import com.calendarfx.view.CalendarView;
 import com.calendarfx.view.DetailedWeekView;
 import com.calendarfx.model.Calendar;
 import com.calendarfx.model.CalendarEvent;
@@ -35,7 +36,7 @@ public class CalendarController extends WorkspaceController {
     );
 
     @FXML
-    DetailedWeekView detailWeekView;
+    CalendarView calendarView;
 
     @FXML
     Button addEventButton;
@@ -55,17 +56,15 @@ public class CalendarController extends WorkspaceController {
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
     public void initialize(Festival festival) throws TypeTicketException {
-        detailWeekView.setAdjustToFirstDayOfWeek(false);
-        detailWeekView.setNumberOfDays(10);
         super.initialize(festival);
         Calendar calendar = new Calendar("Planning");
         CalendarSource calendarSource = new CalendarSource("Festival");
         calendarSource.getCalendars().add(calendar);
-        detailWeekView.getCalendarSources().add(calendarSource);
-        EventHandler<CalendarEvent> handler = this::addToModel;
+        calendarView.getCalendarSources().add(calendarSource);
+        EventHandler<CalendarEvent> handler = this::addToModel; // tentée de faire des events lorsque le calendrier est modifier
         calendar.addEventHandler(handler);
 
-
+        //ajoutes des Entrée dans la liste entries pour ensuite les ajouter dans le planning
         for(Representation r : festival.getRepresentations()){
             Entry<?> tempEntry = new Entry<>(r.getArtiste().getName());
             tempEntry.changeStartTime(LocalTime.from(festival.getStart().plusMinutes(r.getStartDelta())));
@@ -73,11 +72,13 @@ public class CalendarController extends WorkspaceController {
             entries.add(tempEntry);
         }
 
+        //ajout des entrée sur le planning
         for(Entry<?> e : entries){
             calendar.addEntry(e);
         }
 
 
+        //Ajoute de l'event avec les parametre rentré
         addEventButton.setOnAction(e -> {
             Entry<Representation> entry = new Entry<>(nomEvent.getText());
             entry.changeStartTime(LocalTime.of(dateDebut.getValue(),0));
@@ -95,14 +96,17 @@ public class CalendarController extends WorkspaceController {
                 throw new RuntimeException(ex);
             }
         });
+
     }
 
+    //Est censé etre la methode appelé lors ce que le calendrier est modifié
     private void addToModel(CalendarEvent calendarEvent) {
         if(calendarEvent.getEventType() == CalendarEvent.ANY){
             System.out.println("mofiqh");
         }
     }
 
+    //Ajoute au modele
     public void addRep(String artisteName, LocalDateTime start, int duration, String scene) throws ArtisteException, FestivalException {
         Entry<Representation> entry = new Entry<>(artisteName);
         entry.setInterval(start, start.plusHours(duration));
@@ -112,7 +116,6 @@ public class CalendarController extends WorkspaceController {
                 scene,
                 new Artiste(artisteName, "Rock", 10)
         );
-        System.out.println("added");
         entry.setUserObject(representation);
         festival.addRepresentation(representation);
     }
