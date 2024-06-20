@@ -12,6 +12,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -19,6 +22,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -351,13 +355,18 @@ public class MainController {
 
     /**
      * Ouvre le pdf du manuel de l'application.
+     * Compatible avec les systèmes d'exploitation Linux et Windows.
      */
     public void onAboutClicked(ActionEvent actionEvent){
         try {
             File file = new File("src/main/resources/com/musigma/manual.pdf");
             if (file.exists()) {
-                ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
-                pb.start();
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(file);
+                } else {
+                    ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
+                    pb.start();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

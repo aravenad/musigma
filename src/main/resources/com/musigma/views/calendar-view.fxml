@@ -13,13 +13,13 @@
    <children>
       <HBox alignment="CENTER_LEFT" maxHeight="46.0" minHeight="46.0" prefHeight="46.0" prefWidth="1057.0" spacing="10" style="-color-danger-fg: -color-neutral-muted">
          <children>
-            <Label text="date debut:" />
+            <Label text="Date début:" />
             <IntTextField fx:id="dateDebut" maxHeight="-Infinity" promptText="ex :  2" />
-            <Label text="date fin" />
+            <Label text="Date fin" />
             <IntTextField fx:id="dateFin" maxHeight="-Infinity" promptText="ex : 4" />
             <Label text="nom:" />
-            <TextField fx:id="nomEvent" maxHeight="-Infinity" promptText="ex : didier chatant" />
-            <TextField fx:id="scene" maxHeight="-Infinity" promptText="ex : scene 1" />
+            <TextField fx:id="nomEvent" maxHeight="-Infinity" promptText="ex : Michael Jackson" />
+            <TextField fx:id="scene" maxHeight="-Infinity" promptText="ex : Scene 1" />
             <Button fx:id="addEventButton" mnemonicParsing="false" text="Ajouter" />
          </children>
          <VBox.margin>
