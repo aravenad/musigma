@@ -12,6 +12,7 @@ import com.musigma.models.Festival;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
 import com.musigma.models.exception.FestivalException;
+import com.musigma.models.exception.RepresentationException;
 import com.musigma.models.exception.TypeTicketException;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -60,8 +61,7 @@ public class CalendarController extends WorkspaceController {
         CalendarSource calendarSource = new CalendarSource("Festival");
         calendarSource.getCalendars().add(calendar);
         calendarView.getCalendarSources().add(calendarSource);
-        EventHandler<CalendarEvent> handler = this::addToModel;
-        calendar.addEventHandler(handler);
+        calendar.addEventHandler(this::addToModel);
 
         //ajoutes des Entrée dans la liste entries pour ensuite les ajouter dans le planning
         for(Representation r : festival.getRepresentations()){
@@ -89,18 +89,53 @@ public class CalendarController extends WorkspaceController {
                         entry.getEndTime().getHour() - entry.getStartTime().getHour(),
                         scene.getText()
                 );
-            } catch (ArtisteException ex) {
-                throw new RuntimeException(ex);
-            } catch (FestivalException ex) {
+            } catch (ArtisteException | FestivalException ex) {
                 throw new RuntimeException(ex);
             }
         });
     }
 
-    //Est censé etre la methode appelé lors ce que le calendrier est modifié
-    private void addToModel(CalendarEvent calendarEvent) {
-        if(calendarEvent.getEventType() == CalendarEvent.ANY){
-            System.out.println("mofiqh");
+    private void addToModel(Event event){
+        if(event.getEventType() == CalendarEvent.ENTRY_TITLE_CHANGED){
+            //changer nom
+            for(Representation r : festival.getRepresentations()){
+                if(r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())){
+                    try {
+                        r.getArtiste().setName(((Entry<?>) event.getSource()).getTitle());
+                    } catch (ArtisteException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        else if(event.getEventType() == CalendarEvent.ENTRY_INTERVAL_CHANGED){
+            //changer l'heure de début et de fin
+            for(Representation r : festival.getRepresentations()){
+                if(r.getArtiste().getName().equals(event.getSource())){
+                    try {
+                        r.setStartDelta(((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute());
+                    } catch (RepresentationException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        r.setDuration((((Entry<?>) event.getSource()).getEndTime().getHour() * 60 + ((Entry<?>) event.getSource()).getEndTime().getMinute()) - ((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute());
+                    } catch (RepresentationException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        else if(event.getEventType().equals(CalendarEvent.NULL_SOURCE_TARGET)){
+            //pour supprimer l'artiste
+            for(Representation r : festival.getRepresentations()){
+                if(r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())){
+                    try {
+                        festival.removeRepresentation(r);
+                    } catch (FestivalException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         }
     }
 
