@@ -135,6 +135,8 @@ public class TypeTicket implements Serializable {
     public void addAvantage(Avantage avantage) throws TypeTicketException {
         if (avantage == null)
             throw new TypeTicketException("L'avantage est null, doit être défini");
+        if (avantages.contains(avantage))
+            return;
         avantages.add(avantage);
         LOGGER.info("Added Avantage to TypeTicket.avantages");
     }

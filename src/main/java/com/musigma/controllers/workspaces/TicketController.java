@@ -284,6 +284,7 @@ public class TicketController extends WorkspaceController {
                 Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
                 int quantity = Integer.parseInt(textFieldAvantage.getText());
                 Avantage avantage = new Avantage(ticket, stock, quantity);
+                avantage.add();
                 TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
                 tableView.getItems().add(avantage);
                 festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).addAvantage(avantage);

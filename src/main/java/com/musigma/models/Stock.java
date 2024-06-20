@@ -158,6 +158,8 @@ public class Stock implements Serializable {
     public void addAvantage(Avantage avantage) throws StockException {
         if (avantage == null)
             throw new StockException("L'avantage est null, doit être défini");
+        if (avantages.contains(avantage))
+            return;
         avantages.add(avantage);
         LOGGER.info("Added Avantage to Stock.avantages");
     }
