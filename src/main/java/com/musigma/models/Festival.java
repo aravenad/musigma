@@ -395,9 +395,11 @@ public class Festival implements Serializable {
      * @param stock le stock à supprimer
      * @throws FestivalException si le stock n'a pas été trouvé
      */
-    public void removeStock(Stock stock) throws FestivalException {
+    public void removeStock(Stock stock) throws FestivalException, TypeTicketException {
         if (!stocks.remove(stock))
             throw new FestivalException("Le stock n'a pas été trouvé");
+        for (Avantage avantage : stock.getAvantages())
+            avantage.getTicketType().removeAvantage(avantage);
         LOGGER.info("Removed Stock from Festival.stocks");
     }
 
