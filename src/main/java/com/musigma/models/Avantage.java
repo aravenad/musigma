@@ -16,16 +16,24 @@ import static com.musigma.utils.Log.getLogger;
  */
 public class Avantage implements Serializable {
 
-    // Logger de la class
+    /**
+     * Logger de la classe Avantage.
+     */
     private static final Logger LOGGER = getLogger(Avantage.class);
 
-    // Quantité de cet avantage par ticket
+    /**
+     * Quantité d'objet du stock par ticket.
+     */
     private int quantityByTicket;
 
-    // Type de ticket associé à cet avantage
+    /**
+     * Type de ticket associé à cet avantage.
+     */
     private final TypeTicket ticketType;
 
-    // Stock associé à cet avantage
+    /**
+     * Stock associé à cet avantage.
+     */
     private final Stock stock;
 
     /**
@@ -34,6 +42,9 @@ public class Avantage implements Serializable {
      * @param ticketType le type de ticket associé à cet avantage
      * @param stock le stock associé à cet avantage
      * @param quantityByTicket la quantité de cet avantage par ticket
+     * @throws AvantageException si la quantité par ticket est inférieure ou égale à zéro
+     * @throws TypeTicketException si une exception relative au type de ticket survient
+     * @throws StockException si une exception relative au stock survient
      */
     public Avantage(TypeTicket ticketType, Stock stock, int quantityByTicket) throws AvantageException, TypeTicketException, StockException {
         LOGGER.info("Initialized Avantage");

@@ -59,7 +59,7 @@ public class StockController extends WorkspaceController {
      * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
      * Définit un bouton de suppression pour chaque ligne de la table. Définit la modification des noms, quantités et prix des stocks.
      * @param festival le festival
-     * @throws FestivalException si le festival est invalide
+     *
      */
     public void initialize(Festival festival) {
         super.initialize(festival);

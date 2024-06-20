@@ -25,6 +25,11 @@ import java.util.ArrayList;
  * Contrôleur pour l'espace de travail Calendrier.
  */
 public class CalendarController extends WorkspaceController {
+    /**
+     * Enregistrement de l'espace de travail.
+     * Définit le nom, l'icône et la vue de l'espace de travail.
+     * @see com.musigma.controllers.WorkspaceController
+     */
     public static WorkspaceController.WorkspaceRegister REGISTER = new WorkspaceController.WorkspaceRegister(
             "Planning",
             "/com/musigma/images/icons/calendar.png",

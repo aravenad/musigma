@@ -25,37 +25,59 @@ public class Festival implements Serializable {
 
     private static final float AVERAGE_AREA_BY_PEOPLE = .42f;
 
-    // Logger de la class
+    /**
+     * Logger pour afficher les logs.
+     */
     private static final Logger LOGGER = getLogger(Festival.class);
 
-    // Fichier du festival
+    /**
+     * Fichier associé à ce festival.
+     */
     private File file = null;
 
-    // Nom du festival
+    /**
+     * Nom du festival.
+     */
     private String name;
 
-    // Date de début du festival
+    /**
+     * Date de début du festival.
+     */
     private LocalDateTime start;
 
-    // Prix de l'emplacement
+    /**
+     * Prix de location du festival.
+     */
     private float locationPrice;
 
-    // Nom de l'emplacement
+    /**
+     * Emplacement du festival.
+     */
     private String location;
 
-    // Aire de l'emplacement
+    /**
+     * Superficie du festival (m2)
+     */
     private float area;
 
-    // Liste des artistes embauchés pour le festival
+    /**
+     * Liste des artistes du festival.
+     */
     private final ArrayList<Artiste> artistes;
 
-    // Liste des types de tickets proposé (VIP, Standard, ...)
+    /**
+     * Liste des types de tickets du festival.
+     */
     private final ArrayList<TypeTicket> ticketTypes;
 
-    // Liste des stocks disponibles ou requis (Place de parking, bouteille d'eau, ...)
+    /**
+     * Liste des stocks du festival.
+     */
     private final ArrayList<Stock> stocks;
 
-    // Liste des représentations du festival, soit le planning
+    /**
+     * Liste des représentations du festival.
+     */
     private final TreeSet<Representation> representations;
 
     /**
@@ -87,8 +109,7 @@ public class Festival implements Serializable {
      *
      * @param file le chemin du fichier à charger
      * @return le festival chargé depuis le fichier
-     * @throws IOException            en cas d'erreur d'entrée/sortie
-     * @throws ClassNotFoundException si la classe n'est pas trouvée lors de la désérialisation
+     * @throws FestivalException      si le fichier n'est pas défini
      */
     public static Festival Festival(File file) throws FestivalException {
         try (
@@ -110,7 +131,7 @@ public class Festival implements Serializable {
     /**
      * Méthode pour sauvegarder le festival dans un fichier sérialisé.
      *
-     * @throws IOException en cas d'erreur d'entrée/sortie
+     * @throws FestivalException si le fichier n'est pas défini
      */
     public void save() throws FestivalException {
         if (file == null)
@@ -140,6 +161,7 @@ public class Festival implements Serializable {
      * Ce chemin est utilisé pour la sauvegarde et le chargement du festival.
      *
      * @param file le nouveau fichier du festival
+     * @throws FestivalException si le fichier est null
      */
     public void setFile(File file) throws FestivalException {
         if (file == null)
@@ -395,6 +417,8 @@ public class Festival implements Serializable {
      *
      * @param stock le stock à supprimer
      * @throws FestivalException si le stock n'a pas été trouvé
+     * @throws TypeTicketException si un ticket ne veux pas changer de quantité
+     * @throws StockException si un avantage ne veux pas changer de quantité
      */
     public void removeStock(Stock stock) throws FestivalException, TypeTicketException, StockException {
         if (!stocks.remove(stock))
@@ -419,6 +443,7 @@ public class Festival implements Serializable {
      * de tickets à vendre les plus rentables avec le modèle d'optimisation d'Ojalgo.
      *
      * @throws TypeTicketException si un ticket ne veux pas changer de quantité
+     * @return le prix total du festival
      */
     public double optimizeResult() throws TypeTicketException {
         LOGGER.info("Calculated best quantity of ticket to sold");

@@ -1,3 +1,6 @@
+/**
+ * Le module com.musigma est le module principal de l'application.
+ */
 module com.musigma {
     requires javafx.controls;
     requires javafx.fxml;

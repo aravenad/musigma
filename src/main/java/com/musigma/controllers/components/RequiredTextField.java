@@ -11,30 +11,42 @@ import javafx.scene.layout.VBox;
 import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
- * A custom JavaFX component representing a required text field with error handling.
+ * Un composant JavaFX personnalisé représentant un champ de texte requis avec gestion des erreurs.
  */
 public class RequiredTextField extends GridPane {
-
+    /**
+     * Chemin de la vue FXML du composant.
+     */
     private static final String VIEW_PATH = "/com/musigma/views/components/error-text-field.fxml";
-
+    /**
+     * Champ de texte pour l'entrée de l'utilisateur.
+     */
     @FXML
     protected TextField input;
+    /**
+     * Label d'erreur pour afficher les messages d'erreur.
+     */
     @FXML
     protected Label error;
+    /**
+     * Boîte d'erreur pour afficher le message d'erreur.
+     */
     @FXML
     protected VBox errorBox;
-
+    /**
+     * Indique si le champ d'entrée est valide.
+     */
     protected boolean isValid = false;
 
     /**
-     * Constructor that loads the FXML file and sets up the component.
+     * Constructeur qui charge le fichier FXML et configure le composant.
      */
     public RequiredTextField() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(VIEW_PATH));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(RequiredTextField.this);
         tryCatch(
-                String.format("Chargement du composant %s impossible", getClass().getSimpleName()),
+                String.format("Impossible de charger le composant %s", getClass().getSimpleName()),
                 fxmlLoader::load
         );
         input.setOnKeyTyped(e -> isValid());
@@ -42,16 +54,16 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Requests focus on the input field.
+     * Demande le focus sur le champ d'entrée.
      */
     public void requestFocus() {
         input.requestFocus();
     }
 
     /**
-     * Sets an error message and applies error styling.
+     * Définit un message d'erreur et applique un style d'erreur.
      *
-     * @param error the error message to display
+     * @param error le message d'erreur à afficher
      */
     public void setError(String error) {
         this.error.setText("* " + error);
@@ -61,7 +73,7 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Clears the error message and removes error styling.
+     * Efface le message d'erreur et supprime le style d'erreur.
      */
     public void clearError() {
         if (isValid) return;
@@ -71,18 +83,18 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Checks if the input field is empty.
+     * Vérifie si le champ d'entrée est vide.
      *
-     * @return true if the input field is empty, false otherwise
+     * @return true si le champ d'entrée est vide, false sinon
      */
     protected boolean isEmpty() {
         return isValid;
     }
 
     /**
-     * Validates the input field.
+     * Valide le champ d'entrée.
      *
-     * @return true if the input field is valid, false otherwise
+     * @return true si le champ d'entrée est valide, false sinon
      */
     public boolean isValid() {
         if (input.getText().isEmpty()) {
@@ -95,9 +107,9 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Sets the text of the input field.
+     * Définit le texte du champ d'entrée.
      *
-     * @param text the text to set
+     * @param text le texte à définir
      */
     public void setText(String text) {
         input.setText(text);
@@ -105,54 +117,54 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Gets the text from the input field.
+     * Obtient le texte du champ d'entrée.
      *
-     * @return the text in the input field
+     * @return le texte dans le champ d'entrée
      */
     public String getText() {
         return input.getText();
     }
 
     /**
-     * Sets the prompt text of the input field.
+     * Définit le texte d'invite du champ d'entrée.
      *
-     * @param promptText the prompt text to set
+     * @param promptText le texte d'invite à définir
      */
     public void setPromptText(String promptText) {
         input.setPromptText(promptText);
     }
 
     /**
-     * Gets the prompt text of the input field.
+     * Obtient le texte d'invite du champ d'entrée.
      *
-     * @return the prompt text in the input field
+     * @return le texte d'invite dans le champ d'entrée
      */
     public String getPromptText() {
         return input.getPromptText();
     }
 
     /**
-     * Binds the input field to a setter with an error message for invalid input.
+     * Lie le champ d'entrée à un setter avec un message d'erreur pour une entrée invalide.
      *
-     * @param errorMsg the error message to display if the input is invalid
-     * @param setter   the setter to bind the input value to
+     * @param errorMsg le message d'erreur à afficher si l'entrée est invalide
+     * @param setter   le setter pour lier la valeur d'entrée
      */
     public void bind(String errorMsg, Setter<String> setter) {
         input.setOnKeyTyped(e -> {
             if (isValid())
                 tryCatch(
-                    errorMsg,
-                    () -> setter.accept(getText())
+                        errorMsg,
+                        () -> setter.accept(getText())
                 );
         });
     }
 
     /**
-     * Binds the input field to a setter with an initial value and an error message for invalid input.
+     * Lie le champ d'entrée à un setter avec une valeur initiale et un message d'erreur pour une entrée invalide.
      *
-     * @param errorMsg the error message to display if the input is invalid
-     * @param value    the initial value to set in the input field
-     * @param setter   the setter to bind the input value to
+     * @param errorMsg le message d'erreur à afficher si l'entrée est invalide
+     * @param value    la valeur initiale à définir dans le champ d'entrée
+     * @param setter   le setter pour lier la valeur d'entrée
      */
     public void bind(String errorMsg, String value, Setter<String> setter) {
         bind(errorMsg, setter);

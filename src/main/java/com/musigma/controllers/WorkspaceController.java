@@ -11,7 +11,9 @@ import javafx.scene.Node;
  */
 public abstract class WorkspaceController {
 
-    // Le festival associé à ce contrôleur
+    /**
+     * Le festival à manipuler.
+     */
     protected Festival festival;
 
     /**
@@ -28,10 +30,22 @@ public abstract class WorkspaceController {
      * avec un nom, un chemin d'icône, un chemin de vue et un bouton d'ouverture.
      */
     public static class WorkspaceRegister {
-        public String name;          // Le nom de l'espace de travail
-        public String iconPath;      // Le chemin de l'icône de l'espace de travail
-        public String viewPath;      // Le chemin de la vue de l'espace de travail
-        public Node openButton;      // Le bouton d'ouverture de l'espace de travail
+        /**
+         * Le nom de l'espace de travail.
+         */
+        public String name;
+        /**
+         * Le chemin de l'icône de l'espace de travail.
+         */
+        public String iconPath;
+        /**
+         * Le chemin de la vue de l'espace de travail.
+         */
+        public String viewPath;
+        /**
+         * Le bouton d'ouverture de l'espace de travail.
+         */
+        public Node openButton;
 
         /**
          * Constructeur de la classe WorkspaceRegister.

@@ -3,12 +3,18 @@ package com.musigma.utils;
 import java.io.IOException;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-
+/**
+ * Classe utilitaire pour la gestion des logs.
+ */
 public class Log {
-    // Logger principal pour la classe Log
+    /**
+     * Logger pour afficher les logs.
+     */
     private static final Logger LOGGER = getLogger(Log.class);
 
-    // Gestionnaire de logs
+    /**
+     * Gestionnaire de logs.
+     */
     private static final LogManager logManager = LogManager.getLogManager();
 
     static {

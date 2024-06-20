@@ -38,14 +38,28 @@ import static com.musigma.controllers.Dialogs.tryCatch;
  */
 public class MainController {
 
-    // Logger pour la classe MainController
+    /**
+     * Logger pour les messages de log.
+     */
     private static final Logger LOGGER = Log.getLogger(Log.class);
 
-    private static final String APP_NAME = "Musigma"; // Nom de l'application
-    protected static final String ICON_PATH = "/com/musigma/images/logo_full.png"; // Icon de l'application
+    /**
+     * Nom de l'application.
+     */
+    private static final String APP_NAME = "Musigma";
+    /**
+     * Chemin de l'icône de l'application.
+     */
+    protected static final String ICON_PATH = "/com/musigma/images/logo_full.png";
 
-    private static final int MAX_RECENT_FILES = 10; // Nombre maximum de fichiers récents à conserver
-    private static final String STATE_FILEPATH = "previousSession.ser"; // Chemin du fichier d'état de la session précédente
+    /**
+     * Nombre maximum de fichiers récents à conserver.
+     */
+    private static final int MAX_RECENT_FILES = 10;
+    /**
+     * Chemin du fichier d'état de la session précédente.
+     */
+    private static final String STATE_FILEPATH = "previousSession.ser";
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
         HomeController.REGISTER,

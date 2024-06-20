@@ -14,12 +14,25 @@ import static com.musigma.utils.Log.getLogger;
  */
 public class Artiste implements Serializable {
 
-    // Logger de la class
+    /**
+     * Logger de la classe Artiste.
+     */
     private static final Logger LOGGER = getLogger(Artiste.class);
-
+    /**
+     * Nom de l'artiste.
+     */
     private String name;
+    /**
+     * Genre musical de l'artiste.
+     */
     private String genre;
+    /**
+     * Prix de l'artiste.
+     */
     private float price;
+    /**
+     * Liste des représentations de l'artiste.
+     */
     private final ArrayList<Representation> representations;
 
     /**

@@ -15,19 +15,29 @@ import static com.musigma.utils.Log.getLogger;
  */
 public class TypeTicket implements Serializable {
 
-    // Logger de la class
+    /**
+     * Logger de la class
+     */
     private static final Logger LOGGER = getLogger(TypeTicket.class);
 
-    // Type du ticket (ex : VIP, Standard, etc.)
+    /**
+     * Type de ticket
+     */
     private String type;
 
-    // Quantité de ce type de ticket en vente
+    /**
+     * Quantité de tickets disponibles
+     */
     private int quantity;
 
-    // Prix unitaire du ticket
+    /**
+     * Prix unitaire du ticket
+     */
     private float price;
 
-    // Liste des avantages associés à ce type de ticket
+    /**
+     * Liste des avantages associés à ce type de ticket
+     */
     private final ArrayList<Avantage> avantages;
 
     /**
@@ -36,6 +46,7 @@ public class TypeTicket implements Serializable {
      * @param type Type de ticket
      * @param quantity Quantité de tickets disponibles
      * @param price Prix unitaire du ticket
+     * @throws TypeTicketException si le type est null ou vide
      */
     public TypeTicket(String type, int quantity, float price) throws TypeTicketException {
         LOGGER.info("Initialized TypeTicket");

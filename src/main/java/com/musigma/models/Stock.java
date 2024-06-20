@@ -15,22 +15,34 @@ import static com.musigma.utils.Log.getLogger;
  */
 public class Stock implements Serializable {
 
-    // Logger de la class
+    /**
+     * Logger pour afficher les logs.
+     */
     private static final Logger LOGGER = getLogger(Serializable.class);
 
-    // Nom du stock
+    /**
+     * Nom du stock.
+     */
     private String name;
 
-    // Quantité du stock
+    /**
+     * Quantité du stock.
+     */
     private int quantity;
 
-    // Si la quantité du stock est fixe
+    /**
+     * Si la quantité du stock est fixe.
+     */
     private boolean fixed;
 
-    // Prix du stock
+    /**
+     * Prix du stock.
+     */
     private double prix;
 
-    // Liste des avantages associés à ce stock
+    /**
+     * Liste des avantages associés à ce stock.
+     */
     private final ArrayList<Avantage> avantages;
 
     /**
@@ -38,7 +50,9 @@ public class Stock implements Serializable {
      *
      * @param name Nom du stock
      * @param quantity Quantité absolue du stock
-     * @param quantity Si la quantité du stock est fixe
+     * @param fixed Si la quantité du stock est fixe
+     * @param prix Prix du stock
+     * @throws StockException si le nom est null ou vide, si la quantité est négative ou nulle (0)
      */
     public Stock(String name, int quantity, boolean fixed, double prix) throws StockException {
         LOGGER.info("Initialized Stock");

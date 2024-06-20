@@ -1,0 +1,9 @@
+module:com.musigma
+com.musigma
+com.musigma.controllers
+com.musigma.controllers.components
+com.musigma.controllers.workspaces
+com.musigma.models
+com.musigma.models.exception
+com.musigma.utils
+com.musigma.utils.exceptionMethods

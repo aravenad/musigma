@@ -14,19 +14,29 @@ import static com.musigma.utils.Log.getLogger;
  */
 public class Representation implements Comparable<Representation>, Serializable {
 
-    // Logger de la class
+    /**
+     * Logger pour afficher les logs.
+     */
     private static final Logger LOGGER = getLogger(Representation.class);
 
-    // Delta de début par rapport au festival en minute
+    /**
+     * Delta de début par rapport au festival en minute
+     */
     private int startDelta;
 
-    // Durée en minute
+    /**
+     * Durée de la représentation en minute
+     */
     private int duration;
 
-    // Scene attribuée à la représentation
+    /**
+     * Scène de la représentation
+     */
     private String scene;
 
-    // Artiste se représentant
+    /**
+     * Artiste associé à la représentation
+     */
     private Artiste artiste;
 
     /**
@@ -103,6 +113,7 @@ public class Representation implements Comparable<Representation>, Serializable 
      * Défini la durée de la représentation.
      *
      * @param duration la durée de la représentation
+     * @throws RepresentationException si la durée est négative ou nulle
      */
     public void setDuration(int duration) throws RepresentationException {
         if (duration <= 0)
@@ -124,6 +135,7 @@ public class Representation implements Comparable<Representation>, Serializable 
      * Défini la scène de la représentation.
      *
      * @param scene la scène de la représentation
+     * @throws RepresentationException si la scène est null ou vide
      */
     public void setScene(String scene) throws RepresentationException {
         if (scene == null || scene.isBlank())

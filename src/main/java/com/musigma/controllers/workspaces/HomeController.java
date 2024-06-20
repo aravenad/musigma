@@ -16,6 +16,11 @@ import static com.musigma.controllers.Dialogs.tryCatch;
  * Contrôleur de l'espace de travail Home.
  */
 public class HomeController extends WorkspaceController {
+    /**
+     * Enregistrement de l'espace de travail.
+     * Définit le nom, l'icône et la vue de l'espace de travail.
+     * @see com.musigma.controllers.WorkspaceController
+     */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Home",
             "/com/musigma/images/icons/home.png",
