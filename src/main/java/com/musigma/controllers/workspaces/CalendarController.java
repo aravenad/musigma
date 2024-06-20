@@ -9,6 +9,7 @@ import com.musigma.models.Artiste;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
 import com.musigma.models.exception.FestivalException;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 
 import java.time.LocalDateTime;
@@ -21,38 +22,47 @@ public class CalendarController extends WorkspaceController {
             "/com/musigma/images/icons/calendar.png",
             "/com/musigma/views/calendar-view.fxml"
     );
+
     @FXML
-    CalendarView calendarView;
+    private CalendarView calendarView;
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
     private Calendar calendar = new Calendar("My Calendar");
 
-    @FXML
-    public void initialize() throws ArtisteException {
-        calendarView.getCalendarSources().clear();
-        calendarView.getCalendarSources().add(new com.calendarfx.model.CalendarSource("My Calendars") {{
-            getCalendars().add(calendar);
-        }});
-        addEntry("Test", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-    }
 
-    private void handleCalendarEvent(CalendarEvent event) throws ArtisteException, FestivalException {
-        if (event.getEventType() == CalendarEvent.ENTRY_CALENDAR_CHANGED && event.getEntry().getCalendar() == calendar) {
-            entries.add(event.getEntry());
-            festival.addRepresentation(
-                    new Representation(
-                            ((event.getEntry().getStartAsLocalDateTime().getHour() * 60) + event.getEntry().getStartAsLocalDateTime().getMinute()) - ((festival.getStart().getHour() * 60) + festival.getStart().getMinute()),
-                            10,
-                            "ogr",
-                            new Artiste("Rodrigo","Rock", 10)));
+    private void handleCalendarEvent(Event event) {
+        if (event instanceof CalendarEvent) {
+            CalendarEvent calendarEvent = (CalendarEvent) event;
+            if (calendarEvent.getEventType() == CalendarEvent.ENTRY_CALENDAR_CHANGED && calendarEvent.getEntry().getCalendar() == calendar) {
+                Entry<?> entry = calendarEvent.getEntry();
+                try {
+                    entries.add(entry);
+                    festival.addRepresentation(
+                            new Representation(
+                                    ((entry.getStartAsLocalDateTime().getHour() * 60) + entry.getStartAsLocalDateTime().getMinute()) - ((festival.getStart().getHour() * 60) + festival.getStart().getMinute()),
+                                    10,
+                                    "ogr",
+                                    new Artiste("Rodrigo", "Rock", 10))
+                    );
+                    System.out.println("New entry added: " + entry.getTitle());
+                } catch (ArtisteException | FestivalException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    public void addEntry(String title, LocalDateTime start, LocalDateTime end) throws ArtisteException {
+    public void addRep(String title, LocalDateTime start, LocalDateTime end) throws ArtisteException {
         Entry<Representation> entry = new Entry<>(title);
         entry.setInterval(start, end);
-        Representation Representation = new Representation(10, 10, "ogr", new Artiste("Rodrigo","Rock", 10));
-        entry.setUserObject(Representation);
+        Representation representation = new Representation(
+                ((start.getHour() * 60) + start.getMinute()) - ((festival.getStart().getHour() * 60) + festival.getStart().getMinute()),
+                ((end.getHour() * 60) + end.getMinute()) - ((start.getHour() * 60) + start.getMinute()),
+                "ogr",
+                new Artiste("Rodrigo", "Rock", 10)
+        );
+        entry.setUserObject(representation);
+        calendar.addEntry(entry);
         entries.add(entry);
     }
 
