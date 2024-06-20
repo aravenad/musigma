@@ -349,6 +349,8 @@ public class Festival implements Serializable {
     public void addTicketType(TypeTicket ticketType) throws FestivalException {
         if (ticketType == null)
             throw new FestivalException("Le type de ticket est null, doit être défini");
+        if (ticketTypes.stream().anyMatch(t -> Objects.equals(t.getType(), ticketType.getType())))
+            throw new FestivalException("Un autre type ticket existe avec le même nom");
         ticketTypes.add(ticketType);
         LOGGER.info("Added TypeTicket to Festival.ticketTypes");
     }
@@ -383,6 +385,8 @@ public class Festival implements Serializable {
     public void addStock(Stock stock) throws FestivalException {
         if (stock == null)
             throw new FestivalException("Le stock est null, doit être défini");
+        if (stocks.stream().anyMatch(s -> Objects.equals(s.getName(), stock.getName())))
+            throw new FestivalException("Un autre stock existe avec le même nom");
         stocks.add(stock);
         LOGGER.info("Added Stock to Festival.stocks");
     }

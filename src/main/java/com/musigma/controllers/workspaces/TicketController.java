@@ -202,6 +202,7 @@ public class TicketController extends WorkspaceController {
         });
 
         tabPane.getTabs().add(newTab);
+        tabPane.getSelectionModel().select(newTab);
     }
 
     /**
