@@ -2,8 +2,14 @@ package com.musigma.controllers.workspaces;
 
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.models.Festival;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static com.musigma.utils.Dialogs.tryCatch;
 
@@ -22,24 +28,48 @@ public class AccountingController extends WorkspaceController {
     );
 
     @FXML
-    Label labelValue, labelCapa, labelSecu;
+    private TableView<Map.Entry<String, String>> tableview;
 
+    @FXML
+    private TableColumn<Map.Entry<String, String>, String> previsionColumn;
+
+    @FXML
+    private TableColumn<Map.Entry<String, String>, String> montantColumn;
+
+
+    /**
+     * Initialisation de l'espace de travail.
+     * Ajoute les valeurs de prévision calculées à la table.
+     * @param festival le festival
+     */
     @FXML
     public void initialize(Festival festival) {
         super.initialize(festival);
         tryCatch(
     "Erreur lors de l'optimisation de la prévision.",
             () -> {
-                labelValue.setText(String.valueOf(festival.optimizeResult()));
-                labelCapa.setText(String.valueOf(getRecommandedPerson()) + " personnes");
-                labelSecu.setText(String.valueOf(getRecommandedSecurity()) + " agents de sécurité");
-        });
+                previsionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getKey()));
+                montantColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getValue()));
+
+                ObservableList<Map.Entry<String, String>> data = FXCollections.observableArrayList();
+                data.add(new AbstractMap.SimpleEntry<>("Nombre de personnes recommandées :", String.valueOf(getRecommandedPerson())));
+                data.add(new AbstractMap.SimpleEntry<>("Nombre d'agents de sécurité recommandés :", String.valueOf(getRecommandedSecurity())));
+                tableview.setItems(data);
+
+            });
     }
+    /**
+     * Calcule le nombre de personnes recommandées.
+     * @return le nombre de personnes recommandées
+     */
 
     public int getRecommandedPerson() {
         return (int) (festival.getArea() / 0.42);
     }
-
+    /**
+     * Calcule le nombre d'agents de sécurité recommandés.
+     * @return le nombre d'agents de sécurité recommandés
+     */
     public int getRecommandedSecurity() {
         return Math.max(3, (int) (festival.getArea() / 100));
     }
