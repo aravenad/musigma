@@ -5,6 +5,7 @@ import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -99,14 +100,30 @@ public class Avantage implements Serializable {
 
     @Override
     public boolean equals(Object o) {
+        // On utilise les hashcode des ticketType et stock afin d'éviter un stackOverflow
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Avantage avantage = (Avantage) o;
-        return quantityByTicket == avantage.quantityByTicket && Objects.equals(ticketType, avantage.ticketType) && Objects.equals(stock, avantage.stock);
+        return quantityByTicket == avantage.quantityByTicket &&
+                Objects.equals(ticketType.hashCode(), avantage.ticketType.hashCode()) &&
+                Objects.equals(stock.hashCode(), avantage.stock.hashCode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(quantityByTicket, System.identityHashCode(ticketType), System.identityHashCode(stock));
+        // On n'utilise pas les hashcode des avantages de ticketType et stock afin d'éviter un stackOverflow
+        return Objects.hash(
+            quantityByTicket,
+            Objects.hash(
+                    ticketType.getType(),
+                    ticketType.getQuantity(),
+                    ticketType.getPrice()
+            ), // Pseudo hashcode pour ticketType
+            Objects.hash(
+                    stock.getName(),
+                    stock.getQuantity(),
+                    stock.isFixed()
+            ) // Pseudo hashcode pour stock
+        );
     }
 }

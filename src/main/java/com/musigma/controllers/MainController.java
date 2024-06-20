@@ -1,12 +1,10 @@
 package com.musigma.controllers;
 
-import com.musigma.controllers.workspaces.CalendarController;
-import com.musigma.controllers.workspaces.HomeController;
-import com.musigma.controllers.workspaces.StockController;
-import com.musigma.controllers.workspaces.TicketController;
+import com.musigma.controllers.workspaces.*;
 import com.musigma.models.Festival;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
+import com.musigma.models.exception.TypeTicketException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -43,6 +41,7 @@ public class MainController {
             CalendarController.REGISTER,
             StockController.REGISTER,
             TicketController.REGISTER,
+            AccountingController.REGISTER,
     }; // Tableau des espaces de travail disponibles
 
     private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER; // Espace de travail par défaut
@@ -337,7 +336,7 @@ public class MainController {
      * @throws FestivalException Si une erreur liée au festival se produit
      * @throws AvantageException Si une erreur liée aux avantages se produit
      */
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException, AvantageException {
+    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException, AvantageException, TypeTicketException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         currentWorkspaceController = fxmlLoader.getController();

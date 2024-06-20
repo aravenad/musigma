@@ -9,6 +9,7 @@ import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.exception.FestivalException;
+import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -33,25 +34,35 @@ public class StockController extends WorkspaceController {
             "/com/musigma/views/stock-view.fxml"
     );
 
-    @FXML RequiredTextField textFieldObjet;
+    @FXML
+    RequiredTextField textFieldObjet;
 
-    @FXML IntTextField textFieldQuantite;
+    @FXML
+    IntTextField textFieldQuantite;
 
-    @FXML FloatTextField textFieldPrix;
+    @FXML
+    FloatTextField textFieldPrix;
 
-    @FXML Button buttonStock;
+    @FXML
+    Button buttonStock;
 
-    @FXML TableView<Stock> tableView;
+    @FXML
+    TableView<Stock> tableView;
 
-    @FXML TableColumn<Stock, String> nameColumn;
+    @FXML
+    TableColumn<Stock, String> nameColumn;
 
-    @FXML TableColumn<Stock, Integer> quantityColumn;
+    @FXML
+    TableColumn<Stock, Integer> quantityColumn;
 
-    @FXML TableColumn<Stock, Double> priceColumn;
+    @FXML
+    TableColumn<Stock, Double> priceColumn;
 
-    @FXML TableColumn<Stock, Void> actionColumn;
+    @FXML
+    TableColumn<Stock, Void> actionColumn;
 
-    @FXML Label total;
+    @FXML
+    Label total;
 
     /**
      * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
@@ -60,7 +71,7 @@ public class StockController extends WorkspaceController {
      * @throws FestivalException si le festival est invalide
      */
     @FXML
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws TypeTicketException {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
         tableView.setEditable(true); // Permet l'édition de la TableView
@@ -95,7 +106,6 @@ public class StockController extends WorkspaceController {
         addDeleteButtonToTable();
     }
 
-
     /**
      * Ajoute un bouton de suppression à la table, crée une colonne d'action avec le bouton de suppression.
      * Lorsque le bouton est cliqué, la ligne correspondante est supprimée de la table.
@@ -104,7 +114,6 @@ public class StockController extends WorkspaceController {
      */
     private void addDeleteButtonToTable() {
         actionColumn = new TableColumn<>("Actions");
-
         Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<>() {
             @Override
             public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
@@ -133,7 +142,6 @@ public class StockController extends WorkspaceController {
                 };
             }
         };
-
         actionColumn.setCellFactory(cellFactory);
         tableView.getColumns().add(actionColumn);
     }
@@ -166,6 +174,9 @@ public class StockController extends WorkspaceController {
         );
     }
 
+    /**
+     * Calcule le prix total des stocks.
+     */
     private void totalPrix(){
         double t = 0;
         for (Stock stock : tableView.getItems()) {

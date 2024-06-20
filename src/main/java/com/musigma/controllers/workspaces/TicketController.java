@@ -67,7 +67,7 @@ public class TicketController extends WorkspaceController {
      * @see #onAddTicketPressed()
      */
     @FXML
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws TypeTicketException {
         super.initialize(festival);
         restoreTab();
         initializeComboBox();
@@ -81,7 +81,6 @@ public class TicketController extends WorkspaceController {
         });
         buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
-
 
     /**
      * Ajoute un ticket à la liste des tickets. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
@@ -146,7 +145,6 @@ public class TicketController extends WorkspaceController {
                     () -> avantage.setQuantityByTicket(event.getNewValue()));
         });
     }
-
 
     /**
      * Ajoute un bouton de suppression à la table des avantages.
@@ -247,23 +245,19 @@ public class TicketController extends WorkspaceController {
      */
     private void onAddAvantagePressed() {
         if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
-            try {
-                TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
-                Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
-                int quantity = Integer.parseInt(textFieldAvantage.getText());
-                Avantage avantage = new Avantage(ticket, stock, quantity);
-                avantage.add();
-                TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
-                tableView.getItems().add(avantage);
-                festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).addAvantage(avantage);
-            } catch (AvantageException e) {
-                e.printStackTrace();
-            } catch (TypeTicketException | StockException e) {
-                throw new RuntimeException(e);
-            } catch (NumberFormatException e) {
-                textFieldAvantage.requestFocus();
-                return;
-            }
+            tryCatch(
+        "Ajout de l'avantage impossible",
+                () -> {
+                    TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
+                    Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
+                    int quantity = Integer.parseInt(textFieldAvantage.getText());
+                    Avantage avantage = new Avantage(ticket, stock, quantity);
+                    avantage.add();
+                    TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
+                    tableView.getItems().add(avantage);
+                    festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).addAvantage(avantage);
+                }
+            );
         } else {
             textFieldAvantage.requestFocus();
         }

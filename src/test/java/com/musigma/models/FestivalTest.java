@@ -175,6 +175,7 @@ class FestivalTest {
         festival.save();
 
         Festival clonedFestival = Festival.Festival(testFile);
+        assertEquals(festival.hashCode(), clonedFestival.hashCode(), "Le festival doit conserver son hashcode");
         assertEquals(festival, clonedFestival, "Le festival doit conserver les informations");
     }
 
