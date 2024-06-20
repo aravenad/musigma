@@ -78,9 +78,6 @@ public class Dialogs {
             function.run();
             Alert alert = new Alert(Alert.AlertType.INFORMATION, succesMsg);
             alert.showAndWait();
-            ((Stage) alert.getDialogPane().getScene().getWindow())
-                    .getIcons()
-                    .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
         } catch (Exception e) {
             showError(String.format("%s : %s", errorMsg, e.getMessage()));
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
