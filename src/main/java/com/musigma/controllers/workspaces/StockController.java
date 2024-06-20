@@ -3,11 +3,13 @@ package com.musigma.controllers.workspaces;
 import atlantafx.base.util.DoubleStringConverter;
 import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.CustomValidField;
 import com.musigma.controllers.components.FloatTextField;
 import com.musigma.controllers.components.IntTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
+import com.musigma.models.TypeTicket;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -17,6 +19,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 
+import java.util.List;
+
+import static com.musigma.utils.Dialogs.askValidForm;
 import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
@@ -33,18 +38,6 @@ public class StockController extends WorkspaceController {
             "/com/musigma/images/icons/stock.png",
             "/com/musigma/views/stock-view.fxml"
     );
-
-    @FXML
-    RequiredTextField textFieldObjet;
-
-    @FXML
-    IntTextField textFieldQuantite;
-
-    @FXML
-    FloatTextField textFieldPrix;
-
-    @FXML
-    Button buttonStock;
 
     @FXML
     TableView<Stock> tableView;
@@ -102,7 +95,6 @@ public class StockController extends WorkspaceController {
                 "Impossible de modifier le prix du stock",
                 () -> stock.setPrix(event.getNewValue()));
         });
-        buttonStock.setOnAction(e -> onAddStockPressed());
         addDeleteButtonToTable();
     }
 
@@ -152,25 +144,27 @@ public class StockController extends WorkspaceController {
      * Sinon, les champs de saisie invalides sont surlignés en rouge.
      * La méthode est appelée lorsqu'on clique sur le bouton "Ajouter".
      */
-    private void onAddStockPressed() {
-        if (!textFieldObjet.isValid()) {
-            textFieldObjet.requestFocus();
-        } else if (!textFieldQuantite.isValid()) {
-            textFieldQuantite.requestFocus();
-        } else if (!textFieldPrix.isValid()) {
-            textFieldPrix.requestFocus();
-        } else tryCatch(
-                "Ajout du stock impossible",
-                () -> {
-                    Stock stock = new Stock(
-                        textFieldObjet.getText(),
-                        textFieldQuantite.getValue(),
-                        true,
-                        textFieldPrix.getValue());
-                    festival.addStock(stock);
-                    tableView.getItems().add(stock);
-                    totalPrix();
-                }
+    @FXML
+    private void addStock() {
+        CustomValidField<RequiredTextField> stockName = new CustomValidField<>("Nom", new RequiredTextField());
+        CustomValidField<IntTextField> quantity = new CustomValidField<>("Quantité", new IntTextField(true, true));
+        CustomValidField<FloatTextField> price = new CustomValidField<>("Prix", new FloatTextField(true, false));
+
+        askValidForm(
+        "Ajouter un stock",
+    "Ajout d'un stock impossible",
+            new CustomValidField[]{stockName, quantity, price},
+            () -> {
+                Stock stock = new Stock(
+                    stockName.node.getText(),
+                    quantity.node.getValue(),
+                    false,
+                    price.node.getValue()
+                );
+                festival.addStock(stock);
+                tableView.getItems().add(stock);
+                totalPrix();
+            }
         );
     }
 
@@ -178,10 +172,15 @@ public class StockController extends WorkspaceController {
      * Calcule le prix total des stocks.
      */
     private void totalPrix(){
-        double t = 0;
-        for (Stock stock : tableView.getItems()) {
-            t += stock.getPrix() * stock.getQuantity();
+        List<Stock> stocks = tableView.getItems();
+        if (stocks.size() == 0)
+            total.setText("");
+        else {
+            double t = 0;
+            for (Stock stock : stocks) {
+                t += stock.getPrix() * stock.getQuantity();
+            }
+            total.setText("Total : " + t + " €");
         }
-        total.setText("Total : " + t + " €");
     }
 }

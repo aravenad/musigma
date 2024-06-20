@@ -29,6 +29,7 @@ public class FloatTextField extends NumberTextField<Float> {
     @Override
     public void setValue(Float value) {
         input.setText(Float.toString(value).replaceAll("0*$", "").replaceAll("\\.$", ""));
+        isValid();
     }
 
     @Override

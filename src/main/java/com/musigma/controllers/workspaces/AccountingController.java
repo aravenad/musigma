@@ -23,10 +23,9 @@ public class AccountingController extends WorkspaceController {
     @FXML
     Label labelValue, labelCapa, labelSecu;
 
-    @FXML
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
-        labelValue.setText(String.valueOf(festival.optimizeResult()));
+//        labelValue.setText(String.valueOf(festival.optimizeResult()));
         labelCapa.setText(String.valueOf(getRecommandedPerson()) + " personnes");
         labelSecu.setText(String.valueOf(getRecommandedSecurity()) + " agents de sécurité");
     }

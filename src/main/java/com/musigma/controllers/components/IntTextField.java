@@ -29,6 +29,7 @@ public class IntTextField extends NumberTextField<Integer> {
     @Override
     public void setValue(Integer value) {
         input.setText(Float.toString(value).replaceAll("^0*", ""));
+        isValid();
     }
 
     @Override

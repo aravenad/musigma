@@ -1,38 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.musigma.controllers.components.FloatTextField?>
-<?import com.musigma.controllers.components.IntTextField?>
-<?import com.musigma.controllers.components.RequiredTextField?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
-    <HBox style="-color-danger-fg: -color-neutral-muted" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10">
+<HBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
+    <VBox minWidth="200" prefWidth="200" spacing="8.0">
+        <Button maxWidth="1.7976931348623157E308" onAction="#addStock" text="Ajouter stock" />
+        <Separator VBox.vgrow="NEVER" />
+        <Label fx:id="total" />
         <padding>
-            <Insets left="10.0" />
+            <Insets left="10.0" right="8.0" top="8.0" />
         </padding>
-        <Label text="Objet :"/>
-        <RequiredTextField fx:id="textFieldObjet" maxHeight="-Infinity" promptText="ex : Boisson" />
-        <Label text="Quantité :"/>
-        <IntTextField fx:id="textFieldQuantite" maxHeight="-Infinity" promptText="ex : 120" />
-        <Label text="Prix :"/>
-        <FloatTextField fx:id="textFieldPrix" maxHeight="-Infinity" promptText="ex : 2.99" />
-        <Button fx:id="buttonStock" mnemonicParsing="false" text="Ajouter" />
-        <Label fx:id="total" text="Total :" />
-    </HBox>
-    <TableView fx:id="tableView" prefHeight="700.0" prefWidth="967.0">
+    </VBox>
+    <TableView fx:id="tableView" prefHeight="615.0" prefWidth="1058.0">
         <columns>
             <TableColumn fx:id="nameColumn" prefWidth="478.0" text="Objet" />
             <TableColumn fx:id="quantityColumn" minWidth="170.0" prefWidth="267.0" text="Quantité" />
             <TableColumn fx:id="priceColumn" minWidth="50.0" prefWidth="233.0" text="Prix (€)" />
         </columns>
-      <columnResizePolicy>
-         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-      </columnResizePolicy>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
     </TableView>
-</VBox>
+</HBox>

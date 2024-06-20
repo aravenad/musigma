@@ -101,6 +101,7 @@ public class RequiredTextField extends GridPane {
      */
     public void setText(String text) {
         input.setText(text);
+        isValid();
     }
 
     /**
@@ -140,8 +141,8 @@ public class RequiredTextField extends GridPane {
         input.setOnKeyTyped(e -> {
             if (isValid())
                 tryCatch(
-                        errorMsg,
-                        () -> setter.accept(getText())
+                    errorMsg,
+                    () -> setter.accept(getText())
                 );
         });
     }
@@ -156,6 +157,5 @@ public class RequiredTextField extends GridPane {
     public void bind(String errorMsg, String value, Setter<String> setter) {
         bind(errorMsg, setter);
         setText(value);
-        isValid();
     }
 }

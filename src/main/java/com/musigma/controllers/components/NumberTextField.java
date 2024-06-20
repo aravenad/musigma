@@ -83,6 +83,5 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
     public void bindValue(String errorMsg, T value, Setter<T> setter) {
         bindValue(errorMsg, setter);
         setValue(value);
-        isValid();
     }
 }

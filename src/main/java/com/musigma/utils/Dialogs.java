@@ -1,8 +1,17 @@
 package com.musigma.utils;
 
+import com.musigma.controllers.components.CustomValidField;
 import com.musigma.utils.exceptionMethods.Runner;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -38,6 +47,15 @@ public class Dialogs {
         }
     }
 
+    public static void newError(String errorMsg) {
+        LOGGER.severe(errorMsg);
+        Alert alert = new Alert(
+                Alert.AlertType.ERROR,
+                String.format("L'application a rencontré une erreur :\n%s", errorMsg)
+        );
+        alert.showAndWait();
+    }
+
     /**
      * Méthode pour exécuter une opération encapsulée dans un bloc try-catch avec un message de succès.
      *
@@ -48,20 +66,11 @@ public class Dialogs {
     public static void tryCatch(String errorMsg, String succesMsg, Runner function) {
         try {
             function.run();
-
-            // Afficher une boîte de dialogue d'information avec le message de succès
             Alert alert = new Alert(Alert.AlertType.INFORMATION, succesMsg);
             alert.showAndWait();
         } catch (Exception e) {
-            // En cas d'exception, enregistrer les détails dans le journal (LOGGER)
+            newError(String.format("%s : %s", errorMsg, e.getMessage()));
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
-
-            // Afficher une boîte de dialogue d'erreur avec le message d'erreur
-            Alert alert = new Alert(
-                    Alert.AlertType.ERROR,
-                    String.format("L'application a rencontré une erreur :\n%s :\n%s", errorMsg, e.getMessage())
-            );
-            alert.showAndWait();
         }
     }
 
@@ -89,5 +98,60 @@ public class Dialogs {
         FileChooser fc = askFile(title);
         fc.setInitialFileName(fileName);
         return fc;
+    }
+
+
+    public static void askValidForm(String title, String errorMsg, CustomValidField[] customValidFields, Runner nextCallback) {
+        Stage subWindow = new Stage();
+        subWindow.setTitle(title);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(8);
+        grid.setPadding(new Insets(8));
+
+        Scene scene = new Scene(new Pane(grid));
+        subWindow.setScene(scene);
+
+        for (CustomValidField customValidField: customValidFields) {
+            int rowIdx = grid.getRowCount();
+            grid.add(customValidField.label, 0, rowIdx);
+            grid.add(customValidField.node, 1, rowIdx);
+            customValidField.node.setMaxWidth(1.7976931348623157E308);
+        }
+
+        Button cancelButton = new Button("Cancel"),
+                validateButton = new Button("Validate");
+        validateButton.getStyleClass().add("accent");
+
+        HBox buttonsRow = new HBox(validateButton, cancelButton);
+        buttonsRow.setAlignment(Pos.CENTER_RIGHT);
+        buttonsRow.setSpacing(8);
+        buttonsRow.setPadding(new Insets(8, 0, 0, 0));
+        grid.add(buttonsRow, 0, grid.getRowCount(), 2, 1);
+
+        cancelButton.setOnAction(e -> subWindow.close());
+        validateButton.setOnAction(e -> {
+            boolean valid = true;
+            for (CustomValidField customValidField : customValidFields) {
+                if (!customValidField.isValid()) {
+                    customValidField.node.requestFocus();
+                    valid = false;
+                }
+            }
+            if (valid) {
+                tryCatch(
+                        errorMsg,
+                        () -> {
+                            nextCallback.run();
+                            subWindow.close();
+                        }
+                );
+            }
+        });
+
+        subWindow.show();
+//        subWindow.setWidth(scene.getWidth());
+//        subWindow.setHeight(scene.getHeight());
     }
 }
