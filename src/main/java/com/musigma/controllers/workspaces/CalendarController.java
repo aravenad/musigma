@@ -3,7 +3,6 @@ package com.musigma.controllers.workspaces;
 import com.calendarfx.model.Calendar;
 import com.calendarfx.model.CalendarEvent;
 import com.calendarfx.model.CalendarSource;
-import com.calendarfx.view.CalendarView;
 import com.calendarfx.model.Entry;
 import com.calendarfx.view.WeekView;
 import com.musigma.controllers.WorkspaceController;
@@ -11,9 +10,7 @@ import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 
 import java.time.LocalDate;
@@ -36,7 +33,7 @@ public class CalendarController extends WorkspaceController {
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
         weekView.setEntryFactory(createEntryParameter -> {
             Entry<?> entry = new Entry<>();

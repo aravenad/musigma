@@ -39,4 +39,5 @@ public class AccountingController extends WorkspaceController {
         return Math.max(3, (int) (festival.getArea() / 100));
     }
 
+
 }

@@ -1,7 +1,6 @@
 package com.musigma.controllers;
 
 import com.musigma.models.Festival;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.scene.Node;
 
 /**
@@ -19,7 +18,7 @@ public abstract class WorkspaceController {
      *
      * @param festival le festival à initialiser
      */
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         this.festival = festival;
     }
 
