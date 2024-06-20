@@ -45,13 +45,13 @@
         </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
          <children>
-            <Label text="Avantage :" fx:id="avantageLabel" />
+            <Label text="Avantage :" fx:id="labelAvantage" />
             <ComboBox fx:id="comboAvantage" prefWidth="150.0" promptText="Sélectionner...">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ComboBox>
-            <Label text="Quantité :" fx:id="quantityLabel" />
+            <Label text="Quantité :" fx:id="labelQuantiteAvantage" />
             <FloatTextField fx:id="textFieldAvantage" alignment="CENTER" promptText="ex : 100">
                <HBox.margin>
                   <Insets />

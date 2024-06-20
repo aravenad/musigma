@@ -1,6 +1,5 @@
 package com.musigma.controllers.workspaces;
 
-import atlantafx.base.util.DoubleStringConverter;
 import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.controllers.components.FloatTextField;
@@ -54,7 +53,7 @@ public class TicketController extends WorkspaceController {
     ComboBox<Stock> comboAvantage;
 
     @FXML
-    Label avantageLabel, quantityLabel;
+    Label labelAvantage, labelQuantiteAvantage;
 
     /**
      * Initialisation de l'espace de travail, restauration des onglets et ajout des écouteurs , definition des actions des boutons
@@ -230,14 +229,14 @@ public class TicketController extends WorkspaceController {
             comboAvantage.setVisible(false);
             textFieldAvantage.setVisible(false);
             buttonAvantage.setVisible(false);
-            avantageLabel.setVisible(false);
-            quantityLabel.setVisible(false);
+            labelAvantage.setVisible(false);
+            labelQuantiteAvantage.setVisible(false);
         } else {
             comboAvantage.setVisible(true);
             textFieldAvantage.setVisible(true);
             buttonAvantage.setVisible(true);
-            avantageLabel.setVisible(true);
-            quantityLabel.setVisible(true);
+            labelAvantage.setVisible(true);
+            labelQuantiteAvantage.setVisible(true);
         }
     }
 
