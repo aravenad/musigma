@@ -107,6 +107,6 @@ public class Avantage implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(quantityByTicket, ticketType, stock);
+        return Objects.hash(quantityByTicket, System.identityHashCode(ticketType), System.identityHashCode(stock));
     }
 }
