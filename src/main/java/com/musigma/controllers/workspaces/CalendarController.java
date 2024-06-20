@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contrôleur pour l'espace de travail Calendrier.
+ */
 public class CalendarController extends WorkspaceController {
     public static WorkspaceController.WorkspaceRegister REGISTER = new WorkspaceController.WorkspaceRegister(
             "Planning",

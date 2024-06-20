@@ -82,7 +82,6 @@ public class TicketController extends WorkspaceController {
         buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
 
-
     /**
      * Ajoute un ticket à la liste des tickets. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
      * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket. Vérifie si la liste des tickets est vide.
@@ -146,7 +145,6 @@ public class TicketController extends WorkspaceController {
                     () -> avantage.setQuantityByTicket(event.getNewValue()));
         });
     }
-
 
     /**
      * Ajoute un bouton de suppression à la table des avantages.
