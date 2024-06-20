@@ -24,22 +24,11 @@ public class CalendarController extends WorkspaceController {
     );
 
     @FXML
-    CalendarView calendarView;
+    private CalendarView calendarView;
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
     private Calendar calendar = new Calendar("My Calendar");
 
-    @FXML
-    public void initialize() throws ArtisteException {
-        calendarView.getCalendarSources().clear();
-        calendarView.getCalendarSources().add(new com.calendarfx.model.CalendarSource("My Calendars") {{
-            getCalendars().add(calendar);
-        }});
-
-        calendar.addEventHandler(this::handleCalendarEvent);
-
-        addRep("Test Entry", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-    }
 
     private void handleCalendarEvent(Event event) {
         if (event instanceof CalendarEvent) {
