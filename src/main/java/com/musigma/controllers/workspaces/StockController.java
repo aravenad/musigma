@@ -175,9 +175,9 @@ public class StockController extends WorkspaceController {
         else {
             double t = 0;
             for (Stock stock : stocks) {
-                t += (int) stock.getPrix() * stock.getQuantity();
+                t += stock.getPrix() * stock.getQuantity();
             }
-            total.setText("Total : " + t + " €");
+            total.setText(String.format("Total : %.2f €", t));
         }
     }
 }

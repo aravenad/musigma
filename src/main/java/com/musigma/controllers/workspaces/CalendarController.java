@@ -7,23 +7,19 @@ import com.calendarfx.model.CalendarSource;
 import com.calendarfx.model.Entry;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.controllers.components.IntTextField;
+import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.RepresentationException;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Contrôleur pour l'espace de travail Calendrier.
@@ -42,16 +38,10 @@ public class CalendarController extends WorkspaceController {
     Button addEventButton;
 
     @FXML
-    IntTextField dateDebut;
+    IntTextField dateDebut, dateFin, scene;
 
     @FXML
-    IntTextField dateFin;
-
-    @FXML
-    TextField nomEvent;
-
-    @FXML
-    TextField scene;
+    RequiredTextField nomEvent;
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
