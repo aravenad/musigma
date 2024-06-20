@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+
 import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
@@ -65,7 +66,7 @@ public class TicketController extends WorkspaceController {
      * @see #onAddTicketPressed()
      */
     @FXML
-    public void initialize(Festival festival) throws TypeTicketException {
+    public void initialize(Festival festival) {
         super.initialize(festival);
         restoreTab();
         initializeComboBox();
@@ -79,6 +80,33 @@ public class TicketController extends WorkspaceController {
      * Sinon, les champs de saisie invalides sont surlignés en rouge.
      */
     private void onAddTicketPressed() {
+//        CustomValidField<RequiredTextField> textFieldType = new CustomValidField<>("Nom du type de ticket", new RequiredTextField()) {
+//            @Override
+//            public boolean isValid() {
+//                return node.isValid();
+//            }
+//        };
+//        CustomValidField<RequiredTextField> textFieldPrix = new CustomValidField<>("Prix du type de ticket", new FloatTextField()) {
+//            @Override
+//            public boolean isValid() {
+//                return node.isValid();
+//            }
+//        };
+
+//
+//        askValidForm(
+//                "Ajouter un type de ticket",
+//                "Ajout du type de ticket impossible",
+//                new CustomValidField[]{
+//                        ,
+//                },
+//                () -> {
+//                    System.out.println("Test : ");
+//                    System.out.println(test.node.getValue());
+//                }
+//        );
+//
+
         tryCatch(
     "Ajout du type de ticket impossible",
             () -> {

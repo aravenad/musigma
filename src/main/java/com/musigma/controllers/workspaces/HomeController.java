@@ -1,6 +1,7 @@
 package com.musigma.controllers.workspaces;
 
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.CustomValidField;
 import com.musigma.controllers.components.FloatTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
@@ -10,6 +11,7 @@ import javafx.scene.control.DatePicker;
 
 import java.time.LocalDate;
 
+import static com.musigma.utils.Dialogs.askValidForm;
 import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
@@ -48,11 +50,11 @@ public class HomeController extends WorkspaceController {
                 "Mise à jour de l'emplacement du festival impossible",
                 festival.getLocation(), festival::setLocation
         );
-        festivalArea.bindFloat(
+        festivalArea.bindValue(
                 "Mise à jour de l'aire de l'emplacement du festival impossible",
                 festival.getArea(), festival::setArea
         );
-        festivalLocationPrice.bindFloat(
+        festivalLocationPrice.bindValue(
                 "Mise à jour du prix de l'emplacement du festival impossible",
                 festival.getLocationPrice(), festival::setLocationPrice
         );

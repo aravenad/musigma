@@ -254,8 +254,8 @@ public class MainController {
      */
     private void openFestival(File file) {
         tryCatch(
-                "Ouverture du fichier du festival impossible",
-                () -> loadFestival(Festival.Festival(file))
+            "Ouverture du fichier du festival impossible",
+            () -> loadFestival(Festival.Festival(file))
         );
     }
 
@@ -334,9 +334,8 @@ public class MainController {
      * @param register L'enregistrement de l'espace de travail à charger
      * @throws IOException Si une erreur d'entrée/sortie se produit
      * @throws FestivalException Si une erreur liée au festival se produit
-     * @throws AvantageException Si une erreur liée aux avantages se produit
      */
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException, AvantageException, TypeTicketException {
+    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         currentWorkspaceController = fxmlLoader.getController();
