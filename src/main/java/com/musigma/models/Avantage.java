@@ -45,6 +45,16 @@ public class Avantage implements Serializable {
         LOGGER.info("Created Avantage");
     }
 
+    public void add() throws TypeTicketException, StockException {
+        ticketType.addAvantage(this);
+        stock.addAvantage(this);
+    }
+
+    public void remove() throws TypeTicketException, StockException {
+        ticketType.removeAvantage(this);
+        stock.removeAvantage(this);
+    }
+
     /**
      * Retourne la quantité d'objet du stock par ticket.
      *
@@ -97,6 +107,6 @@ public class Avantage implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(quantityByTicket, ticketType, stock);
+        return Objects.hash(quantityByTicket, System.identityHashCode(ticketType), System.identityHashCode(stock));
     }
 }

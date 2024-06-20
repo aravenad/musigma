@@ -1,6 +1,7 @@
 package com.musigma.models;
 
 import com.musigma.models.exception.FestivalException;
+import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -11,10 +12,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static com.musigma.utils.Log.getLogger;
@@ -395,11 +393,12 @@ public class Festival implements Serializable {
      * @param stock le stock à supprimer
      * @throws FestivalException si le stock n'a pas été trouvé
      */
-    public void removeStock(Stock stock) throws FestivalException, TypeTicketException {
+    public void removeStock(Stock stock) throws FestivalException, TypeTicketException, StockException {
         if (!stocks.remove(stock))
             throw new FestivalException("Le stock n'a pas été trouvé");
-        for (Avantage avantage : stock.getAvantages())
-            avantage.getTicketType().removeAvantage(avantage);
+        ArrayList<Avantage> oldAvantages = (ArrayList<Avantage>) stock.getAvantages().clone();
+        for (Avantage avantage: oldAvantages)
+            avantage.remove();
         LOGGER.info("Removed Stock from Festival.stocks");
     }
 
@@ -418,7 +417,7 @@ public class Festival implements Serializable {
      *
      * @throws FestivalException si un ticket ne veux pas changer de quantité
      */
-    public double calcMaxTicket() throws TypeTicketException {
+    public double optimizeResult() throws TypeTicketException {
         LOGGER.info("Calculated best quantity of ticket to sold");
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();

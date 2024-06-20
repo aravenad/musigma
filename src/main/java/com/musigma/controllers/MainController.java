@@ -84,26 +84,24 @@ public class MainController {
     private void loadState() {
         File previousStateFile = new File(STATE_FILEPATH);
         if (previousStateFile.exists()) {
-            tryCatch(
-                    "Chargement de l'état précédent de l'application impossible",
-                    () -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(previousStateFile);
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
-                            if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
-                                recentFiles.addAll(
-                                        previousRecentFiles
-                                                .stream()
-                                                .filter(file -> file != null && file.exists())
-                                                .collect(Collectors.toList())
-                                );
-                            if (!recentFiles.isEmpty())
-                                loadFestival(Festival.Festival(recentFiles.get(0)));
-                            else newFestival();
-                        }
-                    });
+            try (
+                    FileInputStream fis = new FileInputStream(previousStateFile);
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
+                if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
+                    recentFiles.addAll(
+                            previousRecentFiles
+                                    .stream()
+                                    .filter(file -> file != null && file.exists())
+                                    .collect(Collectors.toList())
+                    );
+                if (!recentFiles.isEmpty())
+                    loadFestival(Festival.Festival(recentFiles.get(0)));
+                else newFestival();
+            } catch (Exception e) {
+                newFestival();
+            }
         } else newFestival();
     }
 
