@@ -335,7 +335,7 @@ public class MainController {
      * @throws IOException Si une erreur d'entrée/sortie se produit
      * @throws FestivalException Si une erreur liée au festival se produit
      */
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
+    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, TypeTicketException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         currentWorkspaceController = fxmlLoader.getController();

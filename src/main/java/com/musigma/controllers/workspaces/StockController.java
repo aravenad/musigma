@@ -71,7 +71,7 @@ public class StockController extends WorkspaceController {
      * @throws FestivalException si le festival est invalide
      */
     @FXML
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws TypeTicketException {
         super.initialize(festival);
         tableView.getItems().addAll(festival.getStocks());
         tableView.setEditable(true); // Permet l'édition de la TableView
