@@ -1,23 +1,26 @@
 package com.musigma.controllers.workspaces;
 
-import com.calendarfx.model.Calendar;
-import com.calendarfx.model.CalendarEvent;
-import com.calendarfx.model.CalendarSource;
+import com.calendarfx.model.*;
 import com.calendarfx.view.CalendarView;
-import com.calendarfx.model.Entry;
+import com.calendarfx.view.DetailedWeekView;
 import com.calendarfx.view.WeekView;
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.IntTextField;
 import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
 import com.musigma.models.Representation;
 import com.musigma.models.exception.ArtisteException;
 import com.musigma.models.exception.TypeTicketException;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,25 +35,40 @@ public class CalendarController extends WorkspaceController {
     );
 
     @FXML
-    WeekView weekView;
+    DetailedWeekView detailWeekView;
+
+    @FXML
+    Button addEventButton;
+
+    @FXML
+    IntTextField dateDebut;
+
+    @FXML
+    IntTextField dateFin;
+
+    @FXML
+    TextField nomEvent;
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
     public void initialize(Festival festival) throws TypeTicketException {
+        detailWeekView.setAdjustToFirstDayOfWeek(false);
+        detailWeekView.setNumberOfDays(10);
         super.initialize(festival);
-        weekView.setEntryFactory(createEntryParameter -> {
-            Entry<?> entry = new Entry<>();
-            entry.changeStartDate(LocalDate.now());
-            entry.changeEndDate(LocalDate.now().plusDays(1));
-            return entry;
-        });
         Calendar calendar = new Calendar("Planning");
         calendar.addEntry(new Entry<>());
         CalendarSource calendarSource = new CalendarSource("Festival");
         calendarSource.getCalendars().add(calendar);
-        weekView.getCalendarSources().add(calendarSource);
+        detailWeekView.getCalendarSources().add(calendarSource);
         EventHandler<CalendarEvent> handler = this::addToModel;
         calendar.addEventHandler(handler);
+
+        addEventButton.setOnAction(e -> {
+            Entry<Event> entry = new Entry<>(nomEvent.getText());
+            entry.changeStartTime(LocalTime.of(dateDebut.getValue(),0));
+            entry.changeEndTime(LocalTime.of(dateDebut.getValue(),0));
+            calendar.addEntry(entry);
+        });
     }
 
     private void addToModel(CalendarEvent calendarEvent) {
