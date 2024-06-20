@@ -247,23 +247,19 @@ public class TicketController extends WorkspaceController {
      */
     private void onAddAvantagePressed() {
         if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
-            try {
-                TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
-                Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
-                int quantity = Integer.parseInt(textFieldAvantage.getText());
-                Avantage avantage = new Avantage(ticket, stock, quantity);
-                avantage.add();
-                TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
-                tableView.getItems().add(avantage);
-                festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).addAvantage(avantage);
-            } catch (AvantageException e) {
-                e.printStackTrace();
-            } catch (TypeTicketException | StockException e) {
-                throw new RuntimeException(e);
-            } catch (NumberFormatException e) {
-                textFieldAvantage.requestFocus();
-                return;
-            }
+            tryCatch(
+        "Ajout de l'avantage impossible",
+                () -> {
+                    TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
+                    Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
+                    int quantity = Integer.parseInt(textFieldAvantage.getText());
+                    Avantage avantage = new Avantage(ticket, stock, quantity);
+                    avantage.add();
+                    TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
+                    tableView.getItems().add(avantage);
+                    festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).addAvantage(avantage);
+                }
+            );
         } else {
             textFieldAvantage.requestFocus();
         }

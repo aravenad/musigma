@@ -100,25 +100,30 @@ public class Avantage implements Serializable {
 
     @Override
     public boolean equals(Object o) {
+        // On utilise les hashcode des ticketType et stock afin d'éviter un stackOverflow
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Avantage avantage = (Avantage) o;
         return quantityByTicket == avantage.quantityByTicket &&
-                Objects.equals(ticketType.hashCode(), avantage.ticketType.hashCode()) && // Utilise le hascode pour éviter un stackOverflow
-                Objects.equals(stock.hashCode(), avantage.stock.hashCode()); // Utilise le hascode pour éviter un stackOverflow
+                Objects.equals(ticketType.hashCode(), avantage.ticketType.hashCode()) &&
+                Objects.equals(stock.hashCode(), avantage.stock.hashCode());
     }
 
     @Override
     public int hashCode() {
-        // On n'utilise pas les hashcode de ticketType et stock afin d'éviter un stackOverflow
-        ArrayList<Avantage> ticketTypeAvatanges = (ArrayList<Avantage>) ticketType.getAvantages().clone();
-        ticketTypeAvatanges.remove(this);
-        ArrayList<Avantage> stockAvatanges = (ArrayList<Avantage>) stock.getAvantages().clone();
-        stockAvatanges.remove(this);
+        // On n'utilise pas les hashcode des avantages de ticketType et stock afin d'éviter un stackOverflow
         return Objects.hash(
             quantityByTicket,
-            Objects.hash(ticketType.getType(), ticketType.getQuantity(), ticketType.getPrice(), ticketTypeAvatanges), // Pseudo hashcode pour ticketType
-            Objects.hash(stock.getName(), stock.getQuantity(), stock.isFixed(), stockAvatanges) // Pseudo hashcode pour stock
+            Objects.hash(
+                    ticketType.getType(),
+                    ticketType.getQuantity(),
+                    ticketType.getPrice()
+            ), // Pseudo hashcode pour ticketType
+            Objects.hash(
+                    stock.getName(),
+                    stock.getQuantity(),
+                    stock.isFixed()
+            ) // Pseudo hashcode pour stock
         );
     }
 }
