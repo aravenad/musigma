@@ -45,19 +45,19 @@
         </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
          <children>
-            <Label text="Avantage :" />
-            <ComboBox fx:id="comboAvantage1" prefWidth="135.0" promptText="Sélectionner...">
+            <Label text="Avantage :" fx:id="avantageLabel" />
+            <ComboBox fx:id="comboAvantage" prefWidth="150.0" promptText="Sélectionner...">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ComboBox>
-            <Label text="Quantité :" />
-            <FloatTextField fx:id="textFieldAvantage1" alignment="CENTER" promptText="ex : 100">
+            <Label text="Quantité :" fx:id="quantityLabel" />
+            <FloatTextField fx:id="textFieldAvantage" alignment="CENTER" promptText="ex : 100">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </FloatTextField>
-            <Button fx:id="buttonAvantage1" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Avantage">
+            <Button fx:id="buttonAvantage" mnemonicParsing="false" prefWidth="150.0" text="Ajouter Avantage">
                <HBox.margin>
                   <Insets />
                </HBox.margin>

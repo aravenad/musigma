@@ -53,6 +53,9 @@ public class TicketController extends WorkspaceController {
     @FXML
     ComboBox<Stock> comboAvantage;
 
+    @FXML
+    Label avantageLabel, quantityLabel;
+
     /**
      * Initialisation de l'espace de travail, restauration des onglets et ajout des écouteurs , definition des actions des boutons
      * definition de la comboBox et verification des tickets
@@ -227,10 +230,14 @@ public class TicketController extends WorkspaceController {
             comboAvantage.setVisible(false);
             textFieldAvantage.setVisible(false);
             buttonAvantage.setVisible(false);
+            avantageLabel.setVisible(false);
+            quantityLabel.setVisible(false);
         } else {
             comboAvantage.setVisible(true);
             textFieldAvantage.setVisible(true);
             buttonAvantage.setVisible(true);
+            avantageLabel.setVisible(true);
+            quantityLabel.setVisible(true);
         }
     }
 
