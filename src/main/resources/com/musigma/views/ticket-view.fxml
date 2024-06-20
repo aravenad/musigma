@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -40,23 +41,24 @@
                 <Insets left="10.0" />
             </padding>
             <VBox.margin>
-                <Insets />
+                <Insets top="4.0" />
             </VBox.margin>
         </HBox>
+      <Separator prefWidth="200.0" />
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
          <children>
-            <Label text="Avantage :" fx:id="labelAvantage" />
+            <Label fx:id="labelAvantage" text="Avantage :" />
             <ComboBox fx:id="comboAvantage" prefWidth="150.0" promptText="Sélectionner...">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ComboBox>
-            <Label text="Quantité :" fx:id="labelQuantiteAvantage" />
-            <FloatTextField fx:id="textFieldAvantage" alignment="CENTER" promptText="ex : 100">
+            <Label fx:id="labelQuantiteAvantage" text="Quantité :" />
+            <IntTextField fx:id="textFieldAvantage" alignment="CENTER" promptText="ex : 100">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
-            </FloatTextField>
+            </IntTextField>
             <Button fx:id="buttonAvantage" mnemonicParsing="false" prefWidth="150.0" text="Ajouter Avantage">
                <HBox.margin>
                   <Insets />
@@ -73,6 +75,7 @@
             <Insets />
          </VBox.margin>
       </HBox>
+      <Separator prefWidth="200.0" />
       <TabPane fx:id="tabPane" prefHeight="615.0" prefWidth="1058.0" tabClosingPolicy="UNAVAILABLE" />
     </children>
 </VBox>
