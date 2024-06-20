@@ -55,6 +55,11 @@ public class CalendarController extends WorkspaceController {
 
     private ArrayList<Entry<?>> entries = new ArrayList<>();
 
+    /**
+     * Initialise le contrôleur avec les données du festival.
+     *
+     * @param festival le festival à gérer
+     */
     public void initialize(Festival festival) {
         super.initialize(festival);
         Calendar calendar = new Calendar("Planning");
@@ -95,6 +100,11 @@ public class CalendarController extends WorkspaceController {
         });
     }
 
+    /**
+     * Gère les événements du calendrier pour mettre à jour le modèle de données.
+     *
+     * @param event l'événement du calendrier
+     */
     private void addToModel(Event event){
         if(event.getEventType() == CalendarEvent.ENTRY_TITLE_CHANGED){
             //changer nom
@@ -139,7 +149,16 @@ public class CalendarController extends WorkspaceController {
         }
     }
 
-    //Ajoute au modele
+    /**
+     * Ajoute une représentation au festival.
+     *
+     * @param artisteName le nom de l'artiste
+     * @param start       l'heure de début
+     * @param duration    la durée en heures
+     * @param scene       la scène
+     * @throws ArtisteException   en cas d'erreur liée à l'artiste
+     * @throws FestivalException  en cas d'erreur liée au festival
+     */
     public void addRep(String artisteName, LocalDateTime start, int duration, String scene) throws ArtisteException, FestivalException {
         Entry<Representation> entry = new Entry<>(artisteName);
         entry.setInterval(start, start.plusHours(duration));

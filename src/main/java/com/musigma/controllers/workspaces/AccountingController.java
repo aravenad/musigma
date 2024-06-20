@@ -73,6 +73,4 @@ public class AccountingController extends WorkspaceController {
     public int getRecommandedSecurity() {
         return Math.max(3, (int) (festival.getArea() / 100));
     }
-
-
 }

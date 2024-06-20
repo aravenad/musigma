@@ -5,7 +5,6 @@ import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -44,17 +43,31 @@ public class Avantage implements Serializable {
         LOGGER.info("Created Avantage");
     }
 
-    public void add() throws TypeTicketException, StockException, AvantageException {
-        if (ticketType.getAvantages().stream().anyMatch(av -> av.getStock().equals(stock))) {
+    /**
+     * Connecte cet avantage à son type de ticket et son stock.
+     *
+     * @throws TypeTicketException si une exception relative au type de ticket survient
+     * @throws StockException si une exception relative au stock survient
+     * @throws AvantageException si un avantage identique existe déjà pour ce stock
+     */
+    public void connect() throws TypeTicketException, StockException, AvantageException {
+        if (ticketType.getAvantages().stream().anyMatch(av -> av.getStock().equals(stock)))
             throw new AvantageException("Un avantage identique existe déjà pour ce stock");
-        }
         ticketType.addAvantage(this);
         stock.addAvantage(this);
+        LOGGER.info("Connected stock and ticket from avantage");
     }
 
-    public void remove() throws TypeTicketException, StockException {
+    /**
+     * Déconnecte cet avantage de son type de ticket et son stock.
+     *
+     * @throws TypeTicketException si une exception relative au type de ticket survient
+     * @throws StockException si une exception relative au stock survient
+     */
+    public void disconnect() throws TypeTicketException, StockException {
         ticketType.removeAvantage(this);
         stock.removeAvantage(this);
+        LOGGER.info("Disconnected stock and ticket from avantage");
     }
 
     /**

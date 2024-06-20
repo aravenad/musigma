@@ -19,12 +19,16 @@ import java.util.logging.Logger;
 
 import static com.musigma.controllers.MainController.ICON_PATH;
 
+/**
+ * La classe Dialogs fournit des méthodes utilitaires pour afficher des boîtes de dialogue,
+ * gérer les exceptions et les erreurs, et demander des fichiers à l'utilisateur.
+ */
 public class Dialogs {
 
     // Logger pour la classe Dialogs
     private static final Logger LOGGER = Log.getLogger(Log.class);
 
-    // Nom de fichier par défaut et extension pour le FileChooser
+    // Nom de fichier par défaut et extension pour le dialog
     private static final String FILENAME = "Musigma";
     private static final String EXT_NAME = "*.mgm";
 
@@ -38,12 +42,17 @@ public class Dialogs {
         try {
             function.run();
         } catch (Exception e) {
-            newError(errorMsg + " :\n" + e.getMessage());
+            showError(errorMsg + " :\n" + e.getMessage());
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
         }
     }
 
-    public static void newError(String errorMsg) {
+    /**
+     * Affiche un message d'erreur dans une boîte de dialogue.
+     *
+     * @param errorMsg le message d'erreur à afficher
+     */
+    public static void showError(String errorMsg) {
         LOGGER.severe(errorMsg);
         Alert alert = new Alert(
                 Alert.AlertType.ERROR,
@@ -71,7 +80,7 @@ public class Dialogs {
                     .getIcons()
                     .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
         } catch (Exception e) {
-            newError(String.format("%s : %s", errorMsg, e.getMessage()));
+            showError(String.format("%s : %s", errorMsg, e.getMessage()));
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
         }
     }
@@ -102,7 +111,14 @@ public class Dialogs {
         return fc;
     }
 
-
+    /**
+     * Affiche un formulaire de validation avec plusieurs champs personnalisés.
+     *
+     * @param title            titre de la fenêtre du formulaire
+     * @param errorMsg         message d'erreur à afficher en cas de validation échouée
+     * @param customValidFields tableau de champs personnalisés à valider
+     * @param nextCallback     fonction à exécuter si la validation réussit
+     */
     public static void askValidForm(String title, String errorMsg, CustomValidField[] customValidFields, Runner nextCallback) {
         Stage subWindow = new Stage();
         subWindow.setTitle(title);
@@ -148,11 +164,13 @@ public class Dialogs {
                         () -> {
                             nextCallback.run();
                             subWindow.close();
+                            LOGGER.info("Closed dialog \"" + subWindow.getTitle() + "\"");
                         }
                 );
             }
         });
 
         subWindow.show();
+        LOGGER.info("Opened dialog \"" + subWindow.getTitle() + "\"");
     }
 }

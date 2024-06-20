@@ -9,7 +9,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
 import java.io.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -402,7 +401,7 @@ public class Festival implements Serializable {
             throw new FestivalException("Le stock n'a pas été trouvé");
         ArrayList<Avantage> oldAvantages = (ArrayList<Avantage>) stock.getAvantages().clone();
         for (Avantage avantage: oldAvantages)
-            avantage.remove();
+            avantage.disconnect();
         LOGGER.info("Removed Stock from Festival.stocks");
     }
 
@@ -419,7 +418,7 @@ public class Festival implements Serializable {
      * Optimise les coûts du festival en calculant les quantités respectives
      * de tickets à vendre les plus rentables avec le modèle d'optimisation d'Ojalgo.
      *
-     * @throws FestivalException si un ticket ne veux pas changer de quantité
+     * @throws TypeTicketException si un ticket ne veux pas changer de quantité
      */
     public double optimizeResult() throws TypeTicketException {
         LOGGER.info("Calculated best quantity of ticket to sold");
@@ -427,34 +426,40 @@ public class Festival implements Serializable {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         HashMap<Stock, Expression> constraints = new HashMap<>();
 
+        LOGGER.info("Adding constraint stocks");
         for (Stock stock: stocks)
             if (stock.isFixed()) {
                 Expression constraint = model.addExpression(stock.getName())
                         .upper(stock.getQuantity())
                         .lower(0);
                 constraints.put(stock, constraint);
+                LOGGER.info(String.format("Added variable \"%s\"", stock.getName()));
             }
 
         Expression areaConstraint = model.addExpression("Area")
                 .upper(area)
                 .lower(0);
 
+        LOGGER.info("Definition of the variables");
         for (TypeTicket ticketType : ticketTypes) {
             Variable x = model.addVariable(ticketType.getType()).weight(ticketType.getPrice());
             for (Avantage avantage : ticketType.getAvantages()) {
                 Stock stock = avantage.getStock();
                 if (stock.isFixed()) {
                     constraints.get(stock).set(x, avantage.getQuantityByTicket());
+                    LOGGER.info(String.format("Adding equation \"%s\" on ticket \"%s\"", avantage.getStock().getName(), ticketType.getType()));
                 }
                 areaConstraint.set(x, AVERAGE_AREA_BY_PEOPLE);
+                LOGGER.info(String.format("Adding area equation on ticket \"%s\"", ticketType.getType()));
             }
         }
 
+        LOGGER.info("Calculating optimized result");
         Optimisation.Result results = model.maximise();
 
-        for (int i = 0; i < ticketTypes.size(); i++) {
+        LOGGER.info("Setting optimized quantity of ticket to sold");
+        for (int i = 0; i < ticketTypes.size(); i++)
             ticketTypes.get(i).setQuantity(results.get(i).intValueExact());
-        }
 
         LOGGER.info("Calculated best quantity of ticket to sold");
         return results.getValue();

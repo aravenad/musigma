@@ -14,7 +14,6 @@ import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * Contrôleur de l'espace de travail Home.
- * Gère l'affichage et les interactions de la vue d'accueil pour le festival.
  */
 public class HomeController extends WorkspaceController {
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(

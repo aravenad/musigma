@@ -78,10 +78,14 @@ public class TicketController extends WorkspaceController {
         );
     }
 
+    /**
+     * Met à jour un ticket. Si les champs de saisie sont valides, les détails du ticket sont mis à jour.
+     * Restaure les onglets après la mise à jour.
+     */
     @FXML
     private void updTicket() {
         if (festival.getTicketTypes().isEmpty())
-            newError("Aucun ticket disponible");
+            showError("Aucun ticket disponible");
         else {
             TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
 
@@ -107,10 +111,14 @@ public class TicketController extends WorkspaceController {
         }
     }
 
+    /**
+     * Supprime un ticket sélectionné. Affiche une erreur si aucun ticket n'est disponible.
+     * Restaure les onglets après la suppression.
+     */
     @FXML
     private void removeTicket() {
         if (festival.getTicketTypes().isEmpty())
-            newError("Aucun ticket disponible");
+            showError("Aucun ticket disponible");
         else {
             TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
             tryCatch(
@@ -132,7 +140,7 @@ public class TicketController extends WorkspaceController {
     @FXML
     private void addAvantage() {
         if (festival.getTicketTypes().isEmpty())
-            newError("Aucun ticket disponible");
+            showError("Aucun ticket disponible");
         else {
             TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
 
@@ -154,7 +162,7 @@ public class TicketController extends WorkspaceController {
                                 stockAvantage.node.getSelectionModel().getSelectedItem(),
                                 quantityByTicket.node.getValue()
                         );
-                        avantage.add();
+                        avantage.connect();
                         TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
                         tableView.getItems().add(avantage);
                         ticket.addAvantage(avantage);
