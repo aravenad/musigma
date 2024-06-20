@@ -175,13 +175,13 @@ public class StockController extends WorkspaceController {
     }
 
     /**
-     * Calcule le prix total des stocks.
+     * Calcule le prix total des stocks. 2 décimales.
      */
     private void totalPrix(){
         double t = 0;
         for (Stock stock : tableView.getItems()) {
             t += stock.getPrix() * stock.getQuantity();
         }
-        total.setText("Total : " + t + " €");
+        total.setText(String.format("Total : %.2f €", t));
     }
 }
