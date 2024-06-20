@@ -28,6 +28,7 @@
                <IntTextField fx:id="dateFin" maxHeight="-Infinity" promptText="ex : 4" />
                <Label text="nom:" />
                <TextField fx:id="nomEvent" maxHeight="-Infinity" promptText="ex : didier chatant" />
+               <TextField fx:id="scene" maxHeight="-Infinity" promptText="ex : scene 1" />
                <Button fx:id="addEventButton" mnemonicParsing="false" text="Ajouter" />
             </children>
             <VBox.margin>
