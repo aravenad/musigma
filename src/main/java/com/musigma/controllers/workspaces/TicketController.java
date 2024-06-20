@@ -34,25 +34,25 @@ public class TicketController extends WorkspaceController {
     );
 
     @FXML
-    RequiredTextField textFieldType;
+    RequiredTextField textFieldTicketType;
 
     @FXML
-    IntTextField textFieldQuantite,textFieldAvantage;
+    IntTextField textFieldTicketQuantite, textFieldAvantageQuantite;
 
     @FXML
-    FloatTextField textFieldPrix;
+    FloatTextField textFieldTicketPrix;
 
     @FXML
-    Button buttonTicket, buttonAvantage;
+    Button buttonAddTicket, buttonAddAvantage;
 
     @FXML
     TabPane tabPane;
 
     @FXML
-    ComboBox<Stock> comboAvantage;
+    ComboBox<Stock> comboAvantageList;
 
     @FXML
-    Label labelAvantage, labelQuantiteAvantage;
+    Label labelAvantageList, labelAvantageQuantite;
 
     /**
      * Initialisation de l'espace de travail, restauration des onglets et ajout des écouteurs , definition des actions des boutons
@@ -81,14 +81,14 @@ public class TicketController extends WorkspaceController {
             }
         });
 
-        buttonTicket.setOnAction(e -> {
+        buttonAddTicket.setOnAction(e -> {
             try {
                 onAddTicketPressed();
             } catch (TypeTicketException | FestivalException ex) {
                 throw new RuntimeException(ex);
             }
         });
-        buttonAvantage.setOnAction(e -> onAddAvantagePressed());
+        buttonAddAvantage.setOnAction(e -> onAddAvantagePressed());
     }
 
     /**
@@ -101,25 +101,25 @@ public class TicketController extends WorkspaceController {
      * @see #initialize(Festival)
      */
     private void onAddTicketPressed() throws FestivalException, TypeTicketException {
-        textFieldType.setStyle("-fx-border-color: transparent;");
-        textFieldPrix.setStyle("-fx-border-color: transparent;");
-        textFieldQuantite.setStyle("-fx-border-color: transparent;");
-        if (textFieldType.getText().trim().equals("Objet") || textFieldType.getText().trim().isEmpty() || textFieldType.getText().trim().isBlank() || textFieldType.getText().matches(".*[^a-zA-Z-\\s].*")) {
-            textFieldType.requestFocus();
-            textFieldType.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldPrix.getText().trim().isEmpty() || textFieldPrix.getText().trim().isBlank()) {
-            textFieldPrix.requestFocus();
-            textFieldPrix.setStyle("-fx-border-color: crimson;");
-        } else if (textFieldQuantite.getText().trim().isEmpty() || textFieldQuantite.getText().trim().isBlank()) {
-            textFieldQuantite.requestFocus();
-            textFieldQuantite.setStyle("-fx-border-color: crimson;");
+        textFieldTicketType.setStyle("-fx-border-color: transparent;");
+        textFieldTicketPrix.setStyle("-fx-border-color: transparent;");
+        textFieldTicketQuantite.setStyle("-fx-border-color: transparent;");
+        if (textFieldTicketType.getText().trim().equals("Objet") || textFieldTicketType.getText().trim().isEmpty() || textFieldTicketType.getText().trim().isBlank() || textFieldTicketType.getText().matches(".*[^a-zA-Z-\\s].*")) {
+            textFieldTicketType.requestFocus();
+            textFieldTicketType.setStyle("-fx-border-color: crimson;");
+        } else if (textFieldTicketPrix.getText().trim().isEmpty() || textFieldTicketPrix.getText().trim().isBlank()) {
+            textFieldTicketPrix.requestFocus();
+            textFieldTicketPrix.setStyle("-fx-border-color: crimson;");
+        } else if (textFieldTicketQuantite.getText().trim().isEmpty() || textFieldTicketQuantite.getText().trim().isBlank()) {
+            textFieldTicketQuantite.requestFocus();
+            textFieldTicketQuantite.setStyle("-fx-border-color: crimson;");
         } else {
-            TypeTicket ticket = new TypeTicket(textFieldType.getText(), Integer.parseInt(textFieldQuantite.getText()), Float.parseFloat(textFieldPrix.getText()));
+            TypeTicket ticket = new TypeTicket(textFieldTicketType.getText(), Integer.parseInt(textFieldTicketQuantite.getText()), Float.parseFloat(textFieldTicketPrix.getText()));
             festival.addTicketType(ticket);
             createTab(ticket);
-            textFieldType.setStyle("-fx-border-color: transparent;");
-            textFieldPrix.setStyle("-fx-border-color: transparent;");
-            textFieldQuantite.setStyle("-fx-border-color: transparent;");
+            textFieldTicketType.setStyle("-fx-border-color: transparent;");
+            textFieldTicketPrix.setStyle("-fx-border-color: transparent;");
+            textFieldTicketQuantite.setStyle("-fx-border-color: transparent;");
             checkTicket();
         }
     }
@@ -218,7 +218,7 @@ public class TicketController extends WorkspaceController {
      * @see #initialize(Festival)
      */
     private void initializeComboBox() {
-        comboAvantage.setConverter(new StringConverter<>() {
+        comboAvantageList.setConverter(new StringConverter<>() {
             @Override
             public String toString(Stock stock) {
                 return stock != null ? stock.getName() : "";
@@ -228,7 +228,7 @@ public class TicketController extends WorkspaceController {
                 return null;
             }
         });
-        comboAvantage.getItems().addAll(festival.getStocks());
+        comboAvantageList.getItems().addAll(festival.getStocks());
     }
 
     /**
@@ -239,17 +239,17 @@ public class TicketController extends WorkspaceController {
      */
     private void checkTicket() {
         if (festival.getTicketTypes().isEmpty()) {
-            comboAvantage.setVisible(false);
-            textFieldAvantage.setVisible(false);
-            buttonAvantage.setVisible(false);
-            labelAvantage.setVisible(false);
-            labelQuantiteAvantage.setVisible(false);
+            comboAvantageList.setVisible(false);
+            textFieldAvantageQuantite.setVisible(false);
+            buttonAddAvantage.setVisible(false);
+            labelAvantageList.setVisible(false);
+            labelAvantageQuantite.setVisible(false);
         } else {
-            comboAvantage.setVisible(true);
-            textFieldAvantage.setVisible(true);
-            buttonAvantage.setVisible(true);
-            labelAvantage.setVisible(true);
-            labelQuantiteAvantage.setVisible(true);
+            comboAvantageList.setVisible(true);
+            textFieldAvantageQuantite.setVisible(true);
+            buttonAddAvantage.setVisible(true);
+            labelAvantageList.setVisible(true);
+            labelAvantageQuantite.setVisible(true);
         }
     }
 
@@ -259,13 +259,13 @@ public class TicketController extends WorkspaceController {
      * @see #initialize(Festival)
      */
     private void onAddAvantagePressed() {
-        if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
+        if (comboAvantageList.getSelectionModel().getSelectedItem() != null && !textFieldAvantageQuantite.getText().trim().isEmpty() && !textFieldAvantageQuantite.getText().trim().isBlank()) {
             tryCatch(
                     "Ajout de l'avantage impossible",
                     () -> {
                         TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
-                        Stock stock = comboAvantage.getSelectionModel().getSelectedItem();
-                        int quantity = Integer.parseInt(textFieldAvantage.getText());
+                        Stock stock = comboAvantageList.getSelectionModel().getSelectedItem();
+                        int quantity = Integer.parseInt(textFieldAvantageQuantite.getText());
                         Avantage avantage = new Avantage(ticket, stock, quantity);
                         avantage.add();
                         TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
@@ -274,9 +274,9 @@ public class TicketController extends WorkspaceController {
                     }
             );
         } else {
-            textFieldAvantage.requestFocus();
+            textFieldAvantageQuantite.requestFocus();
         }
-        textFieldAvantage.clearError();
+        textFieldAvantageQuantite.clearError();
     }
 
     /**
