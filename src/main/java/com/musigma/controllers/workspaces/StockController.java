@@ -114,8 +114,6 @@ public class StockController extends WorkspaceController {
                     public void updateItem(Void item, boolean isEmpty) {
                         super.updateItem(item, isEmpty);
                         Button btn = new Button("Supprimer");
-                        System.out.println(item);
-                        System.out.println(isEmpty);
                         if (isEmpty) {
                             setGraphic(null);
                         } else {

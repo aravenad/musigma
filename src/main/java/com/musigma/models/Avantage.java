@@ -1,6 +1,8 @@
 package com.musigma.models;
 
 import com.musigma.models.exception.AvantageException;
+import com.musigma.models.exception.StockException;
+import com.musigma.models.exception.TypeTicketException;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -33,10 +35,12 @@ public class Avantage implements Serializable {
      * @param stock le stock associé à cet avantage
      * @param quantityByTicket la quantité de cet avantage par ticket
      */
-    public Avantage(TypeTicket ticketType, Stock stock, int quantityByTicket) throws AvantageException {
+    public Avantage(TypeTicket ticketType, Stock stock, int quantityByTicket) throws AvantageException, TypeTicketException, StockException {
         LOGGER.info("Initialized Avantage");
         this.ticketType = ticketType;
         this.stock = stock;
+        ticketType.addAvantage(this);
+        stock.addAvantage(this);
         setQuantityByTicket(quantityByTicket);
         LOGGER.info("Created Avantage");
     }

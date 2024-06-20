@@ -1,17 +1,26 @@
 package com.musigma.controllers.workspaces;
 
+import atlantafx.base.util.DoubleStringConverter;
+import atlantafx.base.util.IntegerStringConverter;
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.FloatTextField;
+import com.musigma.controllers.components.IntTextField;
+import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Avantage;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
+import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
+import static com.musigma.utils.Dialogs.tryCatch;
 
 /**
  * Contrôleur pour l'espace de travail Ticket.
@@ -27,7 +36,13 @@ public class TicketController extends WorkspaceController {
     );
 
     @FXML
-    TextField textFieldType, textFieldQuantite, textFieldPrix, textFieldAvantage;
+    RequiredTextField textFieldType;
+
+    @FXML
+    IntTextField textFieldQuantite;
+
+    @FXML
+    FloatTextField textFieldPrix, textFieldAvantage;
 
     @FXML
     Button buttonTicket, buttonAvantage;
@@ -45,7 +60,6 @@ public class TicketController extends WorkspaceController {
      * @throws FestivalException si le festival est invalide
      * @throws AvantageException si l'avantage est invalide
      * @see #restoreTab()
-     * @see #addListener()
      * @see #initializeComboBox()
      * @see #checkTicket()
      * @see #onAddTicketPressed()
@@ -54,7 +68,6 @@ public class TicketController extends WorkspaceController {
     public void initialize(Festival festival) {
         super.initialize(festival);
         restoreTab();
-        addListener();
         initializeComboBox();
         checkTicket();
         buttonTicket.setOnAction(e -> {
@@ -66,33 +79,7 @@ public class TicketController extends WorkspaceController {
         });
         buttonAvantage.setOnAction(e -> onAddAvantagePressed());
     }
-    /**
-     * Ajoute un écouteur sur les champs de texte pour vérifier si les valeurs sont valides
-     * @see #onAddTicketPressed()
-     */
-    private void addListener() {
-        textFieldType.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().equals("Objet") || newValue.trim().isEmpty() || newValue.trim().isBlank() || newValue.matches(".*[^a-zA-Z-\\s].*")) {
-                textFieldType.setStyle("-fx-border-color: crimson;");
-            } else {
-                textFieldType.setStyle("-fx-border-color: transparent;");
-            }
-        });
-        textFieldPrix.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().isEmpty() || newValue.trim().isBlank()) {
-                textFieldPrix.setStyle("-fx-border-color: crimson;");
-            } else {
-                textFieldPrix.setStyle("-fx-border-color: transparent;");
-            }
-        });
-        textFieldQuantite.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.trim().isEmpty() || newValue.trim().isBlank()) {
-                textFieldQuantite.setStyle("-fx-border-color: crimson;");
-            } else {
-                textFieldQuantite.setStyle("-fx-border-color: transparent;");
-            }
-        });
-    }
+
 
     /**
      * Ajoute un ticket à la liste des tickets. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
@@ -100,7 +87,6 @@ public class TicketController extends WorkspaceController {
      * Sinon, les champs de saisie invalides sont surlignés en rouge.
      * @throws FestivalException si le festival est invalide
      * @throws TypeTicketException si le ticket est invalide
-     * @see #addListener()
      */
     private void onAddTicketPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
@@ -131,6 +117,7 @@ public class TicketController extends WorkspaceController {
      * Ajoute les colonnes "Avantage" et "Quantité" au TableView.
      * Ajoute l'avantage au TableView.
      * Ajoute le TableView à l'onglet. Ajoute l'onglet au TabPane.
+     * Ajoute la possibilité d'éditer les quantités.
      * @param ticket TypeTicket Ticket a ajouter
      *
      */
@@ -144,8 +131,54 @@ public class TicketController extends WorkspaceController {
         newTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         avantageColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getStock().getName()));
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantityByTicket()));
+        newTableView.setEditable(true);
+        TableColumn<Avantage, Void> actionColumn = new TableColumn<>("Action");
+        addDeleteButtonToTable(newTableView, actionColumn);
         newTab.setContent(newTableView);
         tabPane.getTabs().add(newTab);
+        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); // Permet l'édition des quantités
+        quantityColumn.setOnEditCommit(event -> {
+            Avantage avantage = event.getRowValue();
+            tryCatch(
+                    "Impossible de modifier la quantité du stock",
+                    () -> avantage.setQuantityByTicket(event.getNewValue()));
+        });
+    }
+
+
+    /**
+     * Ajoute un bouton de suppression à la table des avantages.
+     * Crée un bouton "Supprimer" pour chaque ligne de la table.
+     */
+    private void addDeleteButtonToTable(TableView<Avantage> tableView, TableColumn<Avantage, Void> actionColumn) {
+        Callback<TableColumn<Avantage, Void>, TableCell<Avantage, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<Avantage, Void> call(final TableColumn<Avantage, Void> param) {
+                return new TableCell<>() {
+                    @Override
+                    public void updateItem(Void item, boolean isEmpty) {
+                        super.updateItem(item, isEmpty);
+                        Button btn = new Button("Supprimer");
+                        if (isEmpty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                            btn.setOnAction((e) -> {
+                                Avantage avantage = getTableView().getItems().get(getIndex());
+                                tryCatch(
+                                        "Impossible de supprimer l'avantage",
+                                        () -> {
+                                            festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).removeAvantage(avantage);
+                                            getTableView().getItems().remove(avantage);
+                                        });
+                            });
+                        }
+                    }
+                };
+            }
+        };
+        actionColumn.setCellFactory(cellFactory);
+        tableView.getColumns().add(actionColumn);
     }
 
     /**
@@ -205,7 +238,6 @@ public class TicketController extends WorkspaceController {
      * Ajoute un avantage à un ticket. Si les champs de saisie sont valides, un avantage est créé et ajouté à la liste.
      * Sauvegarde l'avantage dans la liste des avantages du ticket. Ajoute l'avantage au TableView.
      * @see #initialize(Festival)
-     * @see #addListener()
      */
     private void onAddAvantagePressed() {
         if (comboAvantage.getSelectionModel().getSelectedItem() != null && !textFieldAvantage.getText().trim().isEmpty() && !textFieldAvantage.getText().trim().isBlank()) {
@@ -222,18 +254,14 @@ public class TicketController extends WorkspaceController {
             } catch (TypeTicketException e) {
                 throw new RuntimeException(e);
             } catch (NumberFormatException e) {
-                // Gérer les cas où la conversion de textFieldAvantage en entier échoue
                 textFieldAvantage.requestFocus();
-                textFieldAvantage.setStyle("-fx-border-color: crimson;");
                 return;
+            } catch (StockException e) {
+                throw new RuntimeException(e);
             }
         } else {
             textFieldAvantage.requestFocus();
-            textFieldAvantage.setStyle("-fx-border-color: crimson;");
         }
-        // Réinitialiser la bordure du champ texte et effacer le texte
-        textFieldAvantage.setStyle("-fx-border-color: transparent;");
-        textFieldAvantage.clear();
+        textFieldAvantage.clearError();
     }
-
 }
