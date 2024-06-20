@@ -11,7 +11,6 @@ import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
@@ -93,11 +92,13 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Ajoute un ticket à la liste des tickets. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
-     * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket. Vérifie si la liste des tickets est vide.
-     * Sinon, les champs de saisie invalides sont surlignés en rouge.
+     * Ajoute un ticket. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
+     * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket.
      * @throws FestivalException si le festival est invalide
      * @throws TypeTicketException si le ticket est invalide
+     * @see #createTab(TypeTicket)
+     * @see #checkTicket()
+     * @see #initialize(Festival)
      */
     private void onAddTicketPressed() throws FestivalException, TypeTicketException {
         textFieldType.setStyle("-fx-border-color: transparent;");
@@ -124,36 +125,32 @@ public class TicketController extends WorkspaceController {
     }
 
     /**
-     * Crée un onglet pour un ticket. Crée un TableView pour les avantages du ticket.
-     * Ajoute les colonnes "Avantage" et "Quantité" au TableView.
-     * Ajoute l'avantage au TableView.
-     * Ajoute le TableView à l'onglet. Ajoute l'onglet au TabPane.
-     * Ajoute la possibilité d'éditer les quantités.
-     * @param ticket TypeTicket Ticket a ajouter
-     *
+     * Crée un onglet pour un ticket. Ajoute un TableView pour les avantages du ticket.
+     * Ajoute une colonne pour la liste des avantages et une colonne pour la quantité.
+     * Ajoute un bouton de suppression pour chaque ligne de la table.
+     * @param ticket TypeTicket Ticket
+     * @see #renameTab(Tab, TypeTicket, boolean)
+     * @see #addDeleteButtonToTable(TableView, TableColumn)
+     * @see #initialize(Festival)
      */
     private void createTab(TypeTicket ticket) {
         Tab newTab = new Tab(ticket.getType());
-        if (tabPane.getTabs().isEmpty()) {
-            renameTab(newTab, ticket, true);
-        } else {
-            renameTab(newTab, ticket, false);
-        }
-        TableView<Avantage> newTableView = new TableView<>();
-        TableColumn<Avantage, String> avantageColumn = new TableColumn<>("Avantage");
-        TableColumn<Avantage, Integer> quantityColumn = new TableColumn<>("Quantité");
-        newTableView.getColumns().add(avantageColumn);
-        newTableView.getColumns().add(quantityColumn);
-        newTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        avantageColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getStock().getName()));
-        quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantityByTicket()));
-        newTableView.setEditable(true);
+        renameTab(newTab, ticket, tabPane.getTabs().isEmpty());
+        TableView<Avantage> avantageTableView = new TableView<>();
+        TableColumn<Avantage, String> avantageListColumn = new TableColumn<>("Avantage");
+        TableColumn<Avantage, Integer> avantageQuantityColumn = new TableColumn<>("Quantité");
+        avantageTableView.getColumns().add(avantageListColumn);
+        avantageTableView.getColumns().add(avantageQuantityColumn);
+        avantageTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        avantageListColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getStock().getName()));
+        avantageQuantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantityByTicket()));
+        avantageTableView.setEditable(true);
         TableColumn<Avantage, Void> actionColumn = new TableColumn<>("Action");
-        addDeleteButtonToTable(newTableView, actionColumn);
-        newTab.setContent(newTableView);
+        addDeleteButtonToTable(avantageTableView, actionColumn);
+        newTab.setContent(avantageTableView);
         tabPane.getTabs().add(newTab);
-        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); // Permet l'édition des quantités
-        quantityColumn.setOnEditCommit(event -> {
+        avantageQuantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); // Permet l'édition des quantités
+        avantageQuantityColumn.setOnEditCommit(event -> {
             Avantage avantage = event.getRowValue();
             tryCatch(
                     "Impossible de modifier la quantité du stock",
@@ -164,6 +161,9 @@ public class TicketController extends WorkspaceController {
     /**
      * Ajoute un bouton de suppression à la table des avantages.
      * Crée un bouton "Supprimer" pour chaque ligne de la table.
+     * @param tableView TableView<Avantage> Table des avantages
+     * @param actionColumn TableColumn<Avantage, Void> Colonne d'action
+     * @see #initialize(Festival)
      */
     private void addDeleteButtonToTable(TableView<Avantage> tableView, TableColumn<Avantage, Void> actionColumn) {
         Callback<TableColumn<Avantage, Void>, TableCell<Avantage, Void>> cellFactory = new Callback<>() {
@@ -300,7 +300,4 @@ public class TicketController extends WorkspaceController {
             }
         });
     }
-
-
-
 }
