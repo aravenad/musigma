@@ -10,18 +10,13 @@ import com.musigma.models.Avantage;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
-import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
-
-import static com.musigma.utils.Dialogs.*;
+import static com.musigma.controllers.Dialogs.*;
 
 /**
  * Contrôleur pour l'espace de travail Ticket.

@@ -10,7 +10,7 @@ import javafx.scene.control.DatePicker;
 
 import java.time.LocalDate;
 
-import static com.musigma.utils.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * Contrôleur de l'espace de travail Home.

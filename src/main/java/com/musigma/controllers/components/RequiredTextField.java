@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-import static com.musigma.utils.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * A custom JavaFX component representing a required text field with error handling.

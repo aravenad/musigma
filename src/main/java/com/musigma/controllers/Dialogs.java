@@ -1,20 +1,23 @@
-package com.musigma.utils;
+package com.musigma.controllers;
 
 import com.musigma.controllers.components.CustomValidField;
+import com.musigma.utils.Log;
 import com.musigma.utils.exceptionMethods.Runner;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Logger;
+
+import static com.musigma.controllers.MainController.ICON_PATH;
 
 public class Dialogs {
 
@@ -35,15 +38,8 @@ public class Dialogs {
         try {
             function.run();
         } catch (Exception e) {
-            // En cas d'exception, enregistrer les détails dans le journal (LOGGER)
+            newError(errorMsg + " :\n" + e.getMessage());
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
-
-            // Afficher une boîte de dialogue d'erreur avec le message d'erreur
-            Alert alert = new Alert(
-                    Alert.AlertType.ERROR,
-                    String.format("L'application a rencontré une erreur :\n%s :\n%s", errorMsg, e.getMessage())
-            );
-            alert.showAndWait();
         }
     }
 
@@ -53,6 +49,9 @@ public class Dialogs {
                 Alert.AlertType.ERROR,
                 String.format("L'application a rencontré une erreur :\n%s", errorMsg)
         );
+        ((Stage) alert.getDialogPane().getScene().getWindow())
+                .getIcons()
+                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
         alert.showAndWait();
     }
 
@@ -68,6 +67,9 @@ public class Dialogs {
             function.run();
             Alert alert = new Alert(Alert.AlertType.INFORMATION, succesMsg);
             alert.showAndWait();
+            ((Stage) alert.getDialogPane().getScene().getWindow())
+                    .getIcons()
+                    .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
         } catch (Exception e) {
             newError(String.format("%s : %s", errorMsg, e.getMessage()));
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
@@ -104,6 +106,7 @@ public class Dialogs {
     public static void askValidForm(String title, String errorMsg, CustomValidField[] customValidFields, Runner nextCallback) {
         Stage subWindow = new Stage();
         subWindow.setTitle(title);
+        subWindow.getIcons().add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
 
         GridPane grid = new GridPane();
         grid.setHgap(16);
@@ -151,7 +154,5 @@ public class Dialogs {
         });
 
         subWindow.show();
-//        subWindow.setWidth(scene.getWidth());
-//        subWindow.setHeight(scene.getHeight());
     }
 }

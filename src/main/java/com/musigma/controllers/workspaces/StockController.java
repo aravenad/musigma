@@ -9,9 +9,7 @@ import com.musigma.controllers.components.IntTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
-import com.musigma.models.TypeTicket;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -21,8 +19,8 @@ import javafx.util.Callback;
 
 import java.util.List;
 
-import static com.musigma.utils.Dialogs.askValidForm;
-import static com.musigma.utils.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.askValidForm;
+import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * Contrôleur pour l'espace de travail Stock.

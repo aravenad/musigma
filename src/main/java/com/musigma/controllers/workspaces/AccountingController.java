@@ -11,7 +11,7 @@ import javafx.scene.control.*;
 import java.util.AbstractMap;
 import java.util.Map;
 
-import static com.musigma.utils.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.tryCatch;
 
 
 /**

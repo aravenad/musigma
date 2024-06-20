@@ -2,7 +2,7 @@ package com.musigma.controllers.components;
 
 import com.musigma.utils.exceptionMethods.Setter;
 
-import static com.musigma.utils.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.tryCatch;
 
 public abstract class NumberTextField<T extends Number> extends RequiredTextField {
 

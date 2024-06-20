@@ -1,10 +1,11 @@
 package com.musigma.controllers;
 
+import atlantafx.base.theme.CupertinoLight;
 import com.musigma.controllers.workspaces.*;
 import com.musigma.models.Festival;
-import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.TypeTicketException;
+import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,10 +27,11 @@ import java.awt.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.musigma.utils.Dialogs.askFile;
-import static com.musigma.utils.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.askFile;
+import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * Le contrôleur principal de l'application Musigma, gère l'initialisation,
@@ -38,15 +40,17 @@ import static com.musigma.utils.Dialogs.tryCatch;
 public class MainController {
 
     private static final String APP_NAME = "Musigma"; // Nom de l'application
+    protected static final String ICON_PATH = "/com/musigma/images/logo_full.png"; // Icon de l'application
+
     private static final int MAX_RECENT_FILES = 10; // Nombre maximum de fichiers récents à conserver
     private static final String STATE_FILEPATH = "previousSession.ser"; // Chemin du fichier d'état de la session précédente
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
-            HomeController.REGISTER,
-            CalendarController.REGISTER,
-            StockController.REGISTER,
-            TicketController.REGISTER,
-            AccountingController.REGISTER,
+        HomeController.REGISTER,
+        CalendarController.REGISTER,
+        StockController.REGISTER,
+        TicketController.REGISTER,
+        AccountingController.REGISTER,
     }; // Tableau des espaces de travail disponibles
 
     private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER; // Espace de travail par défaut
@@ -80,6 +84,10 @@ public class MainController {
         for (WorkspaceController.WorkspaceRegister workspace : WORKSPACES)
             addWorkspace(workspace);
         loadState();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream(ICON_PATH))));
+        stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
+        stage.show();
     }
 
     /**

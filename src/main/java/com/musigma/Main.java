@@ -1,6 +1,5 @@
 package com.musigma;
 
-import atlantafx.base.theme.CupertinoLight;
 import com.musigma.controllers.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -26,11 +25,7 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(VIEW_PATH));
         Scene scene = new Scene(fxmlLoader.load());
-
-        stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
-        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
         stage.setScene(scene);
-        stage.show();
 
         MainController controller = fxmlLoader.getController();
         controller.initialize(stage);
