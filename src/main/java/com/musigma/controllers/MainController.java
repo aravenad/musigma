@@ -349,6 +349,9 @@ public class MainController {
         register.openButton.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
     }
 
+    /**
+     * Ouvre le pdf du manuel de l'application.
+     */
     public void onAboutClicked(ActionEvent actionEvent){
         try {
             File file = new File("src/main/resources/com/musigma/manual.pdf");
