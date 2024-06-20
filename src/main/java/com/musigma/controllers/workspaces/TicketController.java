@@ -68,7 +68,7 @@ public class TicketController extends WorkspaceController {
      * @see #onAddTicketPressed()
      */
     @FXML
-    public void initialize(Festival festival) {
+    public void initialize(Festival festival) throws TypeTicketException {
         super.initialize(festival);
         restoreTab();
         initializeComboBox();
