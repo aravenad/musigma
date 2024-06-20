@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<fx:root type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.text.Font?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.GridPane"
+         xmlns="http://javafx.com/javafx/17.0.2-ea">
     <children>
-    <TextField fx:id="input" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" />
-      <VBox fx:id="errorBox" fillWidth="false" layoutX="8.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-color: -color-bg-default;" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.vgrow="NEVER">
-         <children>
-             <Label fx:id="error" style="-fx-text-fill: -color-danger-fg" text="Error">
-                 <font>
-                     <Font size="11.0" />
-                 </font>
-             </Label>
-         </children>
-         <padding>
-            <Insets left="4.0" right="4.0" />
-         </padding>
-         <GridPane.margin>
-            <Insets left="8.0" />
-         </GridPane.margin>
-      </VBox>
-  </children>
-   <columnConstraints>
-      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-   </rowConstraints>
+        <TextField fx:id="input" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                   minHeight="-Infinity" minWidth="-Infinity"/>
+        <VBox fx:id="errorBox" fillWidth="false" layoutX="8.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity"
+              style="-fx-background-color: -color-bg-default;" GridPane.hgrow="NEVER" GridPane.rowIndex="1"
+              GridPane.vgrow="NEVER">
+            <children>
+                <Label fx:id="error" style="-fx-text-fill: -color-danger-fg" text="Error">
+                    <font>
+                        <Font size="11.0"/>
+                    </font>
+                </Label>
+            </children>
+            <padding>
+                <Insets left="4.0" right="4.0"/>
+            </padding>
+            <GridPane.margin>
+                <Insets left="8.0"/>
+            </GridPane.margin>
+        </VBox>
+    </children>
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity"/>
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0"/>
+    </rowConstraints>
 </fx:root>

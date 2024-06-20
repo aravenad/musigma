@@ -9,7 +9,6 @@ import com.musigma.controllers.components.IntTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
-import com.musigma.models.exception.FestivalException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -29,6 +28,7 @@ public class StockController extends WorkspaceController {
     /**
      * Enregistrement de l'espace de travail.
      * Définit le nom, l'icône et la vue de l'espace de travail.
+     *
      * @see com.musigma.controllers.WorkspaceController
      */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
@@ -58,8 +58,8 @@ public class StockController extends WorkspaceController {
     /**
      * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
      * Définit un bouton de suppression pour chaque ligne de la table. Définit la modification des noms, quantités et prix des stocks.
-     * @param festival le festival
      *
+     * @param festival le festival
      */
     public void initialize(Festival festival) {
         super.initialize(festival);
@@ -71,8 +71,8 @@ public class StockController extends WorkspaceController {
         nameColumn.setOnEditCommit(event -> {
             Stock stock = event.getRowValue();
             tryCatch(
-                "Impossible de modifier le nom du stock",
-                () -> stock.setName(event.getNewValue()));
+                    "Impossible de modifier le nom du stock",
+                    () -> stock.setName(event.getNewValue()));
         });
 
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
@@ -80,8 +80,8 @@ public class StockController extends WorkspaceController {
         quantityColumn.setOnEditCommit(event -> {
             Stock stock = event.getRowValue();
             tryCatch(
-                "Impossible de modifier la quantité du stock",
-                () -> stock.setQuantity(event.getNewValue()));
+                    "Impossible de modifier la quantité du stock",
+                    () -> stock.setQuantity(event.getNewValue()));
         });
 
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
@@ -89,8 +89,8 @@ public class StockController extends WorkspaceController {
         priceColumn.setOnEditCommit(event -> {
             Stock stock = event.getRowValue();
             tryCatch(
-                "Impossible de modifier le prix du stock",
-                () -> stock.setPrix(event.getNewValue()));
+                    "Impossible de modifier le prix du stock",
+                    () -> stock.setPrix(event.getNewValue()));
         });
         addDeleteButtonToTable();
     }
@@ -99,6 +99,7 @@ public class StockController extends WorkspaceController {
      * Ajoute un bouton de suppression à la table, crée une colonne d'action avec le bouton de suppression.
      * Lorsque le bouton est cliqué, la ligne correspondante est supprimée de la table.
      * La méthode est appelée dans la méthode initialize.
+     *
      * @see #initialize(Festival)
      */
     private void addDeleteButtonToTable() {
@@ -119,12 +120,12 @@ public class StockController extends WorkspaceController {
                             btn.setOnAction((e) -> {
                                 Stock stock = getTableView().getItems().get(getIndex());
                                 tryCatch(
-                            "Impossible de supprimer le stock",
-                                    () -> {
-                                        festival.removeStock(stock);
-                                        getTableView().getItems().remove(stock);
-                                        totalPrix();
-                                    });
+                                        "Impossible de supprimer le stock",
+                                        () -> {
+                                            festival.removeStock(stock);
+                                            getTableView().getItems().remove(stock);
+                                            totalPrix();
+                                        });
                             });
                         }
                     }
@@ -148,27 +149,27 @@ public class StockController extends WorkspaceController {
         CustomValidField<FloatTextField> price = new CustomValidField<>("Prix", new FloatTextField(true, false));
 
         askValidForm(
-        "Ajouter un stock",
-    "Ajout d'un stock impossible",
-            new CustomValidField[]{stockName, quantity, price},
-            () -> {
-                Stock stock = new Stock(
-                    stockName.node.getText(),
-                    quantity.node.getValue(),
-                    false,
-                    price.node.getValue()
-                );
-                festival.addStock(stock);
-                tableView.getItems().add(stock);
-                totalPrix();
-            }
+                "Ajouter un stock",
+                "Ajout d'un stock impossible",
+                new CustomValidField[]{stockName, quantity, price},
+                () -> {
+                    Stock stock = new Stock(
+                            stockName.node.getText(),
+                            quantity.node.getValue(),
+                            false,
+                            price.node.getValue()
+                    );
+                    festival.addStock(stock);
+                    tableView.getItems().add(stock);
+                    totalPrix();
+                }
         );
     }
 
     /**
      * Calcule le prix total des stocks.
      */
-    private void totalPrix(){
+    private void totalPrix() {
         List<Stock> stocks = tableView.getItems();
         if (stocks.size() == 0)
             total.setText("");

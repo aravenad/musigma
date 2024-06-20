@@ -3,6 +3,7 @@ package com.musigma.utils;
 import java.io.IOException;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
 /**
  * Classe utilitaire pour la gestion des logs.
  */

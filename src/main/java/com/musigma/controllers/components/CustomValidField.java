@@ -8,7 +8,7 @@ import javafx.scene.layout.Region;
  *
  * @param <T> Type de région pour le champ personnalisé.
  */
-public class CustomValidField <T extends Region> {
+public class CustomValidField<T extends Region> {
     /**
      * Label du champ.
      */
@@ -22,7 +22,7 @@ public class CustomValidField <T extends Region> {
      * Constructeur de CustomValidField.
      *
      * @param label Le label du champ.
-     * @param node Le noeud de type T pour le champ.
+     * @param node  Le noeud de type T pour le champ.
      */
     public CustomValidField(String label, T node) {
         this.label = new Label(label + " :");

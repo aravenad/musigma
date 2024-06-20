@@ -1,11 +1,12 @@
 package com.musigma.models;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class StockTest {
 
@@ -34,7 +35,7 @@ class StockTest {
         assertThrows(StockException.class, () -> stock.setQuantity(200), "Le stock ne doit pas pouvoir être requantifié tant qu'il est fixé");
         stock.setFixed(false);
         assertDoesNotThrow(() -> stock.setQuantity(200), "Le stock doit pouvoir être requantifié par une quantité valide");
-        assertEquals(200,  stock.getQuantity(), "Le stock doit être requantifié par la quantité valide");
+        assertEquals(200, stock.getQuantity(), "Le stock doit être requantifié par la quantité valide");
         assertThrows(StockException.class, () -> stock.setQuantity(0), "Le stock ne doit pas pouvoir être requantifié par une quantité invalide car nulle (0)");
         assertThrows(StockException.class, () -> stock.setQuantity(-50), "Le stock ne doit pas pouvoir être requantifié par une quantité invalide car négative");
     }

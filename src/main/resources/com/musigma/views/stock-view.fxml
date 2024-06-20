@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<HBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.StockController">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="697.0" prefWidth="1058.0"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.musigma.controllers.workspaces.StockController">
     <VBox minWidth="200" prefWidth="200" spacing="8.0">
-        <Button maxWidth="1.7976931348623157E308" onAction="#addStock" text="Ajouter stock" />
-        <Separator VBox.vgrow="NEVER" />
-        <Label fx:id="total" />
+        <Button maxWidth="1.7976931348623157E308" onAction="#addStock" text="Ajouter stock"/>
+        <Separator VBox.vgrow="NEVER"/>
+        <Label fx:id="total"/>
         <padding>
-            <Insets left="10.0" right="8.0" top="8.0" />
+            <Insets left="10.0" right="8.0" top="8.0"/>
         </padding>
     </VBox>
     <TableView fx:id="tableView" prefHeight="615.0" prefWidth="1058.0">
         <columns>
-            <TableColumn fx:id="nameColumn" prefWidth="478.0" text="Objet" />
-            <TableColumn fx:id="quantityColumn" minWidth="170.0" prefWidth="267.0" text="Quantité" />
-            <TableColumn fx:id="priceColumn" minWidth="50.0" prefWidth="233.0" text="Prix (€)" />
+            <TableColumn fx:id="nameColumn" prefWidth="478.0" text="Objet"/>
+            <TableColumn fx:id="quantityColumn" minWidth="170.0" prefWidth="267.0" text="Quantité"/>
+            <TableColumn fx:id="priceColumn" minWidth="50.0" prefWidth="233.0" text="Prix (€)"/>
         </columns>
         <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
         </columnResizePolicy>
     </TableView>
 </HBox>

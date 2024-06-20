@@ -1,7 +1,6 @@
 package com.musigma.controllers;
 
 import com.musigma.models.Festival;
-import com.musigma.models.exception.TypeTicketException;
 import javafx.scene.Node;
 
 /**

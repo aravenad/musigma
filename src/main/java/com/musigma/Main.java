@@ -17,7 +17,17 @@ public class Main extends Application {
     private static final String VIEW_PATH = "/com/musigma/views/main-view.fxml";
 
     /**
+     * Main method to launch the application
+     *
+     * @param args the arguments passed to the application at launch
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    /**
      * Start the application and load the main view
+     *
      * @param stage the stage
      * @throws IOException if the FXML file is not found
      */
@@ -29,13 +39,5 @@ public class Main extends Application {
 
         MainController controller = fxmlLoader.getController();
         controller.initialize(stage);
-    }
-
-    /**
-     * Main method to launch the application
-     * @param args the arguments passed to the application at launch
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 }

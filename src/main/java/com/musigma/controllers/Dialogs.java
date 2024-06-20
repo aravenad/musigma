@@ -9,7 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -114,10 +116,10 @@ public class Dialogs {
     /**
      * Affiche un formulaire de validation avec plusieurs champs personnalisés.
      *
-     * @param title            titre de la fenêtre du formulaire
-     * @param errorMsg         message d'erreur à afficher en cas de validation échouée
+     * @param title             titre de la fenêtre du formulaire
+     * @param errorMsg          message d'erreur à afficher en cas de validation échouée
      * @param customValidFields tableau de champs personnalisés à valider
-     * @param nextCallback     fonction à exécuter si la validation réussit
+     * @param nextCallback      fonction à exécuter si la validation réussit
      */
     public static void askValidForm(String title, String errorMsg, CustomValidField[] customValidFields, Runner nextCallback) {
         Stage subWindow = new Stage();
@@ -132,7 +134,7 @@ public class Dialogs {
         Scene scene = new Scene(new Pane(grid));
         subWindow.setScene(scene);
 
-        for (CustomValidField customValidField: customValidFields) {
+        for (CustomValidField customValidField : customValidFields) {
             int rowIdx = grid.getRowCount();
             grid.add(customValidField.label, 0, rowIdx);
             grid.add(customValidField.node, 1, rowIdx);

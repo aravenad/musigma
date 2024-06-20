@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import static com.musigma.utils.Log.getLogger;
 
 /**
- * La classe Avantage représente un avantage associé à un type de ticket 
+ * La classe Avantage représente un avantage associé à un type de ticket
  * et à un stock, avec une quantité spécifique par ticket.
  */
 public class Avantage implements Serializable {
@@ -20,31 +20,28 @@ public class Avantage implements Serializable {
      * Logger de la classe Avantage.
      */
     private static final Logger LOGGER = getLogger(Avantage.class);
-
+    /**
+     * Type de ticket associé à cet avantage.
+     */
+    private final TypeTicket ticketType;
+    /**
+     * Stock associé à cet avantage.
+     */
+    private final Stock stock;
     /**
      * Quantité d'objet du stock par ticket.
      */
     private int quantityByTicket;
 
     /**
-     * Type de ticket associé à cet avantage.
-     */
-    private final TypeTicket ticketType;
-
-    /**
-     * Stock associé à cet avantage.
-     */
-    private final Stock stock;
-
-    /**
      * Constructeur de la classe Avantage.
      *
-     * @param ticketType le type de ticket associé à cet avantage
-     * @param stock le stock associé à cet avantage
+     * @param ticketType       le type de ticket associé à cet avantage
+     * @param stock            le stock associé à cet avantage
      * @param quantityByTicket la quantité de cet avantage par ticket
-     * @throws AvantageException si la quantité par ticket est inférieure ou égale à zéro
+     * @throws AvantageException   si la quantité par ticket est inférieure ou égale à zéro
      * @throws TypeTicketException si une exception relative au type de ticket survient
-     * @throws StockException si une exception relative au stock survient
+     * @throws StockException      si une exception relative au stock survient
      */
     public Avantage(TypeTicket ticketType, Stock stock, int quantityByTicket) throws AvantageException, TypeTicketException, StockException {
         LOGGER.info("Initialized Avantage");
@@ -58,8 +55,8 @@ public class Avantage implements Serializable {
      * Connecte cet avantage à son type de ticket et son stock.
      *
      * @throws TypeTicketException si une exception relative au type de ticket survient
-     * @throws StockException si une exception relative au stock survient
-     * @throws AvantageException si un avantage identique existe déjà pour ce stock
+     * @throws StockException      si une exception relative au stock survient
+     * @throws AvantageException   si un avantage identique existe déjà pour ce stock
      */
     public void connect() throws TypeTicketException, StockException, AvantageException {
         if (ticketType.getAvantages().stream().anyMatch(av -> av.getStock().equals(stock)))
@@ -73,7 +70,7 @@ public class Avantage implements Serializable {
      * Déconnecte cet avantage de son type de ticket et son stock.
      *
      * @throws TypeTicketException si une exception relative au type de ticket survient
-     * @throws StockException si une exception relative au stock survient
+     * @throws StockException      si une exception relative au stock survient
      */
     public void disconnect() throws TypeTicketException, StockException {
         ticketType.removeAvantage(this);
@@ -138,17 +135,17 @@ public class Avantage implements Serializable {
     public int hashCode() {
         // On n'utilise pas les hashcode des avantages de ticketType et stock afin d'éviter un stackOverflow
         return Objects.hash(
-            quantityByTicket,
-            Objects.hash(
-                    ticketType.getType(),
-                    ticketType.getQuantity(),
-                    ticketType.getPrice()
-            ), // Pseudo hashcode pour ticketType
-            Objects.hash(
-                    stock.getName(),
-                    stock.getQuantity(),
-                    stock.isFixed()
-            ) // Pseudo hashcode pour stock
+                quantityByTicket,
+                Objects.hash(
+                        ticketType.getType(),
+                        ticketType.getQuantity(),
+                        ticketType.getPrice()
+                ), // Pseudo hashcode pour ticketType
+                Objects.hash(
+                        stock.getName(),
+                        stock.getQuantity(),
+                        stock.isFixed()
+                ) // Pseudo hashcode pour stock
         );
     }
 }

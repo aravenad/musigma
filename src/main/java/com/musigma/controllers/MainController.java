@@ -10,10 +10,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -39,19 +39,17 @@ import static com.musigma.controllers.Dialogs.tryCatch;
 public class MainController {
 
     /**
+     * Chemin de l'icône de l'application.
+     */
+    protected static final String ICON_PATH = "/com/musigma/images/logo_full.png";
+    /**
      * Logger pour les messages de log.
      */
     private static final Logger LOGGER = Log.getLogger(Log.class);
-
     /**
      * Nom de l'application.
      */
     private static final String APP_NAME = "Musigma";
-    /**
-     * Chemin de l'icône de l'application.
-     */
-    protected static final String ICON_PATH = "/com/musigma/images/logo_full.png";
-
     /**
      * Nombre maximum de fichiers récents à conserver.
      */
@@ -62,11 +60,11 @@ public class MainController {
     private static final String STATE_FILEPATH = "previousSession.ser";
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
-        HomeController.REGISTER,
-        CalendarController.REGISTER,
-        StockController.REGISTER,
-        TicketController.REGISTER,
-        AccountingController.REGISTER,
+            HomeController.REGISTER,
+            CalendarController.REGISTER,
+            StockController.REGISTER,
+            TicketController.REGISTER,
+            AccountingController.REGISTER,
     }; // Tableau des espaces de travail disponibles
 
     private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER; // Espace de travail par défaut
@@ -142,15 +140,15 @@ public class MainController {
     private void saveState() {
         LOGGER.info("Saving current state");
         tryCatch(
-    "Sauvegarde de l'état actuel de l'application impossible",
-            () -> {
-                try (
-                    FileOutputStream fos = new FileOutputStream(STATE_FILEPATH);
-                    ObjectOutputStream oos = new ObjectOutputStream(fos)
-                ) {
-                    oos.writeObject(recentFiles);
-                }
-            });
+                "Sauvegarde de l'état actuel de l'application impossible",
+                () -> {
+                    try (
+                            FileOutputStream fos = new FileOutputStream(STATE_FILEPATH);
+                            ObjectOutputStream oos = new ObjectOutputStream(fos)
+                    ) {
+                        oos.writeObject(recentFiles);
+                    }
+                });
         LOGGER.info("Saved current state");
     }
 
@@ -191,6 +189,7 @@ public class MainController {
 
     /**
      * Ajoute un fichier récent à la liste et met à jour le menu des fichiers récents.
+     *
      * @param file Le fichier à ajouter
      */
     private void addRecentFile(File file) {
@@ -219,6 +218,7 @@ public class MainController {
 
     /**
      * Demande à l'utilisateur s'il souhaite sauvegarder le festival actuel s'il a été modifié.
+     *
      * @return true si l'utilisateur a choisi de sauvegarder ou de ne pas sauvegarder, false s'il a annulé
      */
     private boolean askToSaveFestival() {
@@ -239,16 +239,16 @@ public class MainController {
         if (result.equals(ButtonType.YES)) {
             saveFestival();
             LOGGER.info("Saved festival \"" + festival.getName() + "\"");
-        }
-        else if (result.equals(ButtonType.CANCEL)) {
+        } else if (result.equals(ButtonType.CANCEL)) {
             LOGGER.info("User cancelled saving");
             return false;
-        } ;
+        }
         return true;
     }
 
     /**
      * Charge un festival à partir d'un fichier.
+     *
      * @param festival Le festival à charger
      */
     private void loadFestival(Festival festival) {
@@ -259,13 +259,13 @@ public class MainController {
         if (file != null)
             addRecentFile(file);
         tryCatch(
-            "Chargement du festival impossible",
-            () -> {
-                this.festival = festival;
-                festivalHash = festival.hashCode();
-                loadWorkspace(DEFAULT_WORKSPACE);
-                LOGGER.info("Loaded festival \"" + festival.getName() + "\"");
-        });
+                "Chargement du festival impossible",
+                () -> {
+                    this.festival = festival;
+                    festivalHash = festival.hashCode();
+                    loadWorkspace(DEFAULT_WORKSPACE);
+                    LOGGER.info("Loaded festival \"" + festival.getName() + "\"");
+                });
     }
 
     /**
@@ -275,17 +275,17 @@ public class MainController {
     private void newFestival() {
         LOGGER.info("Creating new festival");
         tryCatch(
-            "Création du nouveau festival impossible",
-            () -> {
-                loadFestival(new Festival(
-                        "Nouveau festival",
-                        LocalDateTime.now(),
-                        0,
-                        1,
-                        "Quelque part sur Terre"
-                ));
-                LOGGER.info("Created new festival");
-            });
+                "Création du nouveau festival impossible",
+                () -> {
+                    loadFestival(new Festival(
+                            "Nouveau festival",
+                            LocalDateTime.now(),
+                            0,
+                            1,
+                            "Quelque part sur Terre"
+                    ));
+                    LOGGER.info("Created new festival");
+                });
     }
 
     /**
@@ -295,30 +295,31 @@ public class MainController {
     private void openFestival() {
         LOGGER.info("Opening festival from dialog");
         tryCatch(
-            "Ouverture du fichier du festival impossible",
-            () -> {
-                File file = askFile("Open").showOpenDialog(stage);
-                if (file == null) {
-                    LOGGER.info("User cancelled opening");
-                    return;
-                }
-                loadFestival(Festival.Festival(file));
-                LOGGER.info("Opened another festival");
-        });
+                "Ouverture du fichier du festival impossible",
+                () -> {
+                    File file = askFile("Open").showOpenDialog(stage);
+                    if (file == null) {
+                        LOGGER.info("User cancelled opening");
+                        return;
+                    }
+                    loadFestival(Festival.Festival(file));
+                    LOGGER.info("Opened another festival");
+                });
     }
 
     /**
      * Ouvre un festival à partir du fichier spécifié.
+     *
      * @param file Le fichier du festival à ouvrir
      */
     private void openFestival(File file) {
         LOGGER.info("Opening a festival file");
         tryCatch(
-    "Ouverture du fichier du festival impossible",
-            () -> {
-                loadFestival(Festival.Festival(file));
-                LOGGER.info("Opened a festival file");
-            }
+                "Ouverture du fichier du festival impossible",
+                () -> {
+                    loadFestival(Festival.Festival(file));
+                    LOGGER.info("Opened a festival file");
+                }
         );
     }
 
@@ -332,13 +333,13 @@ public class MainController {
             LOGGER.info("Current festival without file, asking for one to save");
             saveFestivalAs();
         } else tryCatch(
-    "Sauvegarde du festival impossible",
-    "Festival sauvegardé",
-            () -> {
-                festival.save();
-                festivalHash = festival.hashCode();
-                LOGGER.info("Saving current festival");
-            }
+                "Sauvegarde du festival impossible",
+                "Festival sauvegardé",
+                () -> {
+                    festival.save();
+                    festivalHash = festival.hashCode();
+                    LOGGER.info("Saving current festival");
+                }
         );
     }
 
@@ -352,19 +353,20 @@ public class MainController {
         if (file == null) {
             LOGGER.info("User cancelled save");
         } else tryCatch(
-    "Sauvegarde du festival impossible",
-    "Festival sauvegardé",
-            () -> {
-                festival.setFile(file);
-                addRecentFile(file);
-                festival.save();
-                festivalHash = festival.hashCode();
-                LOGGER.info("Saved festival as \"" + festival.getFile().getName() + "\"");
-        });
+                "Sauvegarde du festival impossible",
+                "Festival sauvegardé",
+                () -> {
+                    festival.setFile(file);
+                    addRecentFile(file);
+                    festival.save();
+                    festivalHash = festival.hashCode();
+                    LOGGER.info("Saved festival as \"" + festival.getFile().getName() + "\"");
+                });
     }
 
     /**
      * Ajoute un espace de travail au menu et configure son bouton.
+     *
      * @param register L'enregistrement de l'espace de travail à ajouter
      */
     public void addWorkspace(WorkspaceController.WorkspaceRegister register) {
@@ -391,7 +393,7 @@ public class MainController {
             if (festival == null || currentWorkspace == register)
                 return;
             tryCatch(
-            "Accès à l'espace de travail impossible",
+                    "Accès à l'espace de travail impossible",
                     () -> {
                         loadWorkspace(register);
                         LOGGER.info("Added workspace \"" + register.name + "\"");
@@ -402,6 +404,7 @@ public class MainController {
 
     /**
      * Charge l'espace de travail spécifié.
+     *
      * @param register L'enregistrement de l'espace de travail à charger
      * @throws IOException Si une erreur d'entrée/sortie se produit
      */
@@ -429,19 +432,19 @@ public class MainController {
     private void onAboutClicked() {
         LOGGER.info("Opening manual");
         tryCatch(
-    "Ouverture du manuel impossible",
-            () -> {
-                File file = new File("src/main/resources/com/musigma/manual.pdf");
-                if (file.exists()) {
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().open(file);
-                    } else {
-                        ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
-                        pb.start();
+                "Ouverture du manuel impossible",
+                () -> {
+                    File file = new File("src/main/resources/com/musigma/manual.pdf");
+                    if (file.exists()) {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().open(file);
+                        } else {
+                            ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
+                            pb.start();
+                        }
                     }
+                    LOGGER.info("Opened manual");
                 }
-                LOGGER.info("Opened manual");
-            }
         );
     }
 }

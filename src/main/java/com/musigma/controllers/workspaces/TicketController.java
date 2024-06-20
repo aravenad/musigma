@@ -26,9 +26,9 @@ public class TicketController extends WorkspaceController {
      * Enregistrement de l'espace de travail.
      */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(
-    "Ticket",
-    "/com/musigma/images/icons/ticket.png",
-    "/com/musigma/views/ticket-view.fxml"
+            "Ticket",
+            "/com/musigma/images/icons/ticket.png",
+            "/com/musigma/views/ticket-view.fxml"
     );
 
     @FXML
@@ -37,6 +37,7 @@ public class TicketController extends WorkspaceController {
     /**
      * Initialisation de l'espace de travail, restauration des onglets et ajout des écouteurs , definition des actions des boutons
      * definition de la comboBox et verification des tickets
+     *
      * @param festival Festival
      * @see #restoreTab()
      */
@@ -57,6 +58,7 @@ public class TicketController extends WorkspaceController {
     /**
      * Ajoute un ticket. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
      * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket.
+     *
      * @see #createTab(TypeTicket)
      * @see #initialize(Festival)
      */
@@ -97,16 +99,16 @@ public class TicketController extends WorkspaceController {
             priceTicket.node.setValue(ticket.getPrice());
 
             askValidForm(
-            "Modifier le ticket " + ticket.getType(),
-        "Modification d'un type de ticket impossible",
-                new CustomValidField[]{nameTicket, quantiteTicket, priceTicket},
-                () -> {
-                    ticket.setType(nameTicket.node.getText());
-                    ticket.setQuantity(quantiteTicket.node.getValue());
-                    ticket.setPrice(priceTicket.node.getValue());
-                    tabPane.getTabs().clear();
-                    restoreTab();
-                }
+                    "Modifier le ticket " + ticket.getType(),
+                    "Modification d'un type de ticket impossible",
+                    new CustomValidField[]{nameTicket, quantiteTicket, priceTicket},
+                    () -> {
+                        ticket.setType(nameTicket.node.getText());
+                        ticket.setQuantity(quantiteTicket.node.getValue());
+                        ticket.setPrice(priceTicket.node.getValue());
+                        tabPane.getTabs().clear();
+                        restoreTab();
+                    }
             );
         }
     }
@@ -122,12 +124,12 @@ public class TicketController extends WorkspaceController {
         else {
             TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
             tryCatch(
-        "Impossible de supprimer le type de ticket",
-                () -> {
-                    festival.removeTicketType(ticket);
-                    tabPane.getTabs().clear();
-                    restoreTab();
-                }
+                    "Impossible de supprimer le type de ticket",
+                    () -> {
+                        festival.removeTicketType(ticket);
+                        tabPane.getTabs().clear();
+                        restoreTab();
+                    }
             );
         }
     }
@@ -135,6 +137,7 @@ public class TicketController extends WorkspaceController {
     /**
      * Ajoute un avantage à un ticket. Si les champs de saisie sont valides, un avantage est créé et ajouté à la liste.
      * Sauvegarde l'avantage dans la liste des avantages du ticket. Ajoute l'avantage au TableView.
+     *
      * @see #initialize(Festival)
      */
     @FXML
@@ -153,8 +156,8 @@ public class TicketController extends WorkspaceController {
             CustomValidField<IntTextField> quantityByTicket = new CustomValidField<>("Quantité par ticket", new IntTextField(true, false));
 
             askValidForm(
-                "Ajouter un avantage",
-            "Ajout d'un avantage impossible",
+                    "Ajouter un avantage",
+                    "Ajout d'un avantage impossible",
                     new CustomValidField[]{stockAvantage, quantityByTicket},
                     () -> {
                         Avantage avantage = new Avantage(
@@ -175,6 +178,7 @@ public class TicketController extends WorkspaceController {
      * Crée un onglet pour un ticket. Ajoute un TableView pour les avantages du ticket.
      * Ajoute une colonne pour la liste des avantages et une colonne pour la quantité.
      * Ajoute un bouton de suppression pour chaque ligne de la table.
+     *
      * @param ticket TypeTicket Ticket
      * @see #renameTab(Tab, TypeTicket, boolean)
      * @see #addDeleteButtonToTable(TableView, TableColumn)
@@ -200,8 +204,8 @@ public class TicketController extends WorkspaceController {
         avantageQuantityColumn.setOnEditCommit(event -> {
             Avantage avantage = event.getRowValue();
             tryCatch(
-        "Impossible de modifier la quantité du stock",
-                () -> avantage.setQuantityByTicket(event.getNewValue()));
+                    "Impossible de modifier la quantité du stock",
+                    () -> avantage.setQuantityByTicket(event.getNewValue()));
         });
 
         tabPane.getTabs().add(newTab);
@@ -211,7 +215,8 @@ public class TicketController extends WorkspaceController {
     /**
      * Ajoute un bouton de suppression à la table des avantages.
      * Crée un bouton "Supprimer" pour chaque ligne de la table.
-     * @param tableView TableView<Avantage> Table des avantages
+     *
+     * @param tableView    TableView<Avantage> Table des avantages
      * @param actionColumn TableColumn<Avantage, Void> Colonne d'action
      * @see #initialize(Festival)
      */
@@ -248,6 +253,7 @@ public class TicketController extends WorkspaceController {
 
     /**
      * Restaure les onglets pour les tickets. Ajoute les avantages des tickets aux TableView.
+     *
      * @see #createTab(TypeTicket)
      */
     private void restoreTab() {
@@ -264,8 +270,9 @@ public class TicketController extends WorkspaceController {
 
     /**
      * Renomme un onglet. Si l'onglet est sélectionné, le nom de l'onglet est affiché avec le nombre de tickets et le prix.
-     * @param tab Onglet Tab
-     * @param ticket TypeTicket Ticket
+     *
+     * @param tab        Onglet Tab
+     * @param ticket     TypeTicket Ticket
      * @param isFirstTab boolean Vrai si c'est le premier onglet
      */
     private void renameTab(Tab tab, TypeTicket ticket, boolean isFirstTab) {

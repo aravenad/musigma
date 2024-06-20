@@ -25,7 +25,7 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
      * Constructeur qui charge le fichier FXML et configure le composant avec des paramètres de validation supplémentaires.
      *
      * @param positive Indique si le champ doit contenir une valeur positive.
-     * @param notNull Indique si le champ ne doit pas être null.
+     * @param notNull  Indique si le champ ne doit pas être null.
      */
     public NumberTextField(boolean positive, boolean notNull) {
         super();
@@ -96,13 +96,6 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
     }
 
     /**
-     * Définit la valeur du champ d'entrée.
-     *
-     * @param value La valeur à définir.
-     */
-    public abstract void setValue(T value);
-
-    /**
      * Récupère la valeur du champ d'entrée.
      *
      * @return La valeur du champ d'entrée en tant que T.
@@ -110,9 +103,17 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
     public abstract T getValue();
 
     /**
+     * Définit la valeur du champ d'entrée.
+     *
+     * @param value La valeur à définir.
+     */
+    public abstract void setValue(T value);
+
+    /**
      * Lie le champ d'entrée à un setter avec un message d'erreur pour une entrée invalide.
+     *
      * @param errorMsg message d'erreur
-     * @param setter setter
+     * @param setter   setter
      */
     public void bindValue(String errorMsg, Setter<T> setter) {
         input.setOnKeyTyped(e -> {
@@ -123,12 +124,13 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
                 );
         });
     }
+
     /**
      * Lie le champ d'entrée à un setter avec un message d'erreur pour une entrée invalide.
      *
      * @param errorMsg Le message d'erreur à afficher si l'entrée est invalide.
-     * @param value La valeur à définir.
-     * @param setter Le setter pour lier la valeur d'entrée.
+     * @param value    La valeur à définir.
+     * @param setter   Le setter pour lier la valeur d'entrée.
      */
     public void bindValue(String errorMsg, T value, Setter<T> setter) {
         bindValue(errorMsg, setter);

@@ -19,6 +19,7 @@ public class HomeController extends WorkspaceController {
     /**
      * Enregistrement de l'espace de travail.
      * Définit le nom, l'icône et la vue de l'espace de travail.
+     *
      * @see com.musigma.controllers.WorkspaceController
      */
     public static WorkspaceRegister REGISTER = new WorkspaceRegister(

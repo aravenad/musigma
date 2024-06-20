@@ -43,9 +43,9 @@ public class Representation implements Comparable<Representation>, Serializable 
      * Constructeur de la classe Representation.
      *
      * @param startDelta la différence par rapport au début de la représentation en minutes
-     * @param duration la durée de la représentation en minutes
-     * @param scene la scène de la représentation
-     * @param artiste l'artiste associé à la représentation
+     * @param duration   la durée de la représentation en minutes
+     * @param scene      la scène de la représentation
+     * @param artiste    l'artiste associé à la représentation
      */
     public Representation(int startDelta, int duration, String scene, Artiste artiste) {
         LOGGER.info("Initialized Representation");
@@ -161,7 +161,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         // Alors il y a collision car a < b & b < a + a_d
         if (!scene.equals(representation.getScene()))
             return false;
-        return startDelta < representation.getStartDelta() ? (representation.getStartDelta() < startDelta + duration) : ( startDelta < representation.getStartDelta() + representation.getDuration());
+        return startDelta < representation.getStartDelta() ? (representation.getStartDelta() < startDelta + duration) : (startDelta < representation.getStartDelta() + representation.getDuration());
     }
 
     /**

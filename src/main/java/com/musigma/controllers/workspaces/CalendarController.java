@@ -1,10 +1,10 @@
 package com.musigma.controllers.workspaces;
 
-import com.calendarfx.view.CalendarView;
 import com.calendarfx.model.Calendar;
 import com.calendarfx.model.CalendarEvent;
 import com.calendarfx.model.CalendarSource;
 import com.calendarfx.model.Entry;
+import com.calendarfx.view.CalendarView;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.controllers.components.IntTextField;
 import com.musigma.controllers.components.RequiredTextField;
@@ -17,6 +17,7 @@ import com.musigma.models.exception.RepresentationException;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class CalendarController extends WorkspaceController {
     /**
      * Enregistrement de l'espace de travail.
      * Définit le nom, l'icône et la vue de l'espace de travail.
+     *
      * @see com.musigma.controllers.WorkspaceController
      */
     public static WorkspaceController.WorkspaceRegister REGISTER = new WorkspaceController.WorkspaceRegister(
@@ -48,7 +50,7 @@ public class CalendarController extends WorkspaceController {
     @FXML
     RequiredTextField nomEvent;
 
-    private ArrayList<Entry<?>> entries = new ArrayList<>();
+    private final ArrayList<Entry<?>> entries = new ArrayList<>();
 
     /**
      * Initialise le contrôleur avec les données du festival.
@@ -64,7 +66,7 @@ public class CalendarController extends WorkspaceController {
         calendar.addEventHandler(this::addToModel);
 
         //ajoutes des Entrée dans la liste entries pour ensuite les ajouter dans le planning
-        for(Representation r : festival.getRepresentations()){
+        for (Representation r : festival.getRepresentations()) {
             Entry<?> tempEntry = new Entry<>(r.getArtiste().getName());
             tempEntry.changeStartTime(LocalTime.from(festival.getStart().plusMinutes(r.getStartDelta())));
             tempEntry.changeEndTime(LocalTime.from(festival.getStart().plusMinutes(r.getStartDelta())).plusMinutes(r.getDuration()));
@@ -72,7 +74,7 @@ public class CalendarController extends WorkspaceController {
         }
 
         //ajout des entrée sur le planning
-        for(Entry<?> e : entries){
+        for (Entry<?> e : entries) {
             calendar.addEntry(e);
         }
 
@@ -80,12 +82,12 @@ public class CalendarController extends WorkspaceController {
         //Ajoute de l'event avec les parametre rentré
         addEventButton.setOnAction(e -> {
             Entry<Representation> entry = new Entry<>(nomEvent.getText());
-            entry.changeStartTime(LocalTime.of(dateDebut.getValue(),0));
-            entry.changeEndTime(LocalTime.of(dateFin.getValue(),0));
+            entry.changeStartTime(LocalTime.of(dateDebut.getValue(), 0));
+            entry.changeEndTime(LocalTime.of(dateFin.getValue(), 0));
             calendar.addEntry(entry);
             try {
                 addRep(nomEvent.getText(),
-                        LocalDateTime.of(2024,06,20, dateDebut.getValue(),0),
+                        LocalDateTime.of(2024, 06, 20, dateDebut.getValue(), 0),
                         entry.getEndTime().getHour() - entry.getStartTime().getHour(),
                         scene.getText()
                 );
@@ -100,11 +102,11 @@ public class CalendarController extends WorkspaceController {
      *
      * @param event l'événement du calendrier
      */
-    private void addToModel(Event event){
-        if(event.getEventType() == CalendarEvent.ENTRY_TITLE_CHANGED){
+    private void addToModel(Event event) {
+        if (event.getEventType() == CalendarEvent.ENTRY_TITLE_CHANGED) {
             //changer nom
-            for(Representation r : festival.getRepresentations()){
-                if(r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())){
+            for (Representation r : festival.getRepresentations()) {
+                if (r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())) {
                     try {
                         r.getArtiste().setName(((Entry<?>) event.getSource()).getTitle());
                     } catch (ArtisteException e) {
@@ -112,11 +114,10 @@ public class CalendarController extends WorkspaceController {
                     }
                 }
             }
-        }
-        else if(event.getEventType() == CalendarEvent.ENTRY_INTERVAL_CHANGED){
+        } else if (event.getEventType() == CalendarEvent.ENTRY_INTERVAL_CHANGED) {
             //changer l'heure de début et de fin
-            for(Representation r : festival.getRepresentations()){
-                if(r.getArtiste().getName().equals(event.getSource())){
+            for (Representation r : festival.getRepresentations()) {
+                if (r.getArtiste().getName().equals(event.getSource())) {
                     try {
                         r.setStartDelta(((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute());
                     } catch (RepresentationException e) {
@@ -129,11 +130,10 @@ public class CalendarController extends WorkspaceController {
                     }
                 }
             }
-        }
-        else if(event.getEventType().equals(CalendarEvent.NULL_SOURCE_TARGET)){
+        } else if (event.getEventType().equals(CalendarEvent.NULL_SOURCE_TARGET)) {
             //pour supprimer l'artiste
-            for(Representation r : festival.getRepresentations()){
-                if(r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())){
+            for (Representation r : festival.getRepresentations()) {
+                if (r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())) {
                     try {
                         festival.removeRepresentation(r);
                     } catch (FestivalException e) {
@@ -151,8 +151,8 @@ public class CalendarController extends WorkspaceController {
      * @param start       l'heure de début
      * @param duration    la durée en heures
      * @param scene       la scène
-     * @throws ArtisteException   en cas d'erreur liée à l'artiste
-     * @throws FestivalException  en cas d'erreur liée au festival
+     * @throws ArtisteException  en cas d'erreur liée à l'artiste
+     * @throws FestivalException en cas d'erreur liée au festival
      */
     public void addRep(String artisteName, LocalDateTime start, int duration, String scene) throws ArtisteException, FestivalException {
         Entry<Representation> entry = new Entry<>(artisteName);

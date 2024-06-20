@@ -19,6 +19,10 @@ public class Artiste implements Serializable {
      */
     private static final Logger LOGGER = getLogger(Artiste.class);
     /**
+     * Liste des représentations de l'artiste.
+     */
+    private final ArrayList<Representation> representations;
+    /**
      * Nom de l'artiste.
      */
     private String name;
@@ -30,15 +34,11 @@ public class Artiste implements Serializable {
      * Prix de l'artiste.
      */
     private float price;
-    /**
-     * Liste des représentations de l'artiste.
-     */
-    private final ArrayList<Representation> representations;
 
     /**
      * Constructeur de la classe Artiste.
      *
-     * @param name le nom de l'artiste
+     * @param name  le nom de l'artiste
      * @param genre le genre musical de l'artiste
      * @param price le prix de l'artiste
      * @throws ArtisteException si les valeurs des paramètres ne sont pas valides

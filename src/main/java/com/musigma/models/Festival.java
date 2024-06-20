@@ -11,7 +11,10 @@ import org.ojalgo.optimisation.Variable;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import static com.musigma.utils.Log.getLogger;
@@ -29,65 +32,55 @@ public class Festival implements Serializable {
      * Logger pour afficher les logs.
      */
     private static final Logger LOGGER = getLogger(Festival.class);
-
+    /**
+     * Liste des artistes du festival.
+     */
+    private final ArrayList<Artiste> artistes;
+    /**
+     * Liste des types de tickets du festival.
+     */
+    private final ArrayList<TypeTicket> ticketTypes;
+    /**
+     * Liste des stocks du festival.
+     */
+    private final ArrayList<Stock> stocks;
+    /**
+     * Liste des représentations du festival.
+     */
+    private final TreeSet<Representation> representations;
     /**
      * Fichier associé à ce festival.
      */
     private File file = null;
-
     /**
      * Nom du festival.
      */
     private String name;
-
     /**
      * Date de début du festival.
      */
     private LocalDateTime start;
-
     /**
      * Prix de location du festival.
      */
     private float locationPrice;
-
     /**
      * Emplacement du festival.
      */
     private String location;
-
     /**
      * Superficie du festival (m2)
      */
     private float area;
 
     /**
-     * Liste des artistes du festival.
-     */
-    private final ArrayList<Artiste> artistes;
-
-    /**
-     * Liste des types de tickets du festival.
-     */
-    private final ArrayList<TypeTicket> ticketTypes;
-
-    /**
-     * Liste des stocks du festival.
-     */
-    private final ArrayList<Stock> stocks;
-
-    /**
-     * Liste des représentations du festival.
-     */
-    private final TreeSet<Representation> representations;
-
-    /**
      * Constructeur de la classe Festival.
      *
-     * @param name le nom du festival
-     * @param start la date de début du festival
+     * @param name          le nom du festival
+     * @param start         la date de début du festival
      * @param locationPrice le prix de location du festival
-     * @param area la superficie du festival
-     * @param location l'emplacement du festival
+     * @param area          la superficie du festival
+     * @param location      l'emplacement du festival
      * @throws FestivalException si les valeurs des paramètres ne sont pas valides
      */
     public Festival(String name, LocalDateTime start, float locationPrice, float area, String location) throws FestivalException {
@@ -109,13 +102,13 @@ public class Festival implements Serializable {
      *
      * @param file le chemin du fichier à charger
      * @return le festival chargé depuis le fichier
-     * @throws FestivalException      si le fichier n'est pas défini
+     * @throws FestivalException si le fichier n'est pas défini
      */
     public static Festival Festival(File file) throws FestivalException {
         try (
-            FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-            ObjectInputStream ois = new ObjectInputStream(fis);
-        ){
+                FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
             LOGGER.info(String.format("Reading file %s", file.getAbsolutePath()));
             Festival festival = (Festival) ois.readObject();
             festival.file = file;
@@ -137,8 +130,8 @@ public class Festival implements Serializable {
         if (file == null)
             throw new FestivalException("Le fichier du festival n'a pas été spécifié");
         try (
-            FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+                FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(this);
             LOGGER.info(String.format("Saved festival 0x%x to file %s", super.hashCode(), file.getAbsolutePath()));
@@ -331,7 +324,7 @@ public class Festival implements Serializable {
         if (top != null && top.isColliding(representation))
             if (bottom != null && bottom.isColliding(representation))
                 throw new FestivalException(String.format("La représentation rentre en collision avec %s et %s, les départs/durées doivent être modifié", bottom, top));
-             else
+            else
                 throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifié", top));
         else if (bottom != null && bottom.isColliding(representation))
             throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifié", bottom));
@@ -416,15 +409,15 @@ public class Festival implements Serializable {
      * Supprime un stock de la liste des stocks du festival.
      *
      * @param stock le stock à supprimer
-     * @throws FestivalException si le stock n'a pas été trouvé
+     * @throws FestivalException   si le stock n'a pas été trouvé
      * @throws TypeTicketException si un ticket ne veux pas changer de quantité
-     * @throws StockException si un avantage ne veux pas changer de quantité
+     * @throws StockException      si un avantage ne veux pas changer de quantité
      */
     public void removeStock(Stock stock) throws FestivalException, TypeTicketException, StockException {
         if (!stocks.remove(stock))
             throw new FestivalException("Le stock n'a pas été trouvé");
         ArrayList<Avantage> oldAvantages = (ArrayList<Avantage>) stock.getAvantages().clone();
-        for (Avantage avantage: oldAvantages)
+        for (Avantage avantage : oldAvantages)
             avantage.disconnect();
         LOGGER.info("Removed Stock from Festival.stocks");
     }
@@ -442,8 +435,8 @@ public class Festival implements Serializable {
      * Optimise les coûts du festival en calculant les quantités respectives
      * de tickets à vendre les plus rentables avec le modèle d'optimisation d'Ojalgo.
      *
-     * @throws TypeTicketException si un ticket ne veux pas changer de quantité
      * @return le prix total du festival
+     * @throws TypeTicketException si un ticket ne veux pas changer de quantité
      */
     public double optimizeResult() throws TypeTicketException {
         LOGGER.info("Calculated best quantity of ticket to sold");
@@ -452,7 +445,7 @@ public class Festival implements Serializable {
         HashMap<Stock, Expression> constraints = new HashMap<>();
 
         LOGGER.info("Adding constraint stocks");
-        for (Stock stock: stocks)
+        for (Stock stock : stocks)
             if (stock.isFixed()) {
                 Expression constraint = model.addExpression(stock.getName())
                         .upper(stock.getQuantity())

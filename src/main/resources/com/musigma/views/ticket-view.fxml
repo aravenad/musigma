@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<HBox prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.musigma.controllers.workspaces.TicketController">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="697.0" prefWidth="1058.0"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.musigma.controllers.workspaces.TicketController">
     <VBox prefWidth="200" minWidth="200" spacing="8.0">
-        <Button maxWidth="1.7976931348623157E308" onAction="#addTicket" text="Ajouter type de ticket" />
-        <Button layoutX="20.0" layoutY="18.0" maxWidth="1.7976931348623157E308" onAction="#updTicket" text="Modifier type de ticket" />
-        <Button layoutX="20.0" layoutY="51.0" maxWidth="1.7976931348623157E308" onAction="#removeTicket" text="Supprimer type de ticket" />
-        <Separator />
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addAvantage" text="Ajouter avantage" />
+        <Button maxWidth="1.7976931348623157E308" onAction="#addTicket" text="Ajouter type de ticket"/>
+        <Button layoutX="20.0" layoutY="18.0" maxWidth="1.7976931348623157E308" onAction="#updTicket"
+                text="Modifier type de ticket"/>
+        <Button layoutX="20.0" layoutY="51.0" maxWidth="1.7976931348623157E308" onAction="#removeTicket"
+                text="Supprimer type de ticket"/>
+        <Separator/>
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addAvantage"
+                text="Ajouter avantage"/>
         <padding>
-            <Insets left="10.0" right="8.0" top="8.0" />
+            <Insets left="10.0" right="8.0" top="8.0"/>
         </padding>
     </VBox>
-   <Separator orientation="VERTICAL" prefHeight="200.0" />
-      <TabPane fx:id="tabPane" prefHeight="615.0" prefWidth="1058.0" tabClosingPolicy="UNAVAILABLE" />
+    <Separator orientation="VERTICAL" prefHeight="200.0"/>
+    <TabPane fx:id="tabPane" prefHeight="615.0" prefWidth="1058.0" tabClosingPolicy="UNAVAILABLE"/>
 </HBox>

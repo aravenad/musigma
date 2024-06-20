@@ -21,7 +21,7 @@ public class FloatTextField extends NumberTextField<Float> {
      * Constructeur qui initialise le composant avec des paramètres de validation supplémentaires.
      *
      * @param positive Indique si le champ doit contenir une valeur positive.
-     * @param notNull Indique si le champ ne doit pas être null.
+     * @param notNull  Indique si le champ ne doit pas être null.
      */
     public FloatTextField(boolean positive, boolean notNull) {
         super(positive, notNull);
@@ -33,6 +33,16 @@ public class FloatTextField extends NumberTextField<Float> {
     }
 
     /**
+     * Récupère la valeur du champ d'entrée.
+     *
+     * @return La valeur du champ d'entrée en tant que Float.
+     */
+    @Override
+    public Float getValue() {
+        return Float.parseFloat(input.getText());
+    }
+
+    /**
      * Définit la valeur du champ d'entrée.
      *
      * @param value La valeur à définir.
@@ -41,15 +51,5 @@ public class FloatTextField extends NumberTextField<Float> {
     public void setValue(Float value) {
         input.setText(Float.toString(value).replaceAll("0*$", "").replaceAll("\\.$", ""));
         isValid();
-    }
-
-    /**
-     * Récupère la valeur du champ d'entrée.
-     *
-     * @return La valeur du champ d'entrée en tant que Float.
-     */
-    @Override
-    public Float getValue() {
-        return Float.parseFloat(input.getText());
     }
 }

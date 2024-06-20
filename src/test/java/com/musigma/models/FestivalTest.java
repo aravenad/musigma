@@ -22,7 +22,7 @@ class FestivalTest {
         festival = new Festival("Valid Festival", LocalDateTime.now().plusDays(1), 100, 500, "Paris");
         stock = new Stock("Bouteille Coca", 100, true, 2.5);
         artiste = new Artiste("DCAC", "rock", 100f);
-        ticketType = new TypeTicket("VIP",10,60);
+        ticketType = new TypeTicket("VIP", 10, 60);
         avantage = new Avantage(ticketType, stock, 2);
     }
 
@@ -185,12 +185,12 @@ class FestivalTest {
         Stock gobelet = new Stock("Gobelet", 8000, true, 2.5);
         Stock parking = new Stock("Place de parking", 3000, true, 5);
 
-        TypeTicket vip = new TypeTicket("VIP",0,50);
+        TypeTicket vip = new TypeTicket("VIP", 0, 50);
         new Avantage(vip, gobelet, 1);
         new Avantage(vip, parking, 1);
 
 
-        TypeTicket nonVip = new TypeTicket("Non-VIP",0,35);
+        TypeTicket nonVip = new TypeTicket("Non-VIP", 0, 35);
         new Avantage(nonVip, gobelet, 2);
 
         System.out.println(festival.optimizeResult());

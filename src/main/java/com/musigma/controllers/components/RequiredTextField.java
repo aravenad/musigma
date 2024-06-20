@@ -107,6 +107,15 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
+     * Obtient le texte du champ d'entrée.
+     *
+     * @return le texte dans le champ d'entrée
+     */
+    public String getText() {
+        return input.getText();
+    }
+
+    /**
      * Définit le texte du champ d'entrée.
      *
      * @param text le texte à définir
@@ -117,12 +126,12 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Obtient le texte du champ d'entrée.
+     * Obtient le texte d'invite du champ d'entrée.
      *
-     * @return le texte dans le champ d'entrée
+     * @return le texte d'invite dans le champ d'entrée
      */
-    public String getText() {
-        return input.getText();
+    public String getPromptText() {
+        return input.getPromptText();
     }
 
     /**
@@ -132,15 +141,6 @@ public class RequiredTextField extends GridPane {
      */
     public void setPromptText(String promptText) {
         input.setPromptText(promptText);
-    }
-
-    /**
-     * Obtient le texte d'invite du champ d'entrée.
-     *
-     * @return le texte d'invite dans le champ d'entrée
-     */
-    public String getPromptText() {
-        return input.getPromptText();
     }
 
     /**

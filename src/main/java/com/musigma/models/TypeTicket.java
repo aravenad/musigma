@@ -19,33 +19,29 @@ public class TypeTicket implements Serializable {
      * Logger de la class
      */
     private static final Logger LOGGER = getLogger(TypeTicket.class);
-
+    /**
+     * Liste des avantages associés à ce type de ticket
+     */
+    private final ArrayList<Avantage> avantages;
     /**
      * Type de ticket
      */
     private String type;
-
     /**
      * Quantité de tickets disponibles
      */
     private int quantity;
-
     /**
      * Prix unitaire du ticket
      */
     private float price;
 
     /**
-     * Liste des avantages associés à ce type de ticket
-     */
-    private final ArrayList<Avantage> avantages;
-
-    /**
      * Constructeur de la classe TypeTicket.
      *
-     * @param type Type de ticket
+     * @param type     Type de ticket
      * @param quantity Quantité de tickets disponibles
-     * @param price Prix unitaire du ticket
+     * @param price    Prix unitaire du ticket
      * @throws TypeTicketException si le type est null ou vide
      */
     public TypeTicket(String type, int quantity, float price) throws TypeTicketException {

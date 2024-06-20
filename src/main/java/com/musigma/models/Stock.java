@@ -19,39 +19,34 @@ public class Stock implements Serializable {
      * Logger pour afficher les logs.
      */
     private static final Logger LOGGER = getLogger(Serializable.class);
-
+    /**
+     * Liste des avantages associés à ce stock.
+     */
+    private final ArrayList<Avantage> avantages;
     /**
      * Nom du stock.
      */
     private String name;
-
     /**
      * Quantité du stock.
      */
     private int quantity;
-
     /**
      * Si la quantité du stock est fixe.
      */
     private boolean fixed;
-
     /**
      * Prix du stock.
      */
     private double prix;
 
     /**
-     * Liste des avantages associés à ce stock.
-     */
-    private final ArrayList<Avantage> avantages;
-
-    /**
      * Constructeur de la classe Stock.
      *
-     * @param name Nom du stock
+     * @param name     Nom du stock
      * @param quantity Quantité absolue du stock
-     * @param fixed Si la quantité du stock est fixe
-     * @param prix Prix du stock
+     * @param fixed    Si la quantité du stock est fixe
+     * @param prix     Prix du stock
      * @throws StockException si le nom est null ou vide, si la quantité est négative ou nulle (0)
      */
     public Stock(String name, int quantity, boolean fixed, double prix) throws StockException {
@@ -204,7 +199,7 @@ public class Stock implements Serializable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return this.getName();
     }
 
