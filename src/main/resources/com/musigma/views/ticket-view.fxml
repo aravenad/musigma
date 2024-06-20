@@ -17,21 +17,21 @@
         <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
             <children>
             <Label text="Type :" />
-            <RequiredTextField fx:id="textFieldType" alignment="CENTER" promptText="ex : VIP">
+            <RequiredTextField fx:id="textFieldTicketType" alignment="CENTER" promptText="ex : VIP">
                <HBox.margin>
                   <Insets />
                </HBox.margin></RequiredTextField>
             <Label text="Quantité :" />
-            <IntTextField fx:id="textFieldQuantite" alignment="CENTER" notNull="true" positive="true" promptText="ex : 100">
+            <IntTextField fx:id="textFieldTicketQuantite" alignment="CENTER" notNull="true" positive="true" promptText="ex : 100">
                <HBox.margin>
                   <Insets />
                </HBox.margin></IntTextField>
             <Label text="Prix :" />
-            <FloatTextField fx:id="textFieldPrix" alignment="CENTER" notNull="true" positive="true" promptText="ex : 10.99">
+            <FloatTextField fx:id="textFieldTicketPrix" alignment="CENTER" notNull="true" positive="true" promptText="ex : 10.99">
                <HBox.margin>
                   <Insets />
                </HBox.margin></FloatTextField>
-                <Button fx:id="buttonTicket" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Ticket" />
+                <Button fx:id="buttonAddTicket" mnemonicParsing="false" prefWidth="135.0" text="Ajouter Ticket" />
 
             </children>
             <opaqueInsets>
@@ -47,19 +47,19 @@
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="1058.0" spacing="10.0" style="-color-danger-fg: -color-neutral-muted">
          <children>
-            <Label fx:id="labelAvantage" text="Avantage :" />
-            <ComboBox fx:id="comboAvantage" prefWidth="150.0" promptText="Sélectionner...">
+            <Label fx:id="labelAvantageList" text="Avantage :" />
+            <ComboBox fx:id="comboAvantageList" prefWidth="150.0" promptText="Sélectionner...">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ComboBox>
-            <Label fx:id="labelQuantiteAvantage" text="Quantité :" />
-            <IntTextField fx:id="textFieldAvantage" alignment="CENTER" promptText="ex : 100">
+            <Label fx:id="labelAvantageQuantite" text="Quantité :" />
+            <IntTextField fx:id="textFieldAvantageQuantite" alignment="CENTER" promptText="ex : 100">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </IntTextField>
-            <Button fx:id="buttonAvantage" mnemonicParsing="false" prefWidth="150.0" text="Ajouter Avantage">
+            <Button fx:id="buttonAddAvantage" mnemonicParsing="false" prefWidth="150.0" text="Ajouter Avantage">
                <HBox.margin>
                   <Insets />
                </HBox.margin>

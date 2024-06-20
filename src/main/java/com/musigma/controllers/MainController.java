@@ -5,6 +5,7 @@ import com.musigma.models.Festival;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.TypeTicketException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -254,8 +255,8 @@ public class MainController {
      */
     private void openFestival(File file) {
         tryCatch(
-                "Ouverture du fichier du festival impossible",
-                () -> loadFestival(Festival.Festival(file))
+            "Ouverture du fichier du festival impossible",
+            () -> loadFestival(Festival.Festival(file))
         );
     }
 
@@ -334,9 +335,8 @@ public class MainController {
      * @param register L'enregistrement de l'espace de travail à charger
      * @throws IOException Si une erreur d'entrée/sortie se produit
      * @throws FestivalException Si une erreur liée au festival se produit
-     * @throws AvantageException Si une erreur liée aux avantages se produit
      */
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, FestivalException, AvantageException, TypeTicketException {
+    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException, TypeTicketException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         currentWorkspaceController = fxmlLoader.getController();
@@ -347,5 +347,20 @@ public class MainController {
             currentWorkspace.openButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
         currentWorkspace = register;
         register.openButton.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
+    }
+
+    /**
+     * Ouvre le pdf du manuel de l'application.
+     */
+    public void onAboutClicked(ActionEvent actionEvent){
+        try {
+            File file = new File("src/main/resources/com/musigma/manual.pdf");
+            if (file.exists()) {
+                ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
+                pb.start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

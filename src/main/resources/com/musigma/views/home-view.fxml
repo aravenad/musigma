@@ -54,10 +54,10 @@
                   <Label text="Emplacement :" GridPane.rowIndex="2" />
                   <RequiredTextField fx:id="festivalLocation" prefWidth="200.0" promptText="ex: Lyon" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                  <Label text="Aire de l'emplacement :" GridPane.rowIndex="3" />
+                  <Label text="Superficie de la fosse (m²) :" GridPane.rowIndex="3" />
                   <FloatTextField fx:id="festivalArea" notNull="true" positive="true" prefWidth="200.0" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                  <Label text="Prix de l'emplacement :" GridPane.rowIndex="4" />
+                  <Label text="Prix de l'emplacement (€) :" GridPane.rowIndex="4" />
                   <FloatTextField fx:id="festivalLocationPrice" positive="true" prefWidth="200.0" promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                </children>
             </GridPane>

@@ -163,10 +163,10 @@ public class StockController extends WorkspaceController {
                 "Ajout du stock impossible",
                 () -> {
                     Stock stock = new Stock(
-                            textFieldObjet.getText(),
-                            textFieldQuantite.getValue(),
-                            true,
-                            textFieldPrix.getValue());
+                        textFieldObjet.getText(),
+                        textFieldQuantite.getValue(),
+                        true,
+                        textFieldPrix.getValue());
                     festival.addStock(stock);
                     tableView.getItems().add(stock);
                     totalPrix();

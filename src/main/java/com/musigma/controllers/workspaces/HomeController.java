@@ -48,11 +48,11 @@ public class HomeController extends WorkspaceController {
                 "Mise à jour de l'emplacement du festival impossible",
                 festival.getLocation(), festival::setLocation
         );
-        festivalArea.bindFloat(
+        festivalArea.bindValue(
                 "Mise à jour de l'aire de l'emplacement du festival impossible",
                 festival.getArea(), festival::setArea
         );
-        festivalLocationPrice.bindFloat(
+        festivalLocationPrice.bindValue(
                 "Mise à jour du prix de l'emplacement du festival impossible",
                 festival.getLocationPrice(), festival::setLocationPrice
         );
