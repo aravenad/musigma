@@ -251,13 +251,11 @@ public class TicketController extends WorkspaceController {
                 festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).addAvantage(avantage);
             } catch (AvantageException e) {
                 e.printStackTrace();
-            } catch (TypeTicketException e) {
+            } catch (TypeTicketException | StockException e) {
                 throw new RuntimeException(e);
             } catch (NumberFormatException e) {
                 textFieldAvantage.requestFocus();
                 return;
-            } catch (StockException e) {
-                throw new RuntimeException(e);
             }
         } else {
             textFieldAvantage.requestFocus();
