@@ -5,6 +5,7 @@ import com.musigma.models.Festival;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.TypeTicketException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -346,5 +347,17 @@ public class MainController {
             currentWorkspace.openButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
         currentWorkspace = register;
         register.openButton.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
+    }
+
+    public void onAboutClicked(ActionEvent actionEvent){
+        try {
+            File file = new File("src/main/resources/com/musigma/manual.pdf");
+            if (file.exists()) {
+                ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
+                pb.start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
