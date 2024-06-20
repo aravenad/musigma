@@ -69,7 +69,7 @@ public class CalendarController extends WorkspaceController {
         addEventButton.setOnAction(e -> {
             Entry<Event> entry = new Entry<>(nomEvent.getText());
             entry.changeStartTime(LocalTime.of(dateDebut.getValue(),0));
-            entry.changeEndTime(LocalTime.of(dateDebut.getValue(),0));
+            entry.changeEndTime(LocalTime.of(dateFin.getValue(),0));
             calendar.addEntry(entry);
         });
     }
