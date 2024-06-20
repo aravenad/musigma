@@ -434,7 +434,7 @@ public class MainController {
         tryCatch(
                 "Ouverture du manuel impossible",
                 () -> {
-                    File file = new File("src/main/resources/com/musigma/manual.pdf");
+                    File file = new File("src/main/resources/com/musigma/guide/guide.pdf");
                     if (file.exists()) {
                         if (Desktop.isDesktopSupported()) {
                             Desktop.getDesktop().open(file);
