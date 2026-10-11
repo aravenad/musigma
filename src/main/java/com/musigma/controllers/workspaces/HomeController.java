@@ -28,7 +28,8 @@ public class HomeController extends WorkspaceController {
     public static final WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Accueil",
             "/com/musigma/images/icons/home.png",
-            "/com/musigma/views/home-view.fxml"
+            "/com/musigma/views/home-view.fxml",
+            "Renseignez les informations générales du festival : dates, lieu, surface, prix de location et scènes. Les modifications sont prises en compte immédiatement."
     );
 
     @FXML

@@ -14,7 +14,7 @@ import static com.musigma.utils.Log.getLogger;
  * Une représentation planifiée ne se modifie qu'au travers de {@link Festival#updateRepresentation},
  * qui garantit l'absence de chevauchement sur une même scène.
  */
-public class Representation implements Comparable<Representation>, Serializable {
+public final class Representation implements Comparable<Representation>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,12 +53,12 @@ public class Representation implements Comparable<Representation>, Serializable 
      * @throws RepresentationException si les valeurs des paramètres ne sont pas valides
      */
     public Representation(int startDelta, int duration, String scene, Artiste artiste) throws RepresentationException {
-        LOGGER.info("Initialized Representation");
+        LOGGER.fine("Initialized Representation");
         setStartDelta(startDelta);
         setDuration(duration);
         setScene(scene);
         setArtiste(artiste);
-        LOGGER.info("Created Representation");
+        LOGGER.fine("Created Representation");
     }
 
     /**
@@ -80,7 +80,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (artiste == null)
             throw new RepresentationException("Artiste null, doit être défini");
         this.artiste = artiste;
-        LOGGER.info("Set Representation.artiste");
+        LOGGER.fine("Set Representation.artiste");
     }
 
     /**
@@ -102,7 +102,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (startDelta < 0)
             throw new RepresentationException("La différence avec la date de début du festival est négative, doit être positif");
         this.startDelta = startDelta;
-        LOGGER.info("Set Representation.startDelta");
+        LOGGER.fine("Set Representation.startDelta");
     }
 
     /**
@@ -124,7 +124,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (duration <= 0)
             throw new RepresentationException("La durée est négative ou nulle, doit être positif et non nulle");
         this.duration = duration;
-        LOGGER.info("Set Representation.duration");
+        LOGGER.fine("Set Representation.duration");
     }
 
     /**
@@ -146,7 +146,7 @@ public class Representation implements Comparable<Representation>, Serializable 
         if (scene == null || scene.isBlank())
             throw new RepresentationException("La scene est null ou vide, doit être définie");
         this.scene = scene;
-        LOGGER.info("Set Representation.scene");
+        LOGGER.fine("Set Representation.scene");
     }
 
     /**

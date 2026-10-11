@@ -45,7 +45,7 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
             </columnResizePolicy>
         </TableView>
-        <Label fx:id="result" styleClass="title-3"/>
+        <Label fx:id="result" styleClass="title-3" wrapText="true"/>
         <Label styleClass="title-4" text="Vente optimale"/>
         <TableView fx:id="planTable" prefHeight="130.0" VBox.vgrow="SOMETIMES">
             <columns>

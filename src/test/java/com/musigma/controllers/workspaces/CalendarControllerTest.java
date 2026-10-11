@@ -6,7 +6,6 @@ import com.musigma.controllers.Dialogs;
 import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
 import com.musigma.models.Representation;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import org.junit.jupiter.api.*;
 
@@ -15,12 +14,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 
+import static com.musigma.controllers.FxTestSupport.onFxThread;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Synchronisation entre le planning CalendarFX et le modèle (UC4.2, AUDIT.md C1 à C4).
@@ -29,32 +25,11 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @DisplayName("Planning")
 class CalendarControllerTest {
 
-    private static boolean toolkitAvailable = true;
-
     Festival festival;
     Artiste artiste;
     Representation first, second;
     CalendarController controller;
     List<String> errors;
-
-    @BeforeAll
-    static void startToolkit() {
-        try {
-            Platform.startup(() -> {
-            });
-        } catch (IllegalStateException alreadyStarted) {
-            // JavaFX est déjà démarré par un autre test
-        } catch (Throwable noDisplay) {
-            toolkitAvailable = false;
-        }
-    }
-
-    private static <T> T onFxThread(Callable<T> action) throws Exception {
-        assumeTrue(toolkitAvailable, "JavaFX ne peut pas démarrer sans affichage");
-        FutureTask<T> task = new FutureTask<>(action);
-        Platform.runLater(task);
-        return task.get(10, TimeUnit.SECONDS);
-    }
 
     @BeforeEach
     void setUp() throws Exception {

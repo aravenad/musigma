@@ -27,7 +27,8 @@ public class AccountingController extends WorkspaceController {
     public static final WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Prévision",
             "/com/musigma/images/icons/accounting.png",
-            "/com/musigma/views/accounting-view.fxml"
+            "/com/musigma/views/accounting-view.fxml",
+            "Consultez le bilan prévisionnel. « Calculer la vente optimale » propose les quantités de tickets qui maximisent la recette, « Appliquer » les reporte dans les tickets."
     );
 
     /**

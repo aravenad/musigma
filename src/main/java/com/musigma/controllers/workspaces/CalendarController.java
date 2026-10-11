@@ -39,7 +39,8 @@ public class CalendarController extends WorkspaceController {
     public static final WorkspaceController.WorkspaceRegister REGISTER = new WorkspaceController.WorkspaceRegister(
             "Planning",
             "/com/musigma/images/icons/calendar.png",
-            "/com/musigma/views/calendar-view.fxml"
+            "/com/musigma/views/calendar-view.fxml",
+            "Choisissez un artiste, une scène, un jour, une heure et une durée, puis cliquez sur Planifier. Glissez une représentation pour la déplacer, tirez son bord pour changer sa durée, clic droit pour la supprimer."
     );
 
     /**

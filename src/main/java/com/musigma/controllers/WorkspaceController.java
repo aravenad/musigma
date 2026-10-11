@@ -26,7 +26,7 @@ public abstract class WorkspaceController {
 
     /**
      * La classe interne WorkspaceRegister représente un lien vers un espace de travail
-     * avec un nom, un chemin d'icône, un chemin de vue et un bouton d'ouverture.
+     * avec un nom, un chemin d'icône, un chemin de vue, un texte d'aide et un bouton d'ouverture.
      */
     public static class WorkspaceRegister {
         /**
@@ -42,6 +42,10 @@ public abstract class WorkspaceController {
          */
         public String viewPath;
         /**
+         * Le texte d'aide affiché sous la barre de menus quand l'espace de travail est ouvert.
+         */
+        public String help;
+        /**
          * Le bouton d'ouverture de l'espace de travail.
          */
         public Node openButton;
@@ -52,11 +56,13 @@ public abstract class WorkspaceController {
          * @param name     le nom de l'espace de travail
          * @param iconPath le chemin de l'icône de l'espace de travail
          * @param viewPath le chemin de la vue de l'espace de travail
+         * @param help     le texte d'aide de l'espace de travail
          */
-        public WorkspaceRegister(String name, String iconPath, String viewPath) {
+        public WorkspaceRegister(String name, String iconPath, String viewPath, String help) {
             this.name = name;
             this.iconPath = iconPath;
             this.viewPath = viewPath;
+            this.help = help;
         }
     }
 }

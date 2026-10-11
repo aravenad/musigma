@@ -33,7 +33,8 @@ public class StockController extends WorkspaceController {
     public static final WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Stocks",
             "/com/musigma/images/icons/stock.png",
-            "/com/musigma/views/stock-view.fxml"
+            "/com/musigma/views/stock-view.fxml",
+            "Listez les ressources du festival. Cochez « Limité » pour une ressource que les tickets ne peuvent pas dépasser ; la colonne Consommation indique ce que demandent les tickets."
     );
 
     @FXML
@@ -178,7 +179,7 @@ public class StockController extends WorkspaceController {
         askValidForm(
                 "Ajouter un stock",
                 "Ajout d'un stock impossible",
-                new CustomValidField[]{stockName, quantity, price, fixed},
+                new CustomValidField<?>[]{stockName, quantity, price, fixed},
                 () -> {
                     Stock stock = new Stock(
                             stockName.node.getText(),
@@ -197,9 +198,8 @@ public class StockController extends WorkspaceController {
      * Affiche le coût total des stocks nécessaires et les stocks insuffisants.
      */
     private void refreshTotals() {
-        double cost = festival.getStocks().stream().mapToDouble(stock -> stock.getRequiredQuantity() * stock.getPrix()).sum();
-        total.setText(festival.getStocks().isEmpty() ? "" : String.format("Coût des stocks nécessaires : %.2f €", cost));
-        long insufficient = festival.getStocks().stream().filter(stock -> !stock.isFixed() && stock.getMissingQuantity() > 0).count();
+        total.setText(festival.getStocks().isEmpty() ? "" : String.format("Coût des stocks nécessaires : %.2f €", festival.getStocksCost()));
+        int insufficient = festival.getInsufficientStocks().size();
         missing.setText(insufficient == 0 ? "" : String.format("%d stock(s) insuffisant(s) pour les tickets prévus", insufficient));
     }
 }

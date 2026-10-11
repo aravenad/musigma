@@ -13,7 +13,7 @@ import static com.musigma.utils.Log.getLogger;
 /**
  * La classe Artiste représente un artiste avec un nom, un genre musical et un prix.
  */
-public class Artiste implements Serializable {
+public final class Artiste implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,12 +47,12 @@ public class Artiste implements Serializable {
      * @throws ArtisteException si les valeurs des paramètres ne sont pas valides
      */
     public Artiste(String name, String genre, float price) throws ArtisteException {
-        LOGGER.info("Initialized Artiste");
+        LOGGER.fine("Initialized Artiste");
         representations = new ArrayList<>();
         setName(name);
         setGenre(genre);
         setPrice(price);
-        LOGGER.info("Created Artiste");
+        LOGGER.fine("Created Artiste");
     }
 
     /**
@@ -74,7 +74,7 @@ public class Artiste implements Serializable {
         if (name == null || name.isBlank())
             throw new ArtisteException("Le nom est null ou vide, doit être défini");
         this.name = name;
-        LOGGER.info("Set Artiste.name");
+        LOGGER.fine("Set Artiste.name");
     }
 
     /**
@@ -96,7 +96,7 @@ public class Artiste implements Serializable {
         if (genre == null || genre.isBlank())
             throw new ArtisteException("Le genre est null ou vide, doit être défini");
         this.genre = genre;
-        LOGGER.info("Set Artiste.genre");
+        LOGGER.fine("Set Artiste.genre");
     }
 
     /**
@@ -118,7 +118,7 @@ public class Artiste implements Serializable {
         if (price < 0)
             throw new ArtisteException("Le prix est négatif, doit être positif");
         this.price = price;
-        LOGGER.info("Set Artiste.price");
+        LOGGER.fine("Set Artiste.price");
     }
 
     /**
@@ -134,7 +134,7 @@ public class Artiste implements Serializable {
         if (representation.getArtiste() != this)
             throw new ArtisteException("La représentation concerne un autre artiste");
         representations.add(representation);
-        LOGGER.info("Added Representation to Artiste.representations");
+        LOGGER.fine("Added Representation to Artiste.representations");
     }
 
     /**
@@ -147,7 +147,7 @@ public class Artiste implements Serializable {
     void removeRepresentation(Representation representation) throws ArtisteException {
         if (!representations.remove(representation))
             throw new ArtisteException("La représentation n'a pas été trouvée");
-        LOGGER.info("Removed Representation from Artiste.representations");
+        LOGGER.fine("Removed Representation from Artiste.representations");
     }
 
     /**

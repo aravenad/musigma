@@ -6,19 +6,60 @@
 <?import javafx.scene.layout.VBox?>
 <HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="697.0" prefWidth="1058.0"
       xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.musigma.controllers.workspaces.TicketController">
-    <VBox prefWidth="200" minWidth="200" spacing="8.0">
-        <Button maxWidth="1.7976931348623157E308" onAction="#addTicket" text="Ajouter type de ticket"/>
-        <Button layoutX="20.0" layoutY="18.0" maxWidth="1.7976931348623157E308" onAction="#updTicket"
-                text="Modifier type de ticket"/>
-        <Button layoutX="20.0" layoutY="51.0" maxWidth="1.7976931348623157E308" onAction="#removeTicket"
-                text="Supprimer type de ticket"/>
+    <VBox minWidth="200" prefWidth="200" spacing="8.0">
+        <Button maxWidth="1.7976931348623157E308" onAction="#addTicket" text="Ajouter un type"/>
+        <Button fx:id="editButton" maxWidth="1.7976931348623157E308" onAction="#updTicket" text="Modifier le type">
+            <tooltip>
+                <Tooltip text="Modifier le nom, la quantité, le prix ou la surface du type de ticket sélectionné"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="removeButton" maxWidth="1.7976931348623157E308" onAction="#removeTicket" text="Supprimer le type"/>
         <Separator/>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addAvantage"
-                text="Ajouter avantage"/>
+        <Button fx:id="addAvantageButton" maxWidth="1.7976931348623157E308" onAction="#addAvantage" text="Ajouter un avantage">
+            <tooltip>
+                <Tooltip text="Inclure dans le ticket sélectionné un objet puisé dans un stock (ex : 1 gobelet, 1 place de parking)"/>
+            </tooltip>
+        </Button>
+        <Separator/>
+        <Label fx:id="totalRevenue" wrapText="true"/>
         <padding>
             <Insets left="10.0" right="8.0" top="8.0"/>
         </padding>
     </VBox>
-    <Separator orientation="VERTICAL" prefHeight="200.0"/>
-    <TabPane fx:id="tabPane" prefHeight="615.0" prefWidth="1058.0" tabClosingPolicy="UNAVAILABLE"/>
+    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+        <TableView fx:id="ticketsTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="typeColumn" prefWidth="230.0" text="Type"/>
+                <TableColumn fx:id="quantityColumn" prefWidth="120.0" text="Quantité"/>
+                <TableColumn fx:id="priceColumn" prefWidth="120.0" text="Prix (€)"/>
+                <TableColumn fx:id="surfaceColumn" prefWidth="150.0" text="Surface / pers. (m²)"/>
+                <TableColumn fx:id="revenueColumn" prefWidth="150.0" text="Recette (€)"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Aucun type de ticket"/>
+            </placeholder>
+        </TableView>
+        <Label fx:id="avantagesTitle" text="Avantages">
+            <padding>
+                <Insets left="8.0"/>
+            </padding>
+        </Label>
+        <TableView fx:id="avantagesTable" minHeight="160.0" prefHeight="220.0">
+            <columns>
+                <TableColumn fx:id="stockColumn" prefWidth="260.0" text="Objet du stock"/>
+                <TableColumn fx:id="quantityByTicketColumn" prefWidth="160.0" text="Quantité par ticket"/>
+                <TableColumn fx:id="consumptionColumn" prefWidth="160.0" text="Total pour ce ticket"/>
+                <TableColumn fx:id="avantageActionColumn" prefWidth="110.0" sortable="false" text="Actions"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Sélectionnez un type de ticket pour voir ses avantages"/>
+            </placeholder>
+        </TableView>
+    </VBox>
 </HBox>

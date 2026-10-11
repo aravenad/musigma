@@ -27,7 +27,7 @@ import static com.musigma.utils.Log.getLogger;
  * une superficie, un emplacement et des ressources, comme des artistes,
  * des types de tickets, de stocks et de représentations.
  */
-public class Festival implements Serializable {
+public final class Festival implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -104,7 +104,7 @@ public class Festival implements Serializable {
      * @throws FestivalException si les valeurs des paramètres ne sont pas valides
      */
     public Festival(String name, LocalDateTime start, float locationPrice, float area, String location) throws FestivalException {
-        LOGGER.info("Initialize Festival");
+        LOGGER.fine("Initialize Festival");
         artistes = new ArrayList<>();
         ticketTypes = new ArrayList<>();
         stocks = new ArrayList<>();
@@ -116,7 +116,7 @@ public class Festival implements Serializable {
         setLocationPrice(locationPrice);
         setArea(area);
         setLocation(location);
-        LOGGER.info("Created Festival");
+        LOGGER.fine("Created Festival");
     }
 
     /**
@@ -147,7 +147,7 @@ public class Festival implements Serializable {
      * @return le festival chargé depuis le fichier
      * @throws FestivalException si le fichier n'est pas défini
      */
-    public static Festival Festival(File file) throws FestivalException {
+    public static Festival load(File file) throws FestivalException {
         try (
                 FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 ObjectInputStream ois = new ObjectInputStream(fis)
@@ -238,7 +238,7 @@ public class Festival implements Serializable {
         if (file == null)
             throw new FestivalException("Le fichier du festival est null, doit être défini");
         this.file = file;
-        LOGGER.info("Set Festival.file");
+        LOGGER.fine("Set Festival.file");
     }
 
     /**
@@ -260,7 +260,7 @@ public class Festival implements Serializable {
         if (name == null || name.isEmpty())
             throw new FestivalException("Le nom est null ou vide, doit être défini");
         this.name = name;
-        LOGGER.info("Set Festival.name");
+        LOGGER.fine("Set Festival.name");
     }
 
     /**
@@ -289,7 +289,7 @@ public class Festival implements Serializable {
         if (end != null)
             end = end.plus(Duration.between(this.start, start));
         this.start = start;
-        LOGGER.info("Set Festival.start");
+        LOGGER.fine("Set Festival.start");
     }
 
     /**
@@ -320,7 +320,7 @@ public class Festival implements Serializable {
         if (outside.isPresent())
             throw new FestivalException(String.format("La représentation %s se termine après cette date de fin", outside.get()));
         this.end = end;
-        LOGGER.info("Set Festival.end");
+        LOGGER.fine("Set Festival.end");
     }
 
     /**
@@ -350,7 +350,7 @@ public class Festival implements Serializable {
     public void addScene(String scene) throws FestivalException {
         checkNewSceneName(scene);
         scenes.add(scene.strip());
-        LOGGER.info("Added scene to Festival.scenes");
+        LOGGER.fine("Added scene to Festival.scenes");
     }
 
     /**
@@ -392,7 +392,7 @@ public class Festival implements Serializable {
         if (used > 0)
             throw new FestivalException(String.format("La scène \"%s\" accueille %d représentation(s), à déplacer ou supprimer d'abord", scene, used));
         scenes.remove(scene);
-        LOGGER.info("Removed scene from Festival.scenes");
+        LOGGER.fine("Removed scene from Festival.scenes");
     }
 
     /**
@@ -437,7 +437,7 @@ public class Festival implements Serializable {
         if (locationPrice < 0)
             throw new FestivalException("Le prix de location est négatif, doit être positif");
         this.locationPrice = locationPrice;
-        LOGGER.info("Set Festival.locationPrice");
+        LOGGER.fine("Set Festival.locationPrice");
     }
 
     /**
@@ -459,7 +459,7 @@ public class Festival implements Serializable {
         if (area <= 0)
             throw new FestivalException("La superficie est négative ou nulle (0), doit être positive");
         this.area = area;
-        LOGGER.info("Set Festival.area");
+        LOGGER.fine("Set Festival.area");
     }
 
     /**
@@ -481,7 +481,7 @@ public class Festival implements Serializable {
         if (location == null || location.isEmpty())
             throw new FestivalException("L'emplacement de location est null ou vide, doit être défini");
         this.location = location;
-        LOGGER.info("Set Festival.location");
+        LOGGER.fine("Set Festival.location");
     }
 
     /**
@@ -496,7 +496,7 @@ public class Festival implements Serializable {
         if (artistes.contains(artiste))
             throw new FestivalException(String.format("L'artiste \"%s\" est déjà engagé", artiste.getName()));
         artistes.add(artiste);
-        LOGGER.info("Added Artiste to Festival.artistes");
+        LOGGER.fine("Added Artiste to Festival.artistes");
     }
 
     /**
@@ -511,7 +511,7 @@ public class Festival implements Serializable {
         for (Representation representation : new ArrayList<>(artiste.getRepresentations()))
             removeRepresentation(representation);
         artistes.remove(artiste);
-        LOGGER.info("Removed Artiste from Festival.artistes");
+        LOGGER.fine("Removed Artiste from Festival.artistes");
     }
 
     /**
@@ -592,7 +592,7 @@ public class Festival implements Serializable {
             throw new FestivalException(e.getMessage());
         }
         representations.add(representation);
-        LOGGER.info("Added Representation to Festival.representations");
+        LOGGER.fine("Added Representation to Festival.representations");
     }
 
     /**
@@ -636,7 +636,7 @@ public class Festival implements Serializable {
         } catch (ArtisteException e) {
             LOGGER.warning("Representation was not linked to its Artiste: " + e.getMessage());
         }
-        LOGGER.info("Removed Representation from Festival.representations");
+        LOGGER.fine("Removed Representation from Festival.representations");
     }
 
     /**
@@ -662,7 +662,7 @@ public class Festival implements Serializable {
         if (ticketTypes.stream().anyMatch(t -> Objects.equals(t.getType(), ticketType.getType())))
             throw new FestivalException("Un autre type ticket existe avec le même nom");
         ticketTypes.add(ticketType);
-        LOGGER.info("Added TypeTicket to Festival.ticketTypes");
+        LOGGER.fine("Added TypeTicket to Festival.ticketTypes");
     }
 
     /**
@@ -716,7 +716,7 @@ public class Festival implements Serializable {
         for (Avantage avantage : new ArrayList<>(ticketType.getAvantages()))
             avantage.detach();
         ticketTypes.remove(ticketType);
-        LOGGER.info("Removed TypeTicket from Festival.ticketTypes");
+        LOGGER.fine("Removed TypeTicket from Festival.ticketTypes");
     }
 
     /**
@@ -740,7 +740,7 @@ public class Festival implements Serializable {
         if (stocks.stream().anyMatch(s -> Objects.equals(s.getName(), stock.getName())))
             throw new FestivalException("Un autre stock existe avec le même nom");
         stocks.add(stock);
-        LOGGER.info("Added Stock to Festival.stocks");
+        LOGGER.fine("Added Stock to Festival.stocks");
     }
 
     /**
@@ -774,7 +774,7 @@ public class Festival implements Serializable {
         for (Avantage avantage : new ArrayList<>(stock.getAvantages()))
             avantage.detach();
         stocks.remove(stock);
-        LOGGER.info("Removed Stock from Festival.stocks");
+        LOGGER.fine("Removed Stock from Festival.stocks");
     }
 
     /**
@@ -887,7 +887,7 @@ public class Festival implements Serializable {
         for (TypeTicket ticketType : ticketTypes)
             revenues.add(new Budget.Line(
                     String.format("Tickets « %s » (%d × %s €)", ticketType.getType(), ticketType.getQuantity(), formatAmount(ticketType.getPrice())),
-                    (double) ticketType.getQuantity() * ticketType.getPrice()
+                    ticketType.getRevenue()
             ));
 
         List<Budget.Line> costs = new ArrayList<>();
@@ -900,6 +900,33 @@ public class Festival implements Serializable {
                     stock.getRequiredQuantity() * stock.getPrix()
             ));
         return new Budget(revenues, costs);
+    }
+
+    /**
+     * Retourne le coût des stocks nécessaires (UC3.3).
+     *
+     * @return la somme, pour chaque stock, de la quantité nécessaire multipliée par le prix unitaire
+     */
+    public double getStocksCost() {
+        return stocks.stream().mapToDouble(stock -> stock.getRequiredQuantity() * stock.getPrix()).sum();
+    }
+
+    /**
+     * Retourne les stocks non limités dont la quantité prévue ne couvre pas la consommation des tickets.
+     *
+     * @return les stocks insuffisants
+     */
+    public List<Stock> getInsufficientStocks() {
+        return stocks.stream().filter(stock -> !stock.isFixed() && stock.getMissingQuantity() > 0).toList();
+    }
+
+    /**
+     * Retourne le total des cachets des artistes engagés.
+     *
+     * @return la somme des cachets
+     */
+    public double getTotalFees() {
+        return artistes.stream().mapToDouble(Artiste::getPrice).sum();
     }
 
     /**

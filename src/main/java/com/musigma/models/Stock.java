@@ -15,7 +15,7 @@ import static com.musigma.utils.Log.getLogger;
  * La classe Stock représente un stock avec un nom, une quantité absolue,
  * et une liste d'avantages.
  */
-public class Stock implements Serializable {
+public final class Stock implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,13 +54,13 @@ public class Stock implements Serializable {
      * @throws StockException si le nom est null ou vide, si la quantité est négative ou nulle (0)
      */
     public Stock(String name, int quantity, boolean fixed, double prix) throws StockException {
-        LOGGER.info("Initialized Stock");
+        LOGGER.fine("Initialized Stock");
         avantages = new ArrayList<>();
         setName(name);
         setQuantity(quantity);
         setFixed(fixed);
         setPrix(prix);
-        LOGGER.info("Created Stock");
+        LOGGER.fine("Created Stock");
     }
 
     /**
@@ -82,7 +82,7 @@ public class Stock implements Serializable {
         if (name == null || name.isBlank())
             throw new StockException("Le nom est null ou vide, doit être défini");
         this.name = name;
-        LOGGER.info("Set Stock.name");
+        LOGGER.fine("Set Stock.name");
     }
 
     /**
@@ -107,7 +107,7 @@ public class Stock implements Serializable {
                     getConsumedQuantity(), quantity
             ));
         this.fixed = fixed;
-        LOGGER.info("Set Stock.fixed");
+        LOGGER.fine("Set Stock.fixed");
     }
 
     /**
@@ -137,7 +137,7 @@ public class Stock implements Serializable {
             ));
         }
         this.quantity = quantity;
-        LOGGER.info("Set Stock.quantity");
+        LOGGER.fine("Set Stock.quantity");
     }
 
     /**
@@ -160,7 +160,7 @@ public class Stock implements Serializable {
             throw new StockException("Le prix est négatif, doit être positif ou nul");
         }
         this.prix = prix;
-        LOGGER.info("Set Stock.prix");
+        LOGGER.fine("Set Stock.prix");
     }
 
     /**
@@ -252,7 +252,7 @@ public class Stock implements Serializable {
      */
     void link(Avantage avantage) {
         avantages.add(avantage);
-        LOGGER.info("Added Avantage to Stock.avantages");
+        LOGGER.fine("Added Avantage to Stock.avantages");
     }
 
     /**
@@ -262,7 +262,7 @@ public class Stock implements Serializable {
      */
     void unlink(Avantage avantage) {
         avantages.remove(avantage);
-        LOGGER.info("Removed Avantage from Stock.avantages");
+        LOGGER.fine("Removed Avantage from Stock.avantages");
     }
 
     @Override

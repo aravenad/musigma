@@ -32,7 +32,8 @@ public class ArtistController extends WorkspaceController {
     public static final WorkspaceRegister REGISTER = new WorkspaceRegister(
             "Artistes",
             "/com/musigma/images/icons/artist.png",
-            "/com/musigma/views/artist-view.fxml"
+            "/com/musigma/views/artist-view.fxml",
+            "Engagez les artistes du festival et fixez leur cachet. Double-cliquez sur une valeur pour la modifier, sélectionnez un artiste pour voir ses représentations."
     );
 
     /**
@@ -192,7 +193,7 @@ public class ArtistController extends WorkspaceController {
         askValidForm(
                 "Engager un artiste",
                 "Engagement de l'artiste impossible",
-                new CustomValidField[]{name, genre, fee},
+                new CustomValidField<?>[]{name, genre, fee},
                 () -> {
                     Artiste artiste = new Artiste(name.node.getText(), genre.node.getText(), fee.node.getValue());
                     festival.addArtiste(artiste);
@@ -229,8 +230,7 @@ public class ArtistController extends WorkspaceController {
      * Affiche le total des cachets et le temps encore libre dans le planning.
      */
     private void refreshSummary() {
-        double fees = festival.getArtistes().stream().mapToDouble(Artiste::getPrice).sum();
-        totalFees.setText(String.format("Total des cachets : %.2f €", fees));
+        totalFees.setText(String.format("Total des cachets : %.2f €", festival.getTotalFees()));
         freeTime.setText(String.format("Temps libre sur les scènes : %s", formatDuration(Math.max(0, festival.getFreeMinutes()))));
     }
 }

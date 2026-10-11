@@ -1,28 +1,32 @@
-/* Window */
+/* Barre de menus */
 
 .windowBar {
-    -fx-background-color: rgba(48, 48, 77, 0.1);
+    -fx-background-color: -color-bg-subtle;
 }
 
-.windowBar .menu-bar,
-.windowBar .button {
-    -fx-background-color: transparent;
+/* Aide contextuelle, sous la barre de menus (document IHM : zone de documentation de la page) */
+
+.helpBar {
+    -fx-background-color: -color-accent-subtle;
+    -fx-border-color: -color-border-muted;
+    -fx-border-width: 0 0 1 0;
 }
 
-.windowBar .button {
-    -fx-background-radius: 0;
+.helpBar .label {
+    -fx-text-fill: -color-fg-default;
 }
 
-.windowBar .button:hover {
-    -fx-background-color: darkgrey;
-    -fx-padding: 4px 0.8em 0.3em 0.9em;
+.helpBar .helpIcon {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-background-radius: 1em;
+    -fx-text-fill: -color-fg-emphasis;
+    -fx-font-weight: bold;
+    -fx-min-width: 1.5em;
+    -fx-min-height: 1.5em;
+    -fx-alignment: center;
 }
 
-.windowBar .close:hover {
-    -fx-background-color: crimson;
-    -fx-padding: 4px 0.8em 0.3em 0.9em;
-}
-
+/* Menu des espaces de travail, sombre dans les deux thèmes */
 
 .leftMenu {
     -fx-background-color: #30304d;
@@ -32,6 +36,23 @@
     -fx-text-fill: #f3f3f5;
 }
 
+#pageMenu VBox:hover {
+    -fx-background-color: #ffffff1a;
+    -fx-cursor: hand;
+}
+
 #pageMenu VBox.currentWorkspace {
-    -fx-background-color: #ffffff0f;
+    -fx-background-color: #ffffff26;
+}
+
+/* Planning : CalendarFX impose des fonds clairs, on y garde donc les couleurs de texte du thème clair */
+
+.calendar-page {
+    -color-fg-default: #1d1d1f;
+    -color-fg-muted: #6e6e73;
+    -color-fg-subtle: #86868b;
+    -color-bg-default: #ffffff;
+    -color-bg-subtle: #f5f5f7;
+    -color-border-default: #d2d2d7;
+    -color-border-muted: #e5e5ea;
 }

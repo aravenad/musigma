@@ -17,7 +17,7 @@ import static com.musigma.utils.Log.getLogger;
  * La classe TypeTicket représente un type de ticket avec un identifiant unique,
  * un type, une quantité, un prix et une liste d'avantages.
  */
-public class TypeTicket implements Serializable {
+public final class TypeTicket implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,12 +60,12 @@ public class TypeTicket implements Serializable {
      * @throws TypeTicketException si le type est null ou vide
      */
     public TypeTicket(String type, int quantity, float price) throws TypeTicketException {
-        LOGGER.info("Initialized TypeTicket");
+        LOGGER.fine("Initialized TypeTicket");
         avantages = new ArrayList<>();
         setType(type);
         setQuantity(quantity);
         setPrice(price);
-        LOGGER.info("Created TypeTicket");
+        LOGGER.fine("Created TypeTicket");
     }
 
     /**
@@ -87,7 +87,7 @@ public class TypeTicket implements Serializable {
         if (type == null || type.isBlank())
             throw new TypeTicketException("Le type est null ou vide, doit être défini");
         this.type = type;
-        LOGGER.info("Set TypeTicket.type");
+        LOGGER.fine("Set TypeTicket.type");
     }
 
     /**
@@ -118,7 +118,7 @@ public class TypeTicket implements Serializable {
                 ));
         }
         this.quantity = quantity;
-        LOGGER.info("Set TypeTicket.quantity");
+        LOGGER.fine("Set TypeTicket.quantity");
     }
 
     /**
@@ -140,7 +140,16 @@ public class TypeTicket implements Serializable {
         if (price < 0)
             throw new TypeTicketException("Le prix est négatif, doit être positif");
         this.price = price;
-        LOGGER.info("Set TypeTicket.price");
+        LOGGER.fine("Set TypeTicket.price");
+    }
+
+    /**
+     * Retourne la recette de ce type de ticket : la quantité multipliée par le prix.
+     *
+     * @return la recette en euros
+     */
+    public double getRevenue() {
+        return (double) quantity * price;
     }
 
     /**
@@ -162,7 +171,7 @@ public class TypeTicket implements Serializable {
         if (!(surface > 0))
             throw new TypeTicketException("La surface par ticket est négative ou nulle, doit être positive");
         this.surface = surface;
-        LOGGER.info("Set TypeTicket.surface");
+        LOGGER.fine("Set TypeTicket.surface");
     }
 
     /**
@@ -226,7 +235,7 @@ public class TypeTicket implements Serializable {
      */
     void link(Avantage avantage) {
         avantages.add(avantage);
-        LOGGER.info("Added Avantage to TypeTicket.avantages");
+        LOGGER.fine("Added Avantage to TypeTicket.avantages");
     }
 
     /**
@@ -236,7 +245,7 @@ public class TypeTicket implements Serializable {
      */
     void unlink(Avantage avantage) {
         avantages.remove(avantage);
-        LOGGER.info("Removed Avantage from TypeTicket.avantages");
+        LOGGER.fine("Removed Avantage from TypeTicket.avantages");
     }
 
     @Override

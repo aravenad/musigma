@@ -107,6 +107,12 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- Documentation : mvn javadoc:javadoc, générée dans target/reports/apidocs -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.12.0</version>
+            </plugin>
+            <plugin>
                 <!-- Analyse statique : mvn pmd:check pmd:cpd-check -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>

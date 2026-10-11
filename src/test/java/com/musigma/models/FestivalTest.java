@@ -179,7 +179,7 @@ class FestivalTest {
         festival.setFile(testFile);
         festival.save();
 
-        Festival loaded = Festival.Festival(testFile);
+        Festival loaded = Festival.load(testFile);
         assertEquals(festival.getName(), loaded.getName(), "Le festival doit conserver son nom");
         assertEquals(festival.getStart(), loaded.getStart(), "Le festival doit conserver sa date de début");
         assertEquals(festival.getLocation(), loaded.getLocation(), "Le festival doit conserver son emplacement");

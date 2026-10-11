@@ -36,3 +36,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Fichiers générés (javadoc : mvn javadoc:javadoc, jar : mvn package) ###
+out/
+docs/
+previousSession.ser

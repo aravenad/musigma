@@ -1,17 +1,12 @@
 package com.musigma.controllers.components;
 
-import javafx.application.Platform;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.musigma.controllers.FxTestSupport.onFxThread;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Régressions des champs de saisie numériques (AUDIT.md C5 à C7).
@@ -19,30 +14,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 @DisplayName("Champs numériques")
 class NumberTextFieldTest {
-
-    private static boolean toolkitAvailable = true;
-
-    @BeforeAll
-    static void startToolkit() {
-        try {
-            Platform.startup(() -> {
-            });
-        } catch (IllegalStateException alreadyStarted) {
-            // JavaFX est déjà démarré par un autre test
-        } catch (Throwable noDisplay) {
-            toolkitAvailable = false;
-        }
-    }
-
-    /**
-     * Exécute une action sur le thread JavaFX et renvoie son résultat.
-     */
-    private static <T> T onFxThread(Callable<T> action) throws Exception {
-        assumeTrue(toolkitAvailable, "JavaFX ne peut pas démarrer sans affichage");
-        FutureTask<T> task = new FutureTask<>(action);
-        Platform.runLater(task);
-        return task.get(5, TimeUnit.SECONDS);
-    }
 
     @Test
     @DisplayName("C5 — IntTextField affiche la valeur qu'on lui donne")

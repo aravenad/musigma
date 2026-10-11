@@ -1,9 +1,11 @@
 package com.musigma.controllers;
 
+import atlantafx.base.theme.CupertinoDark;
 import atlantafx.base.theme.CupertinoLight;
 import com.musigma.controllers.workspaces.*;
 import com.musigma.models.Festival;
 import com.musigma.utils.Log;
+import com.musigma.utils.Settings;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.fxml.FXML;
@@ -14,27 +16,30 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static com.musigma.controllers.Dialogs.askFile;
 import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * Le contrôleur principal de l'application Musigma, gère l'initialisation,
- * la navigation entre les espaces de travail, et la gestion des fichiers récents.
+ * la navigation entre les espaces de travail, les fichiers récents et les préférences d'affichage.
  */
 public class MainController {
 
@@ -45,7 +50,7 @@ public class MainController {
     /**
      * Logger pour les messages de log.
      */
-    private static final Logger LOGGER = Log.getLogger(Log.class);
+    private static final Logger LOGGER = Log.getLogger(MainController.class);
     /**
      * Nom de l'application.
      */
@@ -55,31 +60,34 @@ public class MainController {
      */
     private static final int MAX_RECENT_FILES = 10;
     /**
-     * Chemin du fichier d'état de la session précédente.
-     */
-    private static final String STATE_FILEPATH = "previousSession.ser";
-    /**
      * Chemin du manuel utilisateur dans les ressources de l'application.
      */
     private static final String GUIDE_PATH = "/com/musigma/guide/guide.pdf";
+    /**
+     * Taille de police correspondant à un zoom de 100 %, en pixels.
+     */
+    private static final double BASE_FONT_SIZE = 14;
 
-    private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
+    /**
+     * Espaces de travail disponibles, dans l'ordre du menu.
+     */
+    private static final List<WorkspaceController.WorkspaceRegister> WORKSPACES = List.of(
             HomeController.REGISTER,
             ArtistController.REGISTER,
             CalendarController.REGISTER,
             StockController.REGISTER,
             TicketController.REGISTER,
-            AccountingController.REGISTER,
-    }; // Tableau des espaces de travail disponibles
+            AccountingController.REGISTER
+    );
 
     private static final WorkspaceController.WorkspaceRegister DEFAULT_WORKSPACE = HomeController.REGISTER; // Espace de travail par défaut
 
     private static final String CURRENT_WORKSPACE_STYLECLASS = "currentWorkspace"; // Classe CSS pour l'espace de travail actuel
 
+    private final Settings settings = Settings.user(); // Préférences de l'utilisateur
     private Festival festival; // Le festival actuel
-    private ArrayList<File> recentFiles; // Liste des fichiers récents
+    private List<File> recentFiles; // Liste des fichiers récents
     private WorkspaceController.WorkspaceRegister currentWorkspace; // Espace de travail actuel
-    private WorkspaceController currentWorkspaceController; // Contrôleur de l'espace de travail actuel
     private Stage stage; // La fenêtre principale
     private HostServices hostServices; // Services de la plateforme, pour ouvrir le manuel
 
@@ -88,7 +96,13 @@ public class MainController {
     @FXML
     private Menu recentFileMenu; // Menu des fichiers récents
     @FXML
-    private Pane workspace; // Espace de travail
+    private StackPane workspace; // Espace de travail
+    @FXML
+    private HBox helpBar; // Zone d'aide contextuelle
+    @FXML
+    private Label helpText; // Texte de l'aide contextuelle
+    @FXML
+    private CheckMenuItem darkThemeItem, helpItem; // Choix du thème et de l'affichage de l'aide
 
     /**
      * Initialise le contrôleur principal avec la fenêtre spécifiée.
@@ -96,87 +110,35 @@ public class MainController {
      * @param stage        La fenêtre principale
      * @param hostServices Les services de la plateforme, pour ouvrir le manuel
      */
-    @FXML
     public void initialize(Stage stage, HostServices hostServices) {
         this.stage = stage;
         this.hostServices = hostServices;
-        recentFiles = new ArrayList<>();
-        stage.setOnHidden(e -> saveState());
-        // Fermeture demandée par le système (Alt+F4, barre des tâches...) : proposer d'enregistrer
+        recentFiles = new ArrayList<>(settings.getRecentFiles(MAX_RECENT_FILES));
+        loadRecentFileMenu();
+        // Fermeture demandée par le système (bouton de la fenêtre, Alt+F4...) : proposer d'enregistrer
         stage.setOnCloseRequest(e -> {
             if (!askToSaveFestival())
                 e.consume();
         });
-        for (WorkspaceController.WorkspaceRegister workspace : WORKSPACES)
-            addWorkspace(workspace);
-        loadState();
+        for (WorkspaceController.WorkspaceRegister register : WORKSPACES)
+            addWorkspace(register);
+
+        darkThemeItem.setSelected(settings.isDarkTheme());
+        applyTheme();
+        helpItem.setSelected(settings.isHelpVisible());
+        applyHelpVisibility();
+        applyZoom(settings.getZoom());
+
+        if (recentFiles.isEmpty())
+            newFestival();
+        else
+            openFestival(recentFiles.get(0));
+
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream(ICON_PATH))));
-        stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
-        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
+        stage.setMinWidth(900);
+        stage.setMinHeight(600);
         stage.show();
         LOGGER.info("Loaded main controller");
-    }
-
-    /**
-     * Charge l'état de la session précédente depuis le fichier d'état.
-     */
-    private void loadState() {
-        LOGGER.info("Loading previous state");
-        File previousStateFile = new File(STATE_FILEPATH);
-        if (previousStateFile.exists()) {
-            try (
-                    FileInputStream fis = new FileInputStream(previousStateFile);
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                ArrayList<File> previousRecentFiles = (ArrayList<File>) ois.readObject();
-                if (previousRecentFiles != null && !previousRecentFiles.isEmpty())
-                    recentFiles.addAll(
-                            previousRecentFiles
-                                    .stream()
-                                    .filter(file -> file != null && file.exists())
-                                    .collect(Collectors.toList())
-                    );
-                if (!recentFiles.isEmpty())
-                    loadFestival(Festival.Festival(recentFiles.get(0)));
-                else newFestival();
-            } catch (Exception e) {
-                newFestival();
-            }
-        } else newFestival();
-        LOGGER.info("Loaded previous state");
-    }
-
-    /**
-     * Sauvegarde l'état actuel de l'application dans le fichier d'état.
-     */
-    private void saveState() {
-        LOGGER.info("Saving current state");
-        tryCatch(
-                "Sauvegarde de l'état actuel de l'application impossible",
-                () -> {
-                    try (
-                            FileOutputStream fos = new FileOutputStream(STATE_FILEPATH);
-                            ObjectOutputStream oos = new ObjectOutputStream(fos)
-                    ) {
-                        oos.writeObject(recentFiles);
-                    }
-                });
-        LOGGER.info("Saved current state");
-    }
-
-    /**
-     * Gère le glissement de la fenêtre lorsqu'on la déplace avec la souris.
-     *
-     * @param pressEvent Événement de pression de la souris
-     */
-    @FXML
-    private void dragWindow(MouseEvent pressEvent) {
-        Node node = (Node) pressEvent.getSource();
-        node.setOnMouseDragged(dragEvent -> {
-            stage.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
-            stage.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
-        });
-        LOGGER.info("Dragged window");
     }
 
     /**
@@ -191,16 +153,7 @@ public class MainController {
     }
 
     /**
-     * Minimise la fenêtre.
-     */
-    @FXML
-    private void minimizeWindow() {
-        stage.setIconified(true);
-        LOGGER.info("Minimized window");
-    }
-
-    /**
-     * Ajoute un fichier récent à la liste et met à jour le menu des fichiers récents.
+     * Ajoute un fichier en tête des fichiers récents et met à jour le menu et les préférences.
      *
      * @param file Le fichier à ajouter
      */
@@ -209,23 +162,21 @@ public class MainController {
         recentFiles.add(0, file);
         if (recentFiles.size() > MAX_RECENT_FILES)
             recentFiles.remove(MAX_RECENT_FILES);
-        recentFileMenu.getItems().clear();
+        settings.setRecentFiles(recentFiles, MAX_RECENT_FILES);
         loadRecentFileMenu();
-        LOGGER.info("Added recent file");
     }
 
     /**
-     * Charge le menu des fichiers récents.
+     * Affiche les fichiers récents dans le menu.
      */
     private void loadRecentFileMenu() {
-        LOGGER.info("Loading recent files");
+        recentFileMenu.getItems().clear();
         for (File file : recentFiles) {
             MenuItem menu = new MenuItem(file.getName());
             menu.setOnAction(e -> openFestival(file));
             recentFileMenu.getItems().add(menu);
-            LOGGER.info("Loaded recent files \"" + file.getName() + "\"");
         }
-        LOGGER.info("Loaded recent files");
+        recentFileMenu.setDisable(recentFiles.isEmpty());
     }
 
     /**
@@ -236,17 +187,17 @@ public class MainController {
      */
     private boolean askToSaveFestival() {
         if (!festival.isModified()) {
-            LOGGER.info("Festival\"" + festival.getName() + "\" didn't changed");
+            LOGGER.fine("Festival \"" + festival.getName() + "\" didn't change");
             return true;
         }
-        LOGGER.info("Asking to save festival");
         Alert alert = new Alert(
                 Alert.AlertType.CONFIRMATION,
-                String.format("Le festival \"%s\" a été modifié, voulez-vous le sauvegarder ?", this.festival.getName()),
+                String.format("Le festival \"%s\" a été modifié, voulez-vous l'enregistrer ?", this.festival.getName()),
                 ButtonType.YES,
                 ButtonType.NO,
                 ButtonType.CANCEL
         );
+        Dialogs.style(alert.getDialogPane());
         ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
         if (result == ButtonType.YES) {
             saveFestival();
@@ -254,7 +205,6 @@ public class MainController {
                 LOGGER.info("Festival \"" + festival.getName() + "\" was not saved");
                 return false;
             }
-            LOGGER.info("Saved festival \"" + festival.getName() + "\"");
         } else if (result != ButtonType.NO) {
             LOGGER.info("User cancelled saving");
             return false;
@@ -263,14 +213,13 @@ public class MainController {
     }
 
     /**
-     * Charge un festival à partir d'un fichier.
+     * Affiche un festival, après avoir proposé d'enregistrer le festival actuel.
      *
      * @param festival Le festival à charger
      */
     private void loadFestival(Festival festival) {
         if (this.festival != null && !askToSaveFestival())
             return;
-        LOGGER.info("Loading festival \"" + festival.getName() + "\"");
         File file = festival.getFile();
         if (file != null)
             addRecentFile(file);
@@ -279,6 +228,7 @@ public class MainController {
                 () -> {
                     this.festival = festival;
                     festival.markSaved();
+                    currentWorkspace = null;
                     loadWorkspace(DEFAULT_WORKSPACE);
                     LOGGER.info("Loaded festival \"" + festival.getName() + "\"");
                 });
@@ -289,19 +239,16 @@ public class MainController {
      */
     @FXML
     private void newFestival() {
-        LOGGER.info("Creating new festival");
         tryCatch(
                 "Création du nouveau festival impossible",
-                () -> {
-                    loadFestival(new Festival(
-                            "Nouveau festival",
-                            LocalDate.now().atStartOfDay(),
-                            0,
-                            1,
-                            "Quelque part sur Terre"
-                    ));
-                    LOGGER.info("Created new festival");
-                });
+                () -> loadFestival(new Festival(
+                        "Nouveau festival",
+                        LocalDate.now().atStartOfDay(),
+                        0,
+                        1,
+                        "Quelque part sur Terre"
+                ))
+        );
     }
 
     /**
@@ -309,97 +256,78 @@ public class MainController {
      */
     @FXML
     private void openFestival() {
-        LOGGER.info("Opening festival from dialog");
-        tryCatch(
-                "Ouverture du fichier du festival impossible",
-                () -> {
-                    File file = askFile("Open").showOpenDialog(stage);
-                    if (file == null) {
-                        LOGGER.info("User cancelled opening");
-                        return;
-                    }
-                    loadFestival(Festival.Festival(file));
-                    LOGGER.info("Opened another festival");
-                });
+        File file = askFile("Ouvrir un festival").showOpenDialog(stage);
+        if (file != null)
+            openFestival(file);
     }
 
     /**
-     * Ouvre un festival à partir du fichier spécifié.
+     * Ouvre un festival à partir du fichier spécifié. En cas d'échec au démarrage, un nouveau festival est créé.
      *
      * @param file Le fichier du festival à ouvrir
      */
     private void openFestival(File file) {
-        LOGGER.info("Opening a festival file");
         tryCatch(
                 "Ouverture du fichier du festival impossible",
-                () -> {
-                    loadFestival(Festival.Festival(file));
-                    LOGGER.info("Opened a festival file");
-                }
+                () -> loadFestival(Festival.load(file))
         );
+        if (festival == null)
+            newFestival();
     }
 
     /**
-     * Sauvegarde le festival actuel.
+     * Enregistre le festival actuel, dans son fichier s'il en a un, sinon dans un fichier à choisir.
      */
     @FXML
     private void saveFestival() {
-        LOGGER.info("Saving current festival");
-        if (festival.getFile() == null) {
-            LOGGER.info("Current festival without file, asking for one to save");
+        if (festival.getFile() == null)
             saveFestivalAs();
-        } else tryCatch(
-                "Sauvegarde du festival impossible",
-                "Festival sauvegardé",
-                () -> {
-                    festival.save();
-                    LOGGER.info("Saving current festival");
-                }
+        else tryCatch(
+                "Enregistrement du festival impossible",
+                "Festival enregistré",
+                festival::save
         );
     }
 
     /**
-     * Sauvegarde le festival actuel sous un nouveau nom.
+     * Enregistre le festival actuel dans un fichier à choisir.
      */
     @FXML
     private void saveFestivalAs() {
-        LOGGER.info("Saving festival as");
         File file = askFile("Enregistrer sous", festival.getName()).showSaveDialog(stage);
-        if (file == null) {
-            LOGGER.info("User cancelled save");
-        } else tryCatch(
-                "Sauvegarde du festival impossible",
-                "Festival sauvegardé",
+        if (file != null) tryCatch(
+                "Enregistrement du festival impossible",
+                "Festival enregistré",
                 () -> {
                     festival.setFile(file);
-                    addRecentFile(file);
                     festival.save();
-                    LOGGER.info("Saved festival as \"" + festival.getFile().getName() + "\"");
+                    addRecentFile(file);
                 });
     }
 
     /**
-     * Ajoute un espace de travail au menu et configure son bouton.
+     * Ajoute un espace de travail au menu de gauche, avec une infobulle décrivant l'espace.
      *
      * @param register L'enregistrement de l'espace de travail à ajouter
      */
-    public void addWorkspace(WorkspaceController.WorkspaceRegister register) {
-        LOGGER.info("Adding workspace \"" + register.name + "\"");
+    private void addWorkspace(WorkspaceController.WorkspaceRegister register) {
         ImageView icon = new ImageView();
-        icon.setImage(new Image(getClass().getResourceAsStream(register.iconPath)));
+        icon.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(register.iconPath))));
         icon.setFitHeight(32);
         icon.setFitWidth(32);
         icon.setPreserveRatio(true);
         icon.setPickOnBounds(true);
 
-        Label pageLabel = new Label();
-        pageLabel.setText(register.name);
-        pageLabel.setStyle("-fx-font-size: 8pt;");
+        Label pageLabel = new Label(register.name);
+        pageLabel.setStyle("-fx-font-size: 0.75em;");
 
-        VBox pageButtonBox = new VBox();
+        VBox pageButtonBox = new VBox(icon, pageLabel);
         pageButtonBox.setAlignment(Pos.CENTER);
-        pageButtonBox.getChildren().addAll(icon, pageLabel);
         pageButtonBox.setPadding(new Insets(8));
+        Tooltip tooltip = new Tooltip(register.name + "\n" + register.help);
+        tooltip.setWrapText(true);
+        tooltip.setMaxWidth(320);
+        Tooltip.install(pageButtonBox, tooltip);
 
         register.openButton = pageButtonBox;
         pageMenu.getChildren().add(pageButtonBox);
@@ -408,34 +336,97 @@ public class MainController {
                 return;
             tryCatch(
                     "Accès à l'espace de travail impossible",
-                    () -> {
-                        loadWorkspace(register);
-                        LOGGER.info("Added workspace \"" + register.name + "\"");
-                    }
+                    () -> loadWorkspace(register)
             );
         });
     }
 
     /**
-     * Charge l'espace de travail spécifié.
+     * Charge l'espace de travail spécifié et affiche son aide.
      *
      * @param register L'enregistrement de l'espace de travail à charger
-     * @throws IOException Si une erreur d'entrée/sortie se produit
+     * @throws IOException Si la vue de l'espace de travail ne peut pas être chargée
      */
-    public void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
-        LOGGER.info("Loading workspace \"" + register.name + "\"");
+    private void loadWorkspace(WorkspaceController.WorkspaceRegister register) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(register.viewPath));
         workspace.getChildren().setAll((Node) fxmlLoader.load());
-        currentWorkspaceController = fxmlLoader.getController();
-        currentWorkspaceController.initialize(festival);
-        stage.setTitle(String.format("%s - %s", APP_NAME, register.name));
+        WorkspaceController controller = fxmlLoader.getController();
+        controller.initialize(festival);
+        stage.setTitle(String.format("%s - %s - %s", APP_NAME, festival.getName(), register.name));
+        helpText.setText(register.help);
 
-        if (currentWorkspace != null)
-            currentWorkspace.openButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
+        for (WorkspaceController.WorkspaceRegister other : WORKSPACES)
+            other.openButton.getStyleClass().remove(CURRENT_WORKSPACE_STYLECLASS);
         currentWorkspace = register;
         register.openButton.getStyleClass().add(CURRENT_WORKSPACE_STYLECLASS);
+        LOGGER.info("Loaded workspace \"" + register.name + "\"");
+    }
 
-        LOGGER.info("Added workspace \"" + register.name + "\"");
+    /**
+     * Bascule entre le thème clair et le thème sombre.
+     */
+    @FXML
+    private void toggleDarkTheme() {
+        settings.setDarkTheme(darkThemeItem.isSelected());
+        applyTheme();
+    }
+
+    /**
+     * Applique le thème choisi à toutes les fenêtres de l'application.
+     */
+    private void applyTheme() {
+        Application.setUserAgentStylesheet(darkThemeItem.isSelected()
+                ? new CupertinoDark().getUserAgentStylesheet()
+                : new CupertinoLight().getUserAgentStylesheet());
+    }
+
+    /**
+     * Affiche ou masque l'aide contextuelle.
+     */
+    @FXML
+    private void toggleHelp() {
+        settings.setHelpVisible(helpItem.isSelected());
+        applyHelpVisibility();
+    }
+
+    private void applyHelpVisibility() {
+        helpBar.setVisible(helpItem.isSelected());
+        helpBar.setManaged(helpItem.isSelected());
+    }
+
+    /**
+     * Agrandit l'interface.
+     */
+    @FXML
+    private void zoomIn() {
+        applyZoom(settings.setZoom(settings.getZoom() + Settings.ZOOM_STEP));
+    }
+
+    /**
+     * Réduit l'interface.
+     */
+    @FXML
+    private void zoomOut() {
+        applyZoom(settings.setZoom(settings.getZoom() - Settings.ZOOM_STEP));
+    }
+
+    /**
+     * Rétablit la taille normale de l'interface.
+     */
+    @FXML
+    private void resetZoom() {
+        applyZoom(settings.setZoom(100));
+    }
+
+    /**
+     * Applique un zoom à la fenêtre principale et aux boîtes de dialogue.
+     *
+     * @param zoom le zoom en pourcentage
+     */
+    private void applyZoom(int zoom) {
+        String style = String.format("-fx-font-size: %.1fpx;", BASE_FONT_SIZE * zoom / 100);
+        pageMenu.getScene().getRoot().setStyle(style);
+        Dialogs.setRootStyle(style);
     }
 
     /**
@@ -444,7 +435,6 @@ public class MainController {
      */
     @FXML
     private void onAboutClicked() {
-        LOGGER.info("Opening manual");
         tryCatch(
                 "Ouverture du manuel impossible",
                 () -> {

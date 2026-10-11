@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
@@ -17,10 +18,10 @@ import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.musigma.controllers.MainController.ICON_PATH;
@@ -32,7 +33,7 @@ import static com.musigma.controllers.MainController.ICON_PATH;
 public class Dialogs {
 
     // Logger pour la classe Dialogs
-    private static final Logger LOGGER = Log.getLogger(Log.class);
+    private static final Logger LOGGER = Log.getLogger(Dialogs.class);
 
     // Nom de fichier par défaut et extension pour le dialog
     private static final String FILENAME = "Musigma";
@@ -42,6 +43,32 @@ public class Dialogs {
      * Affichage des messages d'erreur : une boîte de dialogue, sauf si un test le remplace.
      */
     private static Consumer<String> errorDisplay = Dialogs::showErrorAlert;
+
+    /**
+     * Style appliqué à la racine des boîtes de dialogue, pour suivre le zoom de la fenêtre principale.
+     */
+    private static String rootStyle = "";
+
+    /**
+     * Définit le style appliqué aux boîtes de dialogue ouvertes ensuite (ex : taille de police du zoom).
+     *
+     * @param style le style CSS de la racine
+     */
+    public static void setRootStyle(String style) {
+        rootStyle = style == null ? "" : style;
+    }
+
+    /**
+     * Applique l'icône de l'application et le style courant à une boîte de dialogue.
+     *
+     * @param pane le contenu de la boîte de dialogue
+     */
+    static void style(DialogPane pane) {
+        pane.setStyle(rootStyle);
+        ((Stage) pane.getScene().getWindow())
+                .getIcons()
+                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
+    }
 
     /**
      * Remplace l'affichage des messages d'erreur, par exemple pour les relever dans un test
@@ -63,8 +90,8 @@ public class Dialogs {
         try {
             function.run();
         } catch (Exception e) {
+            LOGGER.log(Level.WARNING, errorMsg, e);
             showError(errorMsg + " :\n" + e.getMessage());
-            Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
         }
     }
 
@@ -84,13 +111,9 @@ public class Dialogs {
      * @param errorMsg le message d'erreur à afficher
      */
     private static void showErrorAlert(String errorMsg) {
-        Alert alert = new Alert(
-                Alert.AlertType.ERROR,
-                String.format("L'application a rencontré une erreur :\n%s", errorMsg)
-        );
-        ((Stage) alert.getDialogPane().getScene().getWindow())
-                .getIcons()
-                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
+        Alert alert = new Alert(Alert.AlertType.ERROR, errorMsg);
+        alert.setHeaderText("L'opération n'a pas pu aboutir");
+        style(alert.getDialogPane());
         alert.showAndWait();
     }
 
@@ -105,10 +128,12 @@ public class Dialogs {
         try {
             function.run();
             Alert alert = new Alert(Alert.AlertType.INFORMATION, succesMsg);
+            alert.setHeaderText(null);
+            style(alert.getDialogPane());
             alert.showAndWait();
         } catch (Exception e) {
-            showError(String.format("%s : %s", errorMsg, e.getMessage()));
-            Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
+            LOGGER.log(Level.WARNING, errorMsg, e);
+            showError(errorMsg + " :\n" + e.getMessage());
         }
     }
 
@@ -124,9 +149,7 @@ public class Dialogs {
         TextInputDialog dialog = new TextInputDialog(initial);
         dialog.setTitle(title);
         dialog.setHeaderText(header);
-        ((Stage) dialog.getDialogPane().getScene().getWindow())
-                .getIcons()
-                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
+        style(dialog.getDialogPane());
         return dialog.showAndWait();
     }
 
@@ -141,9 +164,7 @@ public class Dialogs {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        ((Stage) alert.getDialogPane().getScene().getWindow())
-                .getIcons()
-                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
+        style(alert.getDialogPane());
         return alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
     }
 
@@ -181,7 +202,7 @@ public class Dialogs {
      * @param customValidFields tableau de champs personnalisés à valider
      * @param nextCallback      fonction à exécuter si la validation réussit
      */
-    public static void askValidForm(String title, String errorMsg, CustomValidField[] customValidFields, Runner nextCallback) {
+    public static void askValidForm(String title, String errorMsg, CustomValidField<?>[] customValidFields, Runner nextCallback) {
         Stage subWindow = new Stage();
         subWindow.setTitle(title);
         subWindow.getIcons().add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
@@ -191,19 +212,23 @@ public class Dialogs {
         grid.setVgap(8);
         grid.setPadding(new Insets(8));
 
-        Scene scene = new Scene(new Pane(grid));
+        Pane root = new Pane(grid);
+        root.setStyle(rootStyle);
+        Scene scene = new Scene(root);
         subWindow.setScene(scene);
 
-        for (CustomValidField customValidField : customValidFields) {
+        for (CustomValidField<?> customValidField : customValidFields) {
             int rowIdx = grid.getRowCount();
             grid.add(customValidField.label, 0, rowIdx);
             grid.add(customValidField.node, 1, rowIdx);
             customValidField.node.setMaxWidth(1.7976931348623157E308);
         }
 
-        Button cancelButton = new Button("Cancel"),
-                validateButton = new Button("Validate");
+        Button cancelButton = new Button("Annuler"),
+                validateButton = new Button("Valider");
         validateButton.getStyleClass().add("accent");
+        validateButton.setDefaultButton(true);
+        cancelButton.setCancelButton(true);
 
         HBox buttonsRow = new HBox(validateButton, cancelButton);
         buttonsRow.setAlignment(Pos.CENTER_RIGHT);
@@ -214,7 +239,7 @@ public class Dialogs {
         cancelButton.setOnAction(e -> subWindow.close());
         validateButton.setOnAction(e -> {
             boolean valid = true;
-            for (CustomValidField customValidField : customValidFields) {
+            for (CustomValidField<?> customValidField : customValidFields) {
                 if (!customValidField.isValid()) {
                     customValidField.node.requestFocus();
                     valid = false;

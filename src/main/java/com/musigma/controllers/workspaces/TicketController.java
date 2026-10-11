@@ -10,305 +10,116 @@ import com.musigma.models.Avantage;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
 import com.musigma.models.TypeTicket;
+import com.musigma.utils.exceptionMethods.Runner;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.Callback;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import static com.musigma.controllers.Dialogs.*;
 
 /**
- * Contrôleur pour l'espace de travail Ticket.
+ * Contrôleur pour l'espace de travail Tickets (UC3.1) : types de tickets et leurs avantages.
  */
 public class TicketController extends WorkspaceController {
     /**
      * Enregistrement de l'espace de travail.
      */
-    public static WorkspaceRegister REGISTER = new WorkspaceRegister(
-            "Ticket",
+    public static final WorkspaceRegister REGISTER = new WorkspaceRegister(
+            "Tickets",
             "/com/musigma/images/icons/ticket.png",
-            "/com/musigma/views/ticket-view.fxml"
+            "/com/musigma/views/ticket-view.fxml",
+            "Créez les types de tickets avec leur prix et la surface occupée par personne, puis ajoutez-leur des avantages puisés dans les stocks."
     );
 
+    /**
+     * Format des montants, ex : « 100 000,00 € ».
+     */
+    private static final NumberFormat CURRENCY = NumberFormat.getCurrencyInstance(Locale.FRANCE);
+
     @FXML
-    TabPane tabPane;
+    TableView<TypeTicket> ticketsTable;
+
+    @FXML
+    TableColumn<TypeTicket, String> typeColumn, quantityColumn, priceColumn, surfaceColumn, revenueColumn;
+
+    @FXML
+    TableView<Avantage> avantagesTable;
+
+    @FXML
+    TableColumn<Avantage, String> stockColumn, consumptionColumn;
+
+    @FXML
+    TableColumn<Avantage, Integer> quantityByTicketColumn;
+
+    @FXML
+    TableColumn<Avantage, Void> avantageActionColumn;
+
+    @FXML
+    Button editButton, removeButton, addAvantageButton;
+
+    @FXML
+    Label avantagesTitle, totalRevenue;
 
     /**
-     * Initialisation de l'espace de travail, restauration des onglets et ajout des écouteurs , definition des actions des boutons
-     * definition de la comboBox et verification des tickets
+     * Initialise l'espace de travail : liste des types de tickets et avantages du type sélectionné.
      *
-     * @param festival Festival
-     * @see #restoreTab()
+     * @param festival le festival
      */
-    @FXML
+    @Override
     public void initialize(Festival festival) {
         super.initialize(festival);
-        restoreTab();
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
-            if (newTab != null) {
-                int index = tabPane.getTabs().indexOf(newTab);
-                TypeTicket ticket = festival.getTicketTypes().get(index);
-                boolean isFirstTab = (index == 0 && tabPane.getTabs().size() == 1);
-                renameTab(newTab, ticket, isFirstTab);
+        typeColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getType()));
+        quantityColumn.setCellValueFactory(f -> new SimpleStringProperty(Integer.toString(f.getValue().getQuantity())));
+        priceColumn.setCellValueFactory(f -> new SimpleStringProperty(formatNumber(f.getValue().getPrice())));
+        surfaceColumn.setCellValueFactory(f -> new SimpleStringProperty(formatNumber(f.getValue().getSurface())));
+        revenueColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().getRevenue())));
+        ticketsTable.setRowFactory(table -> {
+            TableRow<TypeTicket> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && !row.isEmpty())
+                    updTicket();
+            });
+            return row;
+        });
+
+        stockColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getStock().getName()));
+        quantityByTicketColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantityByTicket()));
+        quantityByTicketColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        quantityByTicketColumn.setOnEditCommit(event -> commit(
+                "Impossible de modifier la quantité de l'avantage",
+                () -> event.getRowValue().setQuantityByTicket(event.getNewValue())
+        ));
+        consumptionColumn.setCellValueFactory(f -> new SimpleStringProperty(Long.toString(f.getValue().getTotalQuantity())));
+        avantageActionColumn.setCellFactory(column -> new TableCell<>() {
+            private final Button deleteButton = new Button("Retirer");
+
+            {
+                deleteButton.setOnAction(e -> {
+                    Avantage avantage = getTableView().getItems().get(getIndex());
+                    commit(
+                            "Impossible de retirer l'avantage",
+                            () -> avantage.getTicketType().removeAvantage(avantage)
+                    );
+                });
             }
-        });
-    }
 
-    /**
-     * Ajoute un ticket. Si les champs de saisie sont valides, un ticket est créé et ajouté à la liste.
-     * Sauvegarde le ticket dans la liste des tickets du festival. Crée un onglet pour le ticket.
-     *
-     * @see #createTab(TypeTicket)
-     * @see #initialize(Festival)
-     */
-    @FXML
-    private void addTicket() {
-        CustomValidField<RequiredTextField> nameTicket = new CustomValidField<>("Nom", new RequiredTextField());
-        CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, true));
-        CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
-        CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
-        surfaceTicket.node.setValue(TypeTicket.DEFAULT_SURFACE);
-
-        askValidForm(
-                "Ajouter un type de ticket",
-                "Ajout d'un type de ticket impossible",
-                new CustomValidField[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
-                () -> {
-                    TypeTicket ticket = new TypeTicket(nameTicket.node.getText(), quantiteTicket.node.getValue(), priceTicket.node.getValue());
-                    ticket.setSurface(surfaceTicket.node.getValue());
-                    festival.addTicketType(ticket);
-                    createTab(ticket);
-                }
-        );
-    }
-
-    /**
-     * Met à jour un ticket. Si les champs de saisie sont valides, les détails du ticket sont mis à jour.
-     * Restaure les onglets après la mise à jour.
-     */
-    @FXML
-    private void updTicket() {
-        if (festival.getTicketTypes().isEmpty())
-            showError("Aucun ticket disponible");
-        else {
-            TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
-
-            CustomValidField<RequiredTextField> nameTicket = new CustomValidField<>("Nom", new RequiredTextField());
-            nameTicket.node.setText(ticket.getType());
-            CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, true));
-            quantiteTicket.node.setValue(ticket.getQuantity());
-            CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
-            priceTicket.node.setValue(ticket.getPrice());
-            CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
-            surfaceTicket.node.setValue(ticket.getSurface());
-
-            askValidForm(
-                    "Modifier le ticket " + ticket.getType(),
-                    "Modification d'un type de ticket impossible",
-                    new CustomValidField[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
-                    () -> {
-                        festival.updateTicketType(
-                                ticket,
-                                nameTicket.node.getText(),
-                                quantiteTicket.node.getValue(),
-                                priceTicket.node.getValue(),
-                                surfaceTicket.node.getValue()
-                        );
-                        tabPane.getTabs().clear();
-                        restoreTab();
-                    }
-            );
-        }
-    }
-
-    /**
-     * Supprime un ticket sélectionné. Affiche une erreur si aucun ticket n'est disponible.
-     * Restaure les onglets après la suppression.
-     */
-    @FXML
-    private void removeTicket() {
-        if (festival.getTicketTypes().isEmpty())
-            showError("Aucun ticket disponible");
-        else {
-            TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
-            tryCatch(
-                    "Impossible de supprimer le type de ticket",
-                    () -> {
-                        festival.removeTicketType(ticket);
-                        tabPane.getTabs().clear();
-                        restoreTab();
-                    }
-            );
-        }
-    }
-
-    /**
-     * Ajoute un avantage à un ticket. Si les champs de saisie sont valides, un avantage est créé et ajouté à la liste.
-     * Sauvegarde l'avantage dans la liste des avantages du ticket. Ajoute l'avantage au TableView.
-     *
-     * @see #initialize(Festival)
-     */
-    @FXML
-    private void addAvantage() {
-        if (festival.getTicketTypes().isEmpty())
-            showError("Aucun ticket disponible");
-        else {
-            TypeTicket ticket = festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex());
-
-            CustomValidField<ComboBox<Stock>> stockAvantage = new CustomValidField<>("Stock", new ComboBox<>()) {
-                public boolean isValid() {
-                    return node.getSelectionModel().getSelectedItem() != null;
-                }
-            };
-            stockAvantage.node.getItems().addAll(festival.getStocks());
-            CustomValidField<IntTextField> quantityByTicket = new CustomValidField<>("Quantité par ticket", new IntTextField(true, false));
-
-            askValidForm(
-                    "Ajouter un avantage",
-                    "Ajout d'un avantage impossible",
-                    new CustomValidField[]{stockAvantage, quantityByTicket},
-                    () -> {
-                        Avantage avantage = new Avantage(
-                                ticket,
-                                stockAvantage.node.getSelectionModel().getSelectedItem(),
-                                quantityByTicket.node.getValue()
-                        );
-                        avantage.connect();
-                        TableView<Avantage> tableView = (TableView<Avantage>) tabPane.getSelectionModel().getSelectedItem().getContent();
-                        tableView.getItems().add(avantage);
-                        ticket.addAvantage(avantage);
-                    }
-            );
-        }
-    }
-
-    /**
-     * Crée un onglet pour un ticket. Ajoute un TableView pour les avantages du ticket.
-     * Ajoute une colonne pour la liste des avantages et une colonne pour la quantité.
-     * Ajoute un bouton de suppression pour chaque ligne de la table.
-     *
-     * @param ticket TypeTicket Ticket
-     * @see #renameTab(Tab, TypeTicket, boolean)
-     * @see #addDeleteButtonToTable(TableView, TableColumn)
-     * @see #initialize(Festival)
-     */
-    private void createTab(TypeTicket ticket) {
-        Tab newTab = new Tab(ticket.getType());
-        renameTab(newTab, ticket, tabPane.getTabs().isEmpty());
-        TableView<Avantage> avantageTableView = new TableView<>();
-        TableColumn<Avantage, String> avantageListColumn = new TableColumn<>("Avantage");
-        TableColumn<Avantage, Integer> avantageQuantityColumn = new TableColumn<>("Quantité");
-        avantageTableView.getColumns().add(avantageListColumn);
-        avantageTableView.getColumns().add(avantageQuantityColumn);
-        avantageTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        avantageListColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getStock().getName()));
-        avantageQuantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantityByTicket()));
-        avantageTableView.setEditable(true);
-        TableColumn<Avantage, Void> actionColumn = new TableColumn<>("Action");
-        addDeleteButtonToTable(avantageTableView, actionColumn);
-
-        newTab.setContent(avantageTableView);
-        avantageQuantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); // Permet l'édition des quantités
-        avantageQuantityColumn.setOnEditCommit(event -> {
-            Avantage avantage = event.getRowValue();
-            tryCatch(
-                    "Impossible de modifier la quantité du stock",
-                    () -> avantage.setQuantityByTicket(event.getNewValue()));
-        });
-
-        tabPane.getTabs().add(newTab);
-        tabPane.getSelectionModel().select(newTab);
-    }
-
-    /**
-     * Ajoute un bouton de suppression à la table des avantages.
-     * Crée un bouton "Supprimer" pour chaque ligne de la table.
-     *
-     * @param tableView    TableView<Avantage> Table des avantages
-     * @param actionColumn TableColumn<Avantage, Void> Colonne d'action
-     * @see #initialize(Festival)
-     */
-    private void addDeleteButtonToTable(TableView<Avantage> tableView, TableColumn<Avantage, Void> actionColumn) {
-        Callback<TableColumn<Avantage, Void>, TableCell<Avantage, Void>> cellFactory = new Callback<>() {
             @Override
-            public TableCell<Avantage, Void> call(final TableColumn<Avantage, Void> param) {
-                return new TableCell<>() {
-                    @Override
-                    public void updateItem(Void item, boolean isEmpty) {
-                        super.updateItem(item, isEmpty);
-                        Button btn = new Button("Supprimer");
-                        if (isEmpty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(btn);
-                            btn.setOnAction((e) -> {
-                                Avantage avantage = getTableView().getItems().get(getIndex());
-                                tryCatch(
-                                        "Impossible de supprimer l'avantage",
-                                        () -> {
-                                            festival.getTicketTypes().get(tabPane.getSelectionModel().getSelectedIndex()).removeAvantage(avantage);
-                                            getTableView().getItems().remove(avantage);
-                                        });
-                            });
-                        }
-                    }
-                };
-            }
-        };
-        actionColumn.setCellFactory(cellFactory);
-        tableView.getColumns().add(actionColumn);
-    }
-
-    /**
-     * Restaure les onglets pour les tickets. Ajoute les avantages des tickets aux TableView.
-     *
-     * @see #createTab(TypeTicket)
-     */
-    private void restoreTab() {
-        for (int i = 0; i < festival.getTicketTypes().size(); i++) {
-            TypeTicket ticketType = festival.getTicketTypes().get(i);
-            createTab(ticketType);
-            Tab tab = tabPane.getTabs().get(i);
-            TableView<Avantage> tableView = (TableView<Avantage>) tab.getContent();
-            for (Avantage avantage : ticketType.getAvantages()) {
-                tableView.getItems().add(avantage);
-            }
-        }
-    }
-
-    /**
-     * Renomme un onglet. Si l'onglet est sélectionné, le nom de l'onglet est affiché avec le nombre de tickets et le prix.
-     *
-     * @param tab        Onglet Tab
-     * @param ticket     TypeTicket Ticket
-     * @param isFirstTab boolean Vrai si c'est le premier onglet
-     */
-    private void renameTab(Tab tab, TypeTicket ticket, boolean isFirstTab) {
-        if (isFirstTab) {
-            tab.setText(tabTitle(ticket));
-        } else {
-            tab.setText(ticket.getType());
-        }
-
-        tab.setOnSelectionChanged(e -> {
-            if (tab.isSelected()) {
-                tab.setText(tabTitle(ticket));
-            } else if (!isFirstTab) {
-                tab.setText(ticket.getType());
+            public void updateItem(Void item, boolean isEmpty) {
+                super.updateItem(item, isEmpty);
+                setGraphic(isEmpty ? null : deleteButton);
             }
         });
-    }
+        avantagesTable.setEditable(true);
 
-    /**
-     * Retourne le titre détaillé de l'onglet d'un type de ticket.
-     *
-     * @param ticket le type de ticket
-     * @return le nom, la quantité, le prix et la surface du ticket
-     */
-    private static String tabTitle(TypeTicket ticket) {
-        return String.format("%s (%d tickets, %s €, %s m²/pers.)",
-                ticket.getType(), ticket.getQuantity(), formatNumber(ticket.getPrice()), formatNumber(ticket.getSurface()));
+        ticketsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldTicket, ticket) -> refreshAvantages());
+        refresh();
+        ticketsTable.getSelectionModel().selectFirst();
     }
 
     /**
@@ -318,6 +129,165 @@ public class TicketController extends WorkspaceController {
      * @return le nombre formaté
      */
     private static String formatNumber(float value) {
-        return new java.math.BigDecimal(Float.toString(value)).stripTrailingZeros().toPlainString();
+        return new BigDecimal(Float.toString(value)).stripTrailingZeros().toPlainString();
+    }
+
+    /**
+     * Retourne le type de ticket sélectionné.
+     *
+     * @return le type de ticket sélectionné, ou null
+     */
+    private TypeTicket selected() {
+        return ticketsTable.getSelectionModel().getSelectedItem();
+    }
+
+    /**
+     * Réaffiche les types de tickets en gardant la sélection, puis leurs avantages.
+     */
+    private void refresh() {
+        TypeTicket selected = selected();
+        ticketsTable.getItems().setAll(festival.getTicketTypes());
+        if (selected != null && festival.getTicketTypes().contains(selected))
+            ticketsTable.getSelectionModel().select(selected);
+        ticketsTable.refresh();
+        totalRevenue.setText(String.format("Recette des tickets : %s", CURRENCY.format(festival.getBudget().totalRevenue())));
+        refreshAvantages();
+    }
+
+    /**
+     * Affiche les avantages du type de ticket sélectionné et active les actions qui le concernent.
+     */
+    private void refreshAvantages() {
+        TypeTicket ticket = selected();
+        editButton.setDisable(ticket == null);
+        removeButton.setDisable(ticket == null);
+        addAvantageButton.setDisable(ticket == null);
+        avantagesTitle.setText(ticket == null ? "Avantages" : "Avantages du ticket « " + ticket.getType() + " »");
+        avantagesTable.getItems().setAll(ticket == null ? java.util.List.of() : ticket.getAvantages());
+        avantagesTable.refresh();
+    }
+
+    /**
+     * Applique une modification au modèle puis réaffiche l'écran : une valeur refusée retrouve sa valeur précédente.
+     *
+     * @param errorMsg     le message d'erreur si le modèle refuse la modification
+     * @param modification la modification du modèle
+     */
+    private void commit(String errorMsg, Runner modification) {
+        tryCatch(errorMsg, modification);
+        refresh();
+    }
+
+    /**
+     * Ajoute un type de ticket à partir d'un formulaire.
+     */
+    @FXML
+    private void addTicket() {
+        CustomValidField<RequiredTextField> nameTicket = new CustomValidField<>("Nom", new RequiredTextField());
+        CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, false));
+        CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
+        CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
+        surfaceTicket.node.setValue(TypeTicket.DEFAULT_SURFACE);
+
+        askValidForm(
+                "Ajouter un type de ticket",
+                "Ajout d'un type de ticket impossible",
+                new CustomValidField<?>[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
+                () -> {
+                    TypeTicket ticket = new TypeTicket(nameTicket.node.getText(), quantiteTicket.node.getValue(), priceTicket.node.getValue());
+                    ticket.setSurface(surfaceTicket.node.getValue());
+                    festival.addTicketType(ticket);
+                    refresh();
+                    ticketsTable.getSelectionModel().select(ticket);
+                }
+        );
+    }
+
+    /**
+     * Modifie le type de ticket sélectionné à partir d'un formulaire. La modification est atomique.
+     */
+    @FXML
+    private void updTicket() {
+        TypeTicket ticket = selected();
+        if (ticket == null)
+            return;
+        CustomValidField<RequiredTextField> nameTicket = new CustomValidField<>("Nom", new RequiredTextField());
+        nameTicket.node.setText(ticket.getType());
+        CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, false));
+        quantiteTicket.node.setValue(ticket.getQuantity());
+        CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
+        priceTicket.node.setValue(ticket.getPrice());
+        CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
+        surfaceTicket.node.setValue(ticket.getSurface());
+
+        askValidForm(
+                "Modifier le ticket " + ticket.getType(),
+                "Modification du type de ticket impossible",
+                new CustomValidField<?>[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
+                () -> {
+                    festival.updateTicketType(
+                            ticket,
+                            nameTicket.node.getText(),
+                            quantiteTicket.node.getValue(),
+                            priceTicket.node.getValue(),
+                            surfaceTicket.node.getValue()
+                    );
+                    refresh();
+                }
+        );
+    }
+
+    /**
+     * Supprime le type de ticket sélectionné, après confirmation.
+     */
+    @FXML
+    private void removeTicket() {
+        TypeTicket ticket = selected();
+        if (ticket == null || !confirm(
+                "Supprimer le type de ticket",
+                String.format("Supprimer le type de ticket « %s » et ses %d avantage(s) ?", ticket.getType(), ticket.getAvantages().size())
+        ))
+            return;
+        commit(
+                "Impossible de supprimer le type de ticket",
+                () -> festival.removeTicketType(ticket)
+        );
+    }
+
+    /**
+     * Ajoute un avantage au type de ticket sélectionné à partir d'un formulaire.
+     */
+    @FXML
+    private void addAvantage() {
+        TypeTicket ticket = selected();
+        if (ticket == null)
+            return;
+        if (festival.getStocks().isEmpty()) {
+            showError("Aucun stock : ajoutez d'abord un stock dans l'espace Stocks");
+            return;
+        }
+        CustomValidField<ComboBox<Stock>> stockAvantage = new CustomValidField<>("Stock", new ComboBox<>()) {
+            @Override
+            public boolean isValid() {
+                return node.getSelectionModel().getSelectedItem() != null;
+            }
+        };
+        stockAvantage.node.getItems().addAll(festival.getStocks());
+        CustomValidField<IntTextField> quantityByTicket = new CustomValidField<>("Quantité par ticket", new IntTextField(true, true));
+        quantityByTicket.node.setValue(1);
+
+        askValidForm(
+                "Ajouter un avantage au ticket " + ticket.getType(),
+                "Ajout d'un avantage impossible",
+                new CustomValidField<?>[]{stockAvantage, quantityByTicket},
+                () -> {
+                    new Avantage(
+                            ticket,
+                            stockAvantage.node.getSelectionModel().getSelectedItem(),
+                            quantityByTicket.node.getValue()
+                    ).connect();
+                    refresh();
+                }
+        );
     }
 }
