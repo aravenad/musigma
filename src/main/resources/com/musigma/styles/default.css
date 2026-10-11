@@ -41,7 +41,9 @@
     -fx-background-color: #30304d;
 }
 
-#pageMenu VBox * {
+/* Seulement les libellés du menu : un sélecteur plus large atteindrait aussi les infobulles,
+   qui sont rattachées au bouton survolé et deviendraient blanc sur blanc en thème clair */
+#pageMenu > VBox > .label {
     -fx-text-fill: #f3f3f5;
 }
 
