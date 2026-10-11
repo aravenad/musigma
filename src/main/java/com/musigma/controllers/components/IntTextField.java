@@ -1,20 +1,22 @@
 package com.musigma.controllers.components;
 
+import java.util.regex.Pattern;
+
 /**
- * Un composant JavaFX personnalisé qui étend RequiredTextField pour gérer les entrées de type entier avec une validation supplémentaire.
+ * Un composant JavaFX personnalisé qui étend NumberTextField pour gérer les entrées de type entier.
  */
 public class IntTextField extends NumberTextField<Integer> {
 
     /**
-     * Constructeur qui initialise le composant et configure le champ d'entrée pour n'accepter que des valeurs entières.
+     * Saisies acceptées pendant la frappe : un signe optionnel suivi de chiffres.
+     */
+    private static final Pattern PARTIAL = Pattern.compile("[+-]?\\d*");
+
+    /**
+     * Constructeur qui initialise le composant pour n'accepter que des valeurs entières.
      */
     public IntTextField() {
         super();
-        input.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[+-]?\\d+")) {
-                input.setText(newValue.replaceAll("[^(+|\\-|\\d)]*", ""));
-            }
-        });
     }
 
     /**
@@ -25,31 +27,20 @@ public class IntTextField extends NumberTextField<Integer> {
      */
     public IntTextField(boolean positive, boolean notNull) {
         super(positive, notNull);
-        input.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[+-]?\\d+")) {
-                input.setText(newValue.replaceAll("[^(+|\\-|\\d)]*", ""));
-            }
-        });
     }
 
-    /**
-     * Récupère la valeur du champ d'entrée.
-     *
-     * @return La valeur du champ d'entrée en tant qu'Integer.
-     */
     @Override
-    public Integer getValue() {
-        return Integer.parseInt(input.getText());
+    protected Pattern partialPattern() {
+        return PARTIAL;
     }
 
-    /**
-     * Définit la valeur du champ d'entrée.
-     *
-     * @param value La valeur à définir.
-     */
     @Override
-    public void setValue(Integer value) {
-        input.setText(Float.toString(value).replaceAll("^0*", ""));
-        isValid();
+    protected Integer parse(String text) {
+        return Integer.parseInt(text);
+    }
+
+    @Override
+    protected String format(Integer value) {
+        return Integer.toString(value);
     }
 }

@@ -5,14 +5,12 @@ import com.musigma.controllers.workspaces.*;
 import com.musigma.models.Festival;
 import com.musigma.utils.Log;
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,8 +19,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -58,6 +58,10 @@ public class MainController {
      * Chemin du fichier d'état de la session précédente.
      */
     private static final String STATE_FILEPATH = "previousSession.ser";
+    /**
+     * Chemin du manuel utilisateur dans les ressources de l'application.
+     */
+    private static final String GUIDE_PATH = "/com/musigma/guide/guide.pdf";
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
             HomeController.REGISTER,
@@ -76,6 +80,7 @@ public class MainController {
     private WorkspaceController.WorkspaceRegister currentWorkspace; // Espace de travail actuel
     private WorkspaceController currentWorkspaceController; // Contrôleur de l'espace de travail actuel
     private Stage stage; // La fenêtre principale
+    private HostServices hostServices; // Services de la plateforme, pour ouvrir le manuel
 
     @FXML
     private VBox pageMenu; // Menu de la page
@@ -87,13 +92,20 @@ public class MainController {
     /**
      * Initialise le contrôleur principal avec la fenêtre spécifiée.
      *
-     * @param stage La fenêtre principale
+     * @param stage        La fenêtre principale
+     * @param hostServices Les services de la plateforme, pour ouvrir le manuel
      */
     @FXML
-    public void initialize(Stage stage) {
+    public void initialize(Stage stage, HostServices hostServices) {
         this.stage = stage;
+        this.hostServices = hostServices;
         recentFiles = new ArrayList<>();
         stage.setOnHidden(e -> saveState());
+        // Fermeture demandée par le système (Alt+F4, barre des tâches...) : proposer d'enregistrer
+        stage.setOnCloseRequest(e -> {
+            if (!askToSaveFestival())
+                e.consume();
+        });
         for (WorkspaceController.WorkspaceRegister workspace : WORKSPACES)
             addWorkspace(workspace);
         loadState();
@@ -218,7 +230,8 @@ public class MainController {
     /**
      * Demande à l'utilisateur s'il souhaite sauvegarder le festival actuel s'il a été modifié.
      *
-     * @return true si l'utilisateur a choisi de sauvegarder ou de ne pas sauvegarder, false s'il a annulé
+     * @return true si le festival peut être quitté (enregistré ou abandonné volontairement),
+     * false si l'utilisateur a annulé ou si l'enregistrement n'a pas abouti
      */
     private boolean askToSaveFestival() {
         if (!festival.isModified()) {
@@ -233,12 +246,15 @@ public class MainController {
                 ButtonType.NO,
                 ButtonType.CANCEL
         );
-        alert.showAndWait();
-        ButtonType result = alert.getResult();
-        if (result.equals(ButtonType.YES)) {
+        ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
+        if (result == ButtonType.YES) {
             saveFestival();
+            if (festival.isModified()) {
+                LOGGER.info("Festival \"" + festival.getName() + "\" was not saved");
+                return false;
+            }
             LOGGER.info("Saved festival \"" + festival.getName() + "\"");
-        } else if (result.equals(ButtonType.CANCEL)) {
+        } else if (result != ButtonType.NO) {
             LOGGER.info("User cancelled saving");
             return false;
         }
@@ -422,8 +438,8 @@ public class MainController {
     }
 
     /**
-     * Ouvre le pdf du manuel de l'application.
-     * Compatible avec les systèmes d'exploitation Linux et Windows.
+     * Ouvre le pdf du manuel de l'application avec le lecteur par défaut du système.
+     * Le manuel est extrait des ressources vers un fichier temporaire, ce qui fonctionne aussi depuis le jar.
      */
     @FXML
     private void onAboutClicked() {
@@ -431,17 +447,29 @@ public class MainController {
         tryCatch(
                 "Ouverture du manuel impossible",
                 () -> {
-                    File file = new File("src/main/resources/com/musigma/guide/guide.pdf");
-                    if (file.exists()) {
-                        if (Desktop.isDesktopSupported()) {
-                            Desktop.getDesktop().open(file);
-                        } else {
-                            ProcessBuilder pb = new ProcessBuilder("evince", file.getAbsolutePath());
-                            pb.start();
-                        }
-                    }
+                    Path guide = extractResource(GUIDE_PATH, ".pdf");
+                    hostServices.showDocument(guide.toUri().toString());
                     LOGGER.info("Opened manual");
                 }
         );
+    }
+
+    /**
+     * Copie une ressource de l'application dans un fichier temporaire supprimé à la fermeture.
+     *
+     * @param resourcePath le chemin de la ressource
+     * @param suffix       l'extension du fichier temporaire
+     * @return le chemin du fichier temporaire
+     * @throws IOException si la ressource est introuvable ou ne peut pas être copiée
+     */
+    static Path extractResource(String resourcePath, String suffix) throws IOException {
+        try (InputStream resource = MainController.class.getResourceAsStream(resourcePath)) {
+            if (resource == null)
+                throw new FileNotFoundException("Ressource introuvable : " + resourcePath);
+            Path file = Files.createTempFile("musigma-", suffix);
+            file.toFile().deleteOnExit();
+            Files.copy(resource, file, StandardCopyOption.REPLACE_EXISTING);
+            return file;
+        }
     }
 }

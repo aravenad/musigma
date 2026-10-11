@@ -38,6 +38,6 @@ public class Main extends Application {
         stage.setScene(scene);
 
         MainController controller = fxmlLoader.getController();
-        controller.initialize(stage);
+        controller.initialize(stage, getHostServices());
     }
 }

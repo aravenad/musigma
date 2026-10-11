@@ -1,20 +1,24 @@
 package com.musigma.controllers.components;
 
+import java.math.BigDecimal;
+import java.util.regex.Pattern;
+
 /**
- * Un composant JavaFX personnalisé qui étend RequiredTextField pour gérer les entrées de type float avec une validation supplémentaire.
+ * Un composant JavaFX personnalisé qui étend NumberTextField pour gérer les entrées de type float.
+ * La virgule est acceptée comme séparateur décimal, au même titre que le point.
  */
 public class FloatTextField extends NumberTextField<Float> {
 
     /**
-     * Constructeur qui initialise le composant et configure le champ d'entrée pour n'accepter que des valeurs de type float.
+     * Saisies acceptées pendant la frappe : un signe optionnel, des chiffres, puis une partie décimale optionnelle.
+     */
+    private static final Pattern PARTIAL = Pattern.compile("[+-]?\\d*([.,]\\d*)?");
+
+    /**
+     * Constructeur qui initialise le composant pour n'accepter que des valeurs décimales.
      */
     public FloatTextField() {
         super();
-        input.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[+-]?\\d+(?:\\.\\d+)?")) {
-                input.setText(newValue.replaceAll("[^(+|\\-|\\.|\\d)]*", ""));
-            }
-        });
     }
 
     /**
@@ -25,31 +29,28 @@ public class FloatTextField extends NumberTextField<Float> {
      */
     public FloatTextField(boolean positive, boolean notNull) {
         super(positive, notNull);
-        input.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[+-]?\\d+(?:\\.\\d+)?")) {
-                input.setText(newValue.replaceAll("[^(+|\\-|\\.|\\d)]*", ""));
-            }
-        });
     }
 
-    /**
-     * Récupère la valeur du champ d'entrée.
-     *
-     * @return La valeur du champ d'entrée en tant que Float.
-     */
     @Override
-    public Float getValue() {
-        return Float.parseFloat(input.getText());
+    protected Pattern partialPattern() {
+        return PARTIAL;
     }
 
-    /**
-     * Définit la valeur du champ d'entrée.
-     *
-     * @param value La valeur à définir.
-     */
     @Override
-    public void setValue(Float value) {
-        input.setText(Float.toString(value).replaceAll("0*$", "").replaceAll("\\.$", ""));
-        isValid();
+    protected Float parse(String text) {
+        String normalized = text.replace(',', '.');
+        // Float.parseFloat accepte « 1. » et « .5 », mais pas un séparateur seul
+        if (!normalized.matches("[+-]?(\\d+\\.?\\d*|\\.\\d+)"))
+            throw new NumberFormatException("Nombre invalide : " + text);
+        float value = Float.parseFloat(normalized);
+        if (Float.isInfinite(value))
+            throw new NumberFormatException("Nombre trop grand : " + text);
+        return value;
+    }
+
+    @Override
+    protected String format(Float value) {
+        // Float.toString passe en notation scientifique à partir de 10^7 (ex : 1.2E7)
+        return new BigDecimal(Float.toString(value)).stripTrailingZeros().toPlainString();
     }
 }

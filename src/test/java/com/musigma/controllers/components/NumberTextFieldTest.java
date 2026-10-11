@@ -3,24 +3,22 @@ package com.musigma.controllers.components;
 import javafx.application.Platform;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Défauts connus des champs de saisie numériques (AUDIT.md C5 à C7).
+ * Régressions des champs de saisie numériques (AUDIT.md C5 à C7).
  * Nécessite un affichage pour démarrer JavaFX, sinon les tests sont ignorés.
- * Ces tests échouent tant que les défauts ne sont pas corrigés : lancer avec {@code mvn test -Pbugs}.
  */
-@Tag("bug")
-@DisplayName("Défauts connus — champs numériques")
-class NumberTextFieldBugTest {
+@DisplayName("Champs numériques")
+class NumberTextFieldTest {
 
     private static boolean toolkitAvailable = true;
 
@@ -81,5 +79,58 @@ class NumberTextFieldBugTest {
             }), "Saisie « " + input + " »");
             assertFalse(valid, "Saisie « " + input + " » acceptée");
         }
+    }
+
+    @Test
+    @DisplayName("C7 — une valeur collée (sans frappe clavier) est transmise au modèle")
+    void bindValueFollowsTextChanges() throws Exception {
+        AtomicReference<Integer> received = new AtomicReference<>();
+        IntTextField field = onFxThread(IntTextField::new);
+        onFxThread(() -> {
+            field.bindValue("Erreur", 5, received::set);
+            return null;
+        });
+        assertNull(received.get(), "La valeur initiale ne doit pas être renvoyée au modèle");
+        onFxThread(() -> {
+            field.setText("42");
+            return null;
+        });
+        assertEquals(42, received.get());
+    }
+
+    @Test
+    @DisplayName("FloatTextField accepte la virgule comme séparateur décimal")
+    void floatAcceptsComma() throws Exception {
+        FloatTextField field = onFxThread(FloatTextField::new);
+        assertEquals(12.5f, onFxThread(() -> {
+            field.setText("12,5");
+            return field.getValue();
+        }));
+        assertEquals("0.1", onFxThread(() -> {
+            field.setValue(0.1f);
+            return field.getText();
+        }));
+    }
+
+    @Test
+    @DisplayName("Les contraintes positive et non-nulle sont vérifiées")
+    void positiveAndNotNull() throws Exception {
+        IntTextField field = onFxThread(() -> new IntTextField(true, true));
+        assertFalse(onFxThread(() -> {
+            field.setText("-3");
+            return field.isValid();
+        }), "Valeur négative refusée");
+        assertFalse(onFxThread(() -> {
+            field.setText("0");
+            return field.isValid();
+        }), "Valeur nulle refusée");
+        assertFalse(onFxThread(() -> {
+            field.setText("99999999999");
+            return field.isValid();
+        }), "Entier trop grand refusé");
+        assertTrue(onFxThread(() -> {
+            field.setText("3");
+            return field.isValid();
+        }));
     }
 }

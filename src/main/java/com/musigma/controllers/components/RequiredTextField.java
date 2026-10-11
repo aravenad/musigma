@@ -49,7 +49,7 @@ public class RequiredTextField extends GridPane {
                 String.format("Impossible de charger le composant %s", getClass().getSimpleName()),
                 fxmlLoader::load
         );
-        input.setOnKeyTyped(e -> isValid());
+        input.textProperty().addListener((observable, oldValue, newValue) -> isValid());
         isValid();
     }
 
@@ -83,12 +83,12 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Vérifie si le champ d'entrée est vide.
+     * Vérifie si le champ d'entrée est vide ou ne contient que des espaces.
      *
      * @return true si le champ d'entrée est vide, false sinon
      */
     protected boolean isEmpty() {
-        return isValid;
+        return input.getText().isBlank();
     }
 
     /**
@@ -97,7 +97,7 @@ public class RequiredTextField extends GridPane {
      * @return true si le champ d'entrée est valide, false sinon
      */
     public boolean isValid() {
-        if (input.getText().isEmpty()) {
+        if (isEmpty()) {
             setError("Valeur requise");
             return false;
         } else {
@@ -144,13 +144,13 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Lie le champ d'entrée à un setter avec un message d'erreur pour une entrée invalide.
+     * Lie le champ d'entrée à un setter : chaque modification valide du texte est transmise au setter.
      *
      * @param errorMsg le message d'erreur à afficher si l'entrée est invalide
      * @param setter   le setter pour lier la valeur d'entrée
      */
     public void bind(String errorMsg, Setter<String> setter) {
-        input.setOnKeyTyped(e -> {
+        input.textProperty().addListener((observable, oldValue, newValue) -> {
             if (isValid())
                 tryCatch(
                         errorMsg,
@@ -160,14 +160,14 @@ public class RequiredTextField extends GridPane {
     }
 
     /**
-     * Lie le champ d'entrée à un setter avec une valeur initiale et un message d'erreur pour une entrée invalide.
+     * Affiche une valeur initiale puis lie le champ d'entrée à un setter.
      *
      * @param errorMsg le message d'erreur à afficher si l'entrée est invalide
      * @param value    la valeur initiale à définir dans le champ d'entrée
      * @param setter   le setter pour lier la valeur d'entrée
      */
     public void bind(String errorMsg, String value, Setter<String> setter) {
-        bind(errorMsg, setter);
         setText(value);
+        bind(errorMsg, setter);
     }
 }

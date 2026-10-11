@@ -1,11 +1,16 @@
 package com.musigma.controllers.components;
 
 import com.musigma.utils.exceptionMethods.Setter;
+import javafx.scene.control.TextFormatter;
+
+import java.util.regex.Pattern;
 
 import static com.musigma.controllers.Dialogs.tryCatch;
 
 /**
  * Un composant JavaFX personnalisé qui étend RequiredTextField pour gérer les entrées de type numérique avec une validation supplémentaire.
+ * <p>
+ * Seules les saisies pouvant mener à un nombre sont acceptées, que le texte soit tapé, collé ou défini par le code.
  *
  * @param <T> Type de nombre pour le champ personnalisé.
  */
@@ -19,6 +24,10 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
      */
     public NumberTextField() {
         super();
+        Pattern partial = partialPattern();
+        input.setTextFormatter(new TextFormatter<>(change ->
+                partial.matcher(change.getControlNewText()).matches() ? change : null
+        ));
     }
 
     /**
@@ -28,10 +37,34 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
      * @param notNull  Indique si le champ ne doit pas être null.
      */
     public NumberTextField(boolean positive, boolean notNull) {
-        super();
+        this();
         this.positive = positive;
         this.notNull = notNull;
     }
+
+    /**
+     * Retourne le motif des saisies acceptées pendant la frappe, y compris incomplètes (ex : « - » ou « 1. »).
+     *
+     * @return le motif des saisies acceptées
+     */
+    protected abstract Pattern partialPattern();
+
+    /**
+     * Convertit le texte saisi en nombre.
+     *
+     * @param text le texte saisi
+     * @return le nombre correspondant
+     * @throws NumberFormatException si le texte n'est pas un nombre valide
+     */
+    protected abstract T parse(String text);
+
+    /**
+     * Convertit un nombre en texte à afficher, sans notation scientifique.
+     *
+     * @param value le nombre
+     * @return le texte à afficher
+     */
+    protected abstract String format(T value);
 
     /**
      * Indique si le champ ne doit pas être null.
@@ -74,49 +107,54 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
      *
      * @return true si le champ d'entrée est valide, false sinon.
      */
+    @Override
     public boolean isValid() {
-        if (super.isValid()) {
-            String stringValue = getText();
-            if (stringValue.replaceAll("[+-]", "").isBlank()) {
-                setError("Valeur requise");
-                return false;
-            }
-            double value = Double.parseDouble(stringValue);
-            if (positive && value < 0) {
-                setError("Valeur positive");
-                return false;
-            } else if (notNull && value == 0) {
-                setError("Valeur non-nulle");
-                return false;
-            }
-            return true;
-        } else {
+        if (!super.isValid())
+            return false;
+        double value;
+        try {
+            value = parse(getText()).doubleValue();
+        } catch (NumberFormatException e) {
+            setError("Nombre invalide");
             return false;
         }
+        if (positive && value < 0) {
+            setError("Valeur positive");
+            return false;
+        } else if (notNull && value == 0) {
+            setError("Valeur non-nulle");
+            return false;
+        }
+        return true;
     }
 
     /**
      * Récupère la valeur du champ d'entrée.
      *
      * @return La valeur du champ d'entrée en tant que T.
+     * @throws NumberFormatException si le champ ne contient pas un nombre valide
      */
-    public abstract T getValue();
+    public T getValue() {
+        return parse(getText());
+    }
 
     /**
      * Définit la valeur du champ d'entrée.
      *
      * @param value La valeur à définir.
      */
-    public abstract void setValue(T value);
+    public void setValue(T value) {
+        setText(format(value));
+    }
 
     /**
-     * Lie le champ d'entrée à un setter avec un message d'erreur pour une entrée invalide.
+     * Lie le champ d'entrée à un setter : chaque modification valide du texte est transmise au setter.
      *
      * @param errorMsg message d'erreur
      * @param setter   setter
      */
     public void bindValue(String errorMsg, Setter<T> setter) {
-        input.setOnKeyTyped(e -> {
+        input.textProperty().addListener((observable, oldValue, newValue) -> {
             if (isValid())
                 tryCatch(
                         errorMsg,
@@ -126,14 +164,14 @@ public abstract class NumberTextField<T extends Number> extends RequiredTextFiel
     }
 
     /**
-     * Lie le champ d'entrée à un setter avec un message d'erreur pour une entrée invalide.
+     * Affiche une valeur initiale puis lie le champ d'entrée à un setter.
      *
      * @param errorMsg Le message d'erreur à afficher si l'entrée est invalide.
-     * @param value    La valeur à définir.
+     * @param value    La valeur initiale à afficher.
      * @param setter   Le setter pour lier la valeur d'entrée.
      */
     public void bindValue(String errorMsg, T value, Setter<T> setter) {
-        bindValue(errorMsg, setter);
         setValue(value);
+        bindValue(errorMsg, setter);
     }
 }

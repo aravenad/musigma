@@ -6,7 +6,6 @@ module com.musigma {
     requires javafx.fxml;
 
     requires java.logging;
-    requires java.desktop;
     requires atlantafx.base;
     requires com.calendarfx.view;
     requires ojalgo;
