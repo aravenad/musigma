@@ -1,29 +1,33 @@
 package com.musigma.controllers.workspaces;
 
 import com.calendarfx.model.Calendar;
-import com.calendarfx.model.CalendarEvent;
 import com.calendarfx.model.CalendarSource;
 import com.calendarfx.model.Entry;
+import com.calendarfx.model.Interval;
 import com.calendarfx.view.CalendarView;
 import com.musigma.controllers.WorkspaceController;
 import com.musigma.controllers.components.IntTextField;
-import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
 import com.musigma.models.Representation;
-import com.musigma.models.exception.ArtisteException;
-import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.RepresentationException;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.musigma.controllers.Dialogs.*;
 
 /**
- * Contrôleur pour l'espace de travail Calendrier.
+ * Contrôleur pour l'espace de travail Planning (UC4.2).
+ * <p>
+ * Chaque scène du festival est un calendrier, chaque représentation une entrée.
+ * Toute modification faite dans le calendrier (déplacement, durée, suppression) est d'abord
+ * validée par le modèle ; si elle est refusée, l'entrée retrouve sa place et une erreur s'affiche.
  */
 public class CalendarController extends WorkspaceController {
     /**
@@ -32,157 +36,257 @@ public class CalendarController extends WorkspaceController {
      *
      * @see com.musigma.controllers.WorkspaceController
      */
-    public static WorkspaceController.WorkspaceRegister REGISTER = new WorkspaceController.WorkspaceRegister(
+    public static final WorkspaceController.WorkspaceRegister REGISTER = new WorkspaceController.WorkspaceRegister(
             "Planning",
             "/com/musigma/images/icons/calendar.png",
             "/com/musigma/views/calendar-view.fxml"
     );
 
+    /**
+     * Pas des heures proposées dans le formulaire, en minutes.
+     */
+    private static final int TIME_STEP = 15;
+
     @FXML
     CalendarView calendarView;
 
     @FXML
-    Button addEventButton;
+    ComboBox<Artiste> artisteChoice;
 
     @FXML
-    IntTextField dateDebut, dateFin, scene;
+    ComboBox<String> sceneChoice;
 
     @FXML
-    RequiredTextField nomEvent;
+    DatePicker dayChoice;
 
-    private final ArrayList<Entry<?>> entries = new ArrayList<>();
+    @FXML
+    ComboBox<LocalTime> timeChoice;
+
+    @FXML
+    IntTextField durationField;
 
     /**
-     * Initialise le contrôleur avec les données du festival.
+     * Calendrier de chaque scène.
+     */
+    private final Map<String, Calendar<Representation>> calendars = new HashMap<>();
+
+    /**
+     * Vrai pendant que le contrôleur modifie lui-même les entrées, pour ignorer leurs écouteurs.
+     */
+    private boolean syncing = false;
+
+    /**
+     * Initialise le planning avec les scènes et les représentations du festival.
      *
      * @param festival le festival à gérer
      */
+    @Override
     public void initialize(Festival festival) {
         super.initialize(festival);
-        Calendar calendar = new Calendar("Planning");
-        CalendarSource calendarSource = new CalendarSource("Festival");
-        calendarSource.getCalendars().add(calendar);
-        calendarView.getCalendarSources().add(calendarSource);
-        calendar.addEventHandler(this::addToModel);
 
-        //ajoutes des Entrée dans la liste entries pour ensuite les ajouter dans le planning
-        for (Representation r : festival.getRepresentations()) {
-            Entry<?> tempEntry = new Entry<>(r.getArtiste().getName());
-            tempEntry.changeStartTime(LocalTime.from(festival.getStart().plusMinutes(r.getStartDelta())));
-            tempEntry.changeEndTime(LocalTime.from(festival.getStart().plusMinutes(r.getStartDelta())).plusMinutes(r.getDuration()));
-            entries.add(tempEntry);
+        CalendarSource source = new CalendarSource(festival.getName());
+        Calendar.Style[] styles = Calendar.Style.values();
+        for (int i = 0; i < festival.getScenes().size(); i++) {
+            String scene = festival.getScenes().get(i);
+            Calendar<Representation> calendar = new Calendar<>(scene);
+            calendar.setStyle(styles[i % styles.length]);
+            calendars.put(scene, calendar);
+            source.getCalendars().add(calendar);
         }
+        calendarView.getCalendarSources().setAll(source);
+        calendarView.setDefaultCalendarProvider(control -> calendars.get(festival.getScenes().get(0)));
 
-        //ajout des entrée sur le planning
-        for (Entry<?> e : entries) {
-            calendar.addEntry(e);
-        }
+        // Les représentations se créent par le formulaire, qui demande l'artiste et la scène
+        calendarView.setEntryFactory(param -> null);
+        calendarView.setContextMenuCallback(param -> null);
+        calendarView.setEntryDetailsCallback(param -> false);
+        calendarView.setEntryContextMenuCallback(param -> entryContextMenu(param.getEntry()));
+        calendarView.setShowAddCalendarButton(false);
+        calendarView.setShowPrintButton(false);
+        calendarView.setShowDeveloperConsole(false);
+        calendarView.setShowSearchField(false);
+        calendarView.setDate(festival.getStart().toLocalDate());
+        calendarView.showWeekPage();
+        // Affiche d'abord l'heure de la première représentation, sinon le début d'après-midi
+        calendarView.setRequestedTime(festival.getRepresentations().stream()
+                .map(r -> festival.getStart().plusMinutes(r.getStartDelta()).toLocalTime())
+                .min(LocalTime::compareTo)
+                .map(time -> time.minusHours(Math.min(1, time.getHour())))
+                .orElse(LocalTime.of(14, 0)));
 
+        for (Representation representation : festival.getRepresentations())
+            addEntry(representation);
 
-        //Ajoute de l'event avec les parametre rentré
-        addEventButton.setOnAction(e -> {
-            Entry<Representation> entry = new Entry<>(nomEvent.getText());
-            entry.changeStartTime(LocalTime.of(dateDebut.getValue(), 0));
-            entry.changeEndTime(LocalTime.of(dateFin.getValue(), 0));
-            calendar.addEntry(entry);
-            try {
-                addRep(nomEvent.getText(),
-                        LocalDateTime.of(2024, 06, 20, dateDebut.getValue(), 0),
-                        entry.getEndTime().getHour() - entry.getStartTime().getHour(),
-                        scene.getText()
-                );
-            } catch (ArtisteException | FestivalException | RepresentationException ex) {
-                throw new RuntimeException(ex);
+        setUpForm();
+    }
+
+    /**
+     * Prépare le formulaire de planification : artistes engagés, scènes, jours du festival et heures.
+     */
+    private void setUpForm() {
+        artisteChoice.getItems().setAll(festival.getArtistes());
+        sceneChoice.getItems().setAll(festival.getScenes());
+        sceneChoice.getSelectionModel().selectFirst();
+
+        LocalDate firstDay = festival.getStart().toLocalDate();
+        LocalDate lastDay = festival.getEnd().minusNanos(1).toLocalDate();
+        dayChoice.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.isBefore(firstDay) || date.isAfter(lastDay));
             }
         });
+        dayChoice.setValue(firstDay);
+
+        for (LocalTime time = LocalTime.MIDNIGHT; ; time = time.plusMinutes(TIME_STEP)) {
+            timeChoice.getItems().add(time);
+            if (time.equals(LocalTime.MIDNIGHT.minusMinutes(TIME_STEP)))
+                break;
+        }
+        timeChoice.setValue(LocalTime.of(20, 0));
+        durationField.setValue(60);
     }
 
     /**
-     * Gère les événements du calendrier pour mettre à jour le modèle de données.
-     *
-     * @param event l'événement du calendrier
+     * Planifie une représentation à partir du formulaire.
      */
-    private void addToModel(Event event) {
-        if (event.getEventType() == CalendarEvent.ENTRY_TITLE_CHANGED) {
-            //changer nom
-            for (Representation r : festival.getRepresentations()) {
-                if (r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())) {
-                    try {
-                        r.getArtiste().setName(((Entry<?>) event.getSource()).getTitle());
-                    } catch (ArtisteException e) {
-                        throw new RuntimeException(e);
-                    }
+    @FXML
+    private void planRepresentation() {
+        Artiste artiste = artisteChoice.getValue();
+        String scene = sceneChoice.getValue();
+        LocalDate day = dayChoice.getValue();
+        LocalTime time = timeChoice.getValue();
+        if (artiste == null) {
+            showError(festival.getArtistes().isEmpty()
+                    ? "Aucun artiste engagé : engagez d'abord un artiste dans l'espace Artistes"
+                    : "Choisissez l'artiste de la représentation");
+            return;
+        }
+        if (scene == null || day == null || time == null || !durationField.isValid()) {
+            showError("Choisissez la scène, le jour, l'heure et la durée de la représentation");
+            return;
+        }
+        tryCatch(
+                "Planification de la représentation impossible",
+                () -> {
+                    Representation representation = new Representation(
+                            minutesSinceStart(day.atTime(time)),
+                            durationField.getValue(),
+                            scene,
+                            artiste
+                    );
+                    festival.addRepresentation(representation);
+                    addEntry(representation);
+                    calendarView.setDate(day);
                 }
-            }
-        } else if (event.getEventType() == CalendarEvent.ENTRY_INTERVAL_CHANGED) {
-            //changer l'heure de début et de fin
-            for (Representation r : festival.getRepresentations()) {
-                if (r.getArtiste().getName().equals(event.getSource())) {
-                    try {
-                        festival.updateRepresentation(
-                                r,
-                                ((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute(),
-                                (((Entry<?>) event.getSource()).getEndTime().getHour() * 60 + ((Entry<?>) event.getSource()).getEndTime().getMinute()) - ((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute(),
-                                r.getScene()
-                        );
-                    } catch (FestivalException | RepresentationException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        } else if (event.getEventType().equals(CalendarEvent.NULL_SOURCE_TARGET)) {
-            //pour supprimer l'artiste
-            for (Representation r : festival.getRepresentations()) {
-                if (r.getArtiste().getName().equals(((Entry<?>) event.getSource()).getTitle())) {
-                    try {
-                        festival.removeRepresentation(r);
-                    } catch (FestivalException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
+        );
+    }
+
+    /**
+     * Retourne le nombre de minutes entre le début du festival et une date.
+     *
+     * @param dateTime la date
+     * @return le nombre de minutes, négatif si la date précède le festival
+     */
+    private int minutesSinceStart(LocalDateTime dateTime) {
+        return (int) Duration.between(festival.getStart(), dateTime).toMinutes();
+    }
+
+    /**
+     * Ajoute l'entrée d'une représentation dans le calendrier de sa scène et la synchronise avec le modèle.
+     *
+     * @param representation la représentation
+     */
+    private void addEntry(Representation representation) {
+        Entry<Representation> entry = new Entry<>(representation.getArtiste().getName());
+        entry.setUserObject(representation);
+        entry.setInterval(intervalOf(representation));
+        entry.intervalProperty().addListener((observable, oldInterval, newInterval) -> onIntervalChanged(entry, oldInterval, newInterval));
+        entry.calendarProperty().addListener((observable, oldCalendar, newCalendar) -> onCalendarChanged(entry, oldCalendar, newCalendar));
+        syncing = true;
+        calendars.get(representation.getScene()).addEntry(entry);
+        syncing = false;
+    }
+
+    /**
+     * Retourne l'intervalle d'une représentation dans le calendrier.
+     *
+     * @param representation la représentation
+     * @return l'intervalle allant du début à la fin de la représentation
+     */
+    private Interval intervalOf(Representation representation) {
+        LocalDateTime start = festival.getStart().plusMinutes(representation.getStartDelta());
+        return new Interval(start, start.plusMinutes(representation.getDuration()));
+    }
+
+    /**
+     * Répercute le déplacement ou le redimensionnement d'une entrée sur sa représentation.
+     *
+     * @param entry       l'entrée modifiée
+     * @param oldInterval l'intervalle précédent
+     * @param newInterval le nouvel intervalle
+     */
+    private void onIntervalChanged(Entry<Representation> entry, Interval oldInterval, Interval newInterval) {
+        if (syncing)
+            return;
+        Representation representation = entry.getUserObject();
+        try {
+            festival.updateRepresentation(
+                    representation,
+                    minutesSinceStart(newInterval.getStartDateTime()),
+                    (int) Duration.between(newInterval.getStartDateTime(), newInterval.getEndDateTime()).toMinutes(),
+                    representation.getScene()
+            );
+        } catch (Exception e) {
+            syncing = true;
+            entry.setInterval(oldInterval);
+            syncing = false;
+            showError("Déplacement de la représentation impossible :\n" + e.getMessage());
         }
     }
 
     /**
-     * Ajoute une représentation au festival.
+     * Répercute le changement de calendrier d'une entrée : suppression (touche Suppr) ou changement de scène.
      *
-     * @param artisteName le nom de l'artiste
-     * @param start       l'heure de début
-     * @param duration    la durée en heures
-     * @param scene       la scène
-     * @throws ArtisteException        en cas d'erreur liée à l'artiste
-     * @throws FestivalException       en cas d'erreur liée au festival
-     * @throws RepresentationException en cas d'erreur liée à la représentation
+     * @param entry       l'entrée modifiée
+     * @param oldCalendar le calendrier précédent
+     * @param newCalendar le nouveau calendrier, null si l'entrée a été supprimée
      */
-    public void addRep(String artisteName, LocalDateTime start, int duration, String scene) throws ArtisteException, FestivalException, RepresentationException {
-        Entry<Representation> entry = new Entry<>(artisteName);
-        entry.setInterval(start, start.plusHours(duration));
-        Representation representation = new Representation(
-                ((start.getHour() * 60) + start.getMinute()) - ((festival.getStart().getHour() * 60) + festival.getStart().getMinute()),
-                ((start.plusHours(duration).getHour() * 60) + start.plusHours(duration).getMinute()) - ((start.getHour() * 60) + start.getMinute()),
-                scene,
-                findOrEngageArtiste(artisteName)
-        );
-        entry.setUserObject(representation);
-        festival.addRepresentation(representation);
+    private void onCalendarChanged(Entry<Representation> entry, Calendar<?> oldCalendar, Calendar<?> newCalendar) {
+        if (syncing)
+            return;
+        Representation representation = entry.getUserObject();
+        try {
+            if (newCalendar == null)
+                festival.removeRepresentation(representation);
+            else
+                festival.updateRepresentation(representation, representation.getStartDelta(), representation.getDuration(), newCalendar.getName());
+        } catch (Exception e) {
+            syncing = true;
+            entry.setCalendar(oldCalendar);
+            syncing = false;
+            showError("Modification de la représentation impossible :\n" + e.getMessage());
+        }
     }
 
     /**
-     * Retrouve un artiste engagé par son nom, ou l'engage s'il ne l'est pas encore.
-     * Palliatif en attendant l'écran de gestion des artistes (UC4.1).
+     * Crée le menu contextuel d'une entrée.
      *
-     * @param artisteName le nom de l'artiste
-     * @return l'artiste engagé au festival
-     * @throws ArtisteException  si le nom n'est pas valide
-     * @throws FestivalException si l'artiste ne peut pas être engagé
+     * @param entry l'entrée cliquée
+     * @return le menu permettant de supprimer la représentation
      */
-    private Artiste findOrEngageArtiste(String artisteName) throws ArtisteException, FestivalException {
-        for (Artiste artiste : festival.getArtistes())
-            if (artiste.getName().equals(artisteName))
-                return artiste;
-        Artiste artiste = new Artiste(artisteName, "Rock", 10);
-        festival.addArtiste(artiste);
-        return artiste;
+    private ContextMenu entryContextMenu(Entry<?> entry) {
+        MenuItem delete = new MenuItem("Supprimer la représentation");
+        delete.setOnAction(e -> tryCatch(
+                "Suppression de la représentation impossible",
+                () -> {
+                    festival.removeRepresentation((Representation) entry.getUserObject());
+                    syncing = true;
+                    entry.removeFromCalendar();
+                    syncing = false;
+                }
+        ));
+        return new ContextMenu(delete);
     }
 }

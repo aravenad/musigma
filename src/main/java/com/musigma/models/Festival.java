@@ -3,6 +3,7 @@ package com.musigma.models;
 import com.musigma.models.exception.ArtisteException;
 import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.RepresentationException;
+import com.musigma.models.exception.StockException;
 import com.musigma.models.exception.TypeTicketException;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -10,6 +11,9 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,7 +31,10 @@ public class Festival implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final float AVERAGE_AREA_BY_PEOPLE = .42f;
+    /**
+     * Nom de la scène créée avec un nouveau festival.
+     */
+    public static final String DEFAULT_SCENE = "Scène principale";
 
     /**
      * Logger pour afficher les logs.
@@ -50,6 +57,10 @@ public class Festival implements Serializable {
      */
     private final ArrayList<Representation> representations;
     /**
+     * Scènes du festival, sur lesquelles se déroulent les représentations.
+     * Non finale pour pouvoir être initialisée à la lecture d'un ancien fichier.
+     */
+    private ArrayList<String> scenes;    /**
      * Fichier associé à ce festival, renseigné au chargement ou à l'enregistrement.
      */
     private transient File file = null;
@@ -65,6 +76,10 @@ public class Festival implements Serializable {
      * Date de début du festival.
      */
     private LocalDateTime start;
+    /**
+     * Date de fin du festival (exclue).
+     */
+    private LocalDateTime end;
     /**
      * Prix de location du festival.
      */
@@ -82,7 +97,7 @@ public class Festival implements Serializable {
      * Constructeur de la classe Festival.
      *
      * @param name          le nom du festival
-     * @param start         la date de début du festival
+     * @param start         la date de début du festival ; le festival dure un jour et compte une scène par défaut
      * @param locationPrice le prix de location du festival
      * @param area          la superficie du festival
      * @param location      l'emplacement du festival
@@ -94,12 +109,35 @@ public class Festival implements Serializable {
         ticketTypes = new ArrayList<>();
         stocks = new ArrayList<>();
         representations = new ArrayList<>();
+        scenes = new ArrayList<>(List.of(DEFAULT_SCENE));
         setName(name);
         setStart(start);
+        end = start.plusDays(1);
         setLocationPrice(locationPrice);
         setArea(area);
         setLocation(location);
         LOGGER.info("Created Festival");
+    }
+
+    /**
+     * Complète un festival enregistré avant l'ajout de la date de fin et des scènes.
+     *
+     * @param in le flux de lecture
+     * @throws IOException            si la lecture échoue
+     * @throws ClassNotFoundException si une classe du fichier est inconnue
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (end == null) {
+            int lastMinute = representations.stream().mapToInt(r -> r.getStartDelta() + r.getDuration()).max().orElse(0);
+            end = start.plusDays(Math.max(1, (lastMinute + 24 * 60 - 1) / (24 * 60)));
+        }
+        if (scenes == null) {
+            scenes = new ArrayList<>();
+            representations.stream().map(Representation::getScene).distinct().forEach(scenes::add);
+            if (scenes.isEmpty())
+                scenes.add(DEFAULT_SCENE);
+        }
     }
 
     /**
@@ -238,6 +276,8 @@ public class Festival implements Serializable {
      * Définit la date de début du festival.
      *
      * @param start la date de début du festival
+     * La date de fin est décalée d'autant : le festival garde sa durée et ses représentations.
+     *
      * @throws FestivalException si la date est null ou antérieure à la date actuelle
      */
     public void setStart(LocalDateTime start) throws FestivalException {
@@ -246,8 +286,136 @@ public class Festival implements Serializable {
         if (LocalDate.now().isAfter(start.toLocalDate())) {
             throw new FestivalException("La date est antérieure à la date d'aujourd'hui, doit être aujourd'hui ou plus tard");
         }
+        if (end != null)
+            end = end.plus(Duration.between(this.start, start));
         this.start = start;
         LOGGER.info("Set Festival.start");
+    }
+
+    /**
+     * Retourne la date de fin du festival (exclue).
+     *
+     * @return la date de fin du festival
+     */
+    public LocalDateTime getEnd() {
+        return end;
+    }
+
+    /**
+     * Définit la date de fin du festival (exclue).
+     *
+     * @param end la date de fin du festival
+     * @throws FestivalException si la date est null, ne suit pas la date de début,
+     *                           ou si des représentations se terminent après elle
+     */
+    public void setEnd(LocalDateTime end) throws FestivalException {
+        if (end == null)
+            throw new FestivalException("La date de fin est null, doit être définie");
+        if (!end.isAfter(start))
+            throw new FestivalException("La date de fin doit suivre la date de début");
+        long minutes = Duration.between(start, end).toMinutes();
+        Optional<Representation> outside = representations.stream()
+                .filter(r -> r.getStartDelta() + r.getDuration() > minutes)
+                .findFirst();
+        if (outside.isPresent())
+            throw new FestivalException(String.format("La représentation %s se termine après cette date de fin", outside.get()));
+        this.end = end;
+        LOGGER.info("Set Festival.end");
+    }
+
+    /**
+     * Retourne la durée du festival en minutes.
+     *
+     * @return le nombre de minutes entre le début et la fin du festival
+     */
+    public int getDurationMinutes() {
+        return (int) Duration.between(start, end).toMinutes();
+    }
+
+    /**
+     * Retourne les scènes du festival.
+     *
+     * @return la liste des scènes, non modifiable
+     */
+    public List<String> getScenes() {
+        return Collections.unmodifiableList(scenes);
+    }
+
+    /**
+     * Ajoute une scène au festival.
+     *
+     * @param scene le nom de la scène
+     * @throws FestivalException si le nom est vide ou déjà utilisé
+     */
+    public void addScene(String scene) throws FestivalException {
+        checkNewSceneName(scene);
+        scenes.add(scene.strip());
+        LOGGER.info("Added scene to Festival.scenes");
+    }
+
+    /**
+     * Renomme une scène, ainsi que la scène de ses représentations.
+     *
+     * @param scene   le nom actuel de la scène
+     * @param newName le nouveau nom
+     * @throws FestivalException si la scène n'existe pas, ou si le nouveau nom est vide ou déjà utilisé
+     */
+    public void renameScene(String scene, String newName) throws FestivalException {
+        int index = scenes.indexOf(scene);
+        if (index < 0)
+            throw new FestivalException(String.format("La scène \"%s\" n'existe pas", scene));
+        checkNewSceneName(newName);
+        String name = newName.strip();
+        for (Representation representation : representations)
+            if (representation.getScene().equals(scene))
+                try {
+                    representation.setScene(name);
+                } catch (RepresentationException e) {
+                    throw new FestivalException(e.getMessage());
+                }
+        scenes.set(index, name);
+        LOGGER.info("Renamed scene of Festival.scenes");
+    }
+
+    /**
+     * Supprime une scène sans représentation. Le festival garde toujours au moins une scène.
+     *
+     * @param scene le nom de la scène
+     * @throws FestivalException si la scène n'existe pas, est la dernière, ou accueille des représentations
+     */
+    public void removeScene(String scene) throws FestivalException {
+        if (!scenes.contains(scene))
+            throw new FestivalException(String.format("La scène \"%s\" n'existe pas", scene));
+        if (scenes.size() == 1)
+            throw new FestivalException("Le festival doit garder au moins une scène");
+        long used = representations.stream().filter(r -> r.getScene().equals(scene)).count();
+        if (used > 0)
+            throw new FestivalException(String.format("La scène \"%s\" accueille %d représentation(s), à déplacer ou supprimer d'abord", scene, used));
+        scenes.remove(scene);
+        LOGGER.info("Removed scene from Festival.scenes");
+    }
+
+    /**
+     * Vérifie qu'un nom de scène est valide et libre.
+     *
+     * @param scene le nom à vérifier
+     * @throws FestivalException si le nom est vide ou déjà utilisé
+     */
+    private void checkNewSceneName(String scene) throws FestivalException {
+        if (scene == null || scene.isBlank())
+            throw new FestivalException("Le nom de la scène est vide, doit être défini");
+        if (scenes.stream().anyMatch(s -> s.equalsIgnoreCase(scene.strip())))
+            throw new FestivalException(String.format("La scène \"%s\" existe déjà", scene.strip()));
+    }
+
+    /**
+     * Retourne le temps encore libre dans le planning, toutes scènes confondues.
+     *
+     * @return le nombre de minutes de scène non occupées par une représentation
+     */
+    public long getFreeMinutes() {
+        long occupied = representations.stream().mapToLong(Representation::getDuration).sum();
+        return (long) scenes.size() * getDurationMinutes() - occupied;
     }
 
     /**
@@ -376,6 +544,21 @@ public class Festival implements Serializable {
      * @param ignored    une représentation à ne pas prendre en compte (celle qu'on déplace), ou null
      * @return la première représentation en collision, ou null s'il n'y en a pas
      */
+    /**
+     * Vérifie qu'un créneau est sur une scène du festival et pendant le festival.
+     *
+     * @param scene      la scène
+     * @param startDelta le début du créneau en minutes depuis le début du festival
+     * @param duration   la durée du créneau en minutes
+     * @throws FestivalException si la scène n'existe pas ou si le créneau déborde du festival
+     */
+    private void checkSlot(String scene, int startDelta, int duration) throws FestivalException {
+        if (!scenes.contains(scene))
+            throw new FestivalException(String.format("La scène \"%s\" n'existe pas dans le festival", scene));
+        if (startDelta + duration > getDurationMinutes())
+            throw new FestivalException("La représentation doit se terminer avant la fin du festival");
+    }
+
     private Representation findCollision(String scene, int startDelta, int duration, Representation ignored) {
         return representations.stream()
                 .filter(other -> other != ignored && other.isColliding(scene, startDelta, duration))
@@ -397,6 +580,7 @@ public class Festival implements Serializable {
             throw new FestivalException("La représentation est déjà planifiée");
         if (!artistes.contains(representation.getArtiste()))
             throw new FestivalException(String.format("L'artiste \"%s\" n'est pas engagé au festival", representation.getArtiste().getName()));
+        checkSlot(representation.getScene(), representation.getStartDelta(), representation.getDuration());
 
         Representation collision = findCollision(representation.getScene(), representation.getStartDelta(), representation.getDuration(), null);
         if (collision != null)
@@ -426,6 +610,7 @@ public class Festival implements Serializable {
             throw new FestivalException("La représentation n'a pas été trouvée");
         // Valide les nouvelles valeurs avant toute modification
         new Representation(startDelta, duration, scene, representation.getArtiste());
+        checkSlot(scene, startDelta, duration);
 
         Representation collision = findCollision(scene, startDelta, duration, representation);
         if (collision != null)
@@ -481,6 +666,45 @@ public class Festival implements Serializable {
     }
 
     /**
+     * Modifie un type de ticket en une seule fois : si une valeur est refusée, rien n'est modifié.
+     *
+     * @param ticketType le type de ticket à modifier
+     * @param type       le nouveau nom, unique dans le festival
+     * @param quantity   la nouvelle quantité
+     * @param price      le nouveau prix
+     * @param surface    la nouvelle surface par détenteur (m²)
+     * @throws FestivalException si le type de ticket n'appartient pas au festival ou si une valeur est refusée
+     */
+    public void updateTicketType(TypeTicket ticketType, String type, int quantity, float price, float surface) throws FestivalException {
+        if (!ticketTypes.contains(ticketType))
+            throw new FestivalException("Le type de ticket n'a pas été trouvé");
+        if (ticketTypes.stream().anyMatch(t -> t != ticketType && Objects.equals(t.getType(), type)))
+            throw new FestivalException("Un autre type ticket existe avec le même nom");
+
+        String oldType = ticketType.getType();
+        int oldQuantity = ticketType.getQuantity();
+        float oldPrice = ticketType.getPrice();
+        float oldSurface = ticketType.getSurface();
+        try {
+            ticketType.setType(type);
+            ticketType.setQuantity(quantity);
+            ticketType.setPrice(price);
+            ticketType.setSurface(surface);
+        } catch (TypeTicketException e) {
+            try {
+                ticketType.setType(oldType);
+                ticketType.setQuantity(oldQuantity);
+                ticketType.setPrice(oldPrice);
+                ticketType.setSurface(oldSurface);
+            } catch (TypeTicketException impossible) {
+                throw new IllegalStateException("Le type de ticket ne peut pas être rétabli", impossible);
+            }
+            throw new FestivalException(e.getMessage());
+        }
+        LOGGER.info("Updated TypeTicket of Festival.ticketTypes");
+    }
+
+    /**
      * Supprime un type de ticket du festival, en détachant ses avantages des stocks.
      *
      * @param ticketType le type de ticket à supprimer
@@ -520,6 +744,25 @@ public class Festival implements Serializable {
     }
 
     /**
+     * Renomme un stock en gardant les noms de stocks uniques.
+     *
+     * @param stock le stock à renommer
+     * @param name  le nouveau nom
+     * @throws FestivalException si le stock n'appartient pas au festival, ou si le nom est vide ou déjà utilisé
+     */
+    public void renameStock(Stock stock, String name) throws FestivalException {
+        if (!stocks.contains(stock))
+            throw new FestivalException("Le stock n'a pas été trouvé");
+        if (stocks.stream().anyMatch(s -> s != stock && Objects.equals(s.getName(), name)))
+            throw new FestivalException("Un autre stock existe avec le même nom");
+        try {
+            stock.setName(name);
+        } catch (StockException e) {
+            throw new FestivalException(e.getMessage());
+        }
+    }
+
+    /**
      * Supprime un stock du festival, en détachant ses avantages des types de tickets.
      *
      * @param stock le stock à supprimer
@@ -544,54 +787,155 @@ public class Festival implements Serializable {
     }
 
     /**
-     * Optimise les coûts du festival en calculant les quantités respectives
-     * de tickets à vendre les plus rentables avec le modèle d'optimisation d'Ojalgo.
+     * Calcule la vente la plus rentable (UC3.2) : la quantité de chaque type de ticket
+     * qui maximise la recette, sans dépasser la surface du festival ni les stocks limités.
+     * Le festival n'est pas modifié : voir {@link #applySalesPlan(SalesPlan)}.
      *
-     * @return le prix total du festival
-     * @throws TypeTicketException si un ticket ne veux pas changer de quantité
+     * @return la recommandation de vente
+     * @throws FestivalException s'il n'y a aucun type de ticket ou si le problème n'a pas de solution
      */
-    public double optimizeResult() throws TypeTicketException {
-        LOGGER.info("Calculated best quantity of ticket to sold");
+    public SalesPlan optimizeSales() throws FestivalException {
+        if (ticketTypes.isEmpty())
+            throw new FestivalException("Aucun type de ticket à mettre en vente");
+        LOGGER.info("Optimizing ticket sales");
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        HashMap<Stock, Expression> constraints = new HashMap<>();
-
-        LOGGER.info("Adding constraint stocks");
+        Expression areaConstraint = model.addExpression("Surface").upper(area);
+        Map<Stock, Expression> stockConstraints = new HashMap<>();
         for (Stock stock : stocks)
-            if (stock.isFixed()) {
-                Expression constraint = model.addExpression(stock.getName())
-                        .upper(stock.getQuantity())
-                        .lower(0);
-                constraints.put(stock, constraint);
-                LOGGER.info(String.format("Added variable \"%s\"", stock.getName()));
-            }
+            if (stock.isFixed())
+                stockConstraints.put(stock, model.addExpression(stock.getName()).upper(stock.getQuantity()));
 
-        Expression areaConstraint = model.addExpression("Area")
-                .upper(area)
-                .lower(0);
-
-        LOGGER.info("Definition of the variables");
+        List<Variable> variables = new ArrayList<>();
         for (TypeTicket ticketType : ticketTypes) {
-            Variable x = model.addVariable(ticketType.getType()).weight(ticketType.getPrice());
+            Variable x = model.addVariable(ticketType.getType()).weight(ticketType.getPrice()).lower(0).integer(true);
+            areaConstraint.set(x, ticketType.getSurface());
             for (Avantage avantage : ticketType.getAvantages()) {
-                Stock stock = avantage.getStock();
-                if (stock.isFixed()) {
-                    constraints.get(stock).set(x, avantage.getQuantityByTicket());
-                    LOGGER.info(String.format("Adding equation \"%s\" on ticket \"%s\"", avantage.getStock().getName(), ticketType.getType()));
-                }
-                areaConstraint.set(x, AVERAGE_AREA_BY_PEOPLE);
-                LOGGER.info(String.format("Adding area equation on ticket \"%s\"", ticketType.getType()));
+                Expression constraint = stockConstraints.get(avantage.getStock());
+                if (constraint != null)
+                    constraint.set(x, avantage.getQuantityByTicket());
             }
+            variables.add(x);
         }
 
-        LOGGER.info("Calculating optimized result");
-        Optimisation.Result results = model.maximise();
+        Optimisation.Result result = model.maximise();
+        if (!result.getState().isFeasible())
+            throw new FestivalException("Aucune vente optimale trouvée (" + result.getState() + ")");
 
-        LOGGER.info("Setting optimized quantity of ticket to sold");
-        for (int i = 0; i < ticketTypes.size(); i++)
-            ticketTypes.get(i).setQuantity(results.get(i).intValueExact());
+        Map<TypeTicket, Integer> quantities = new LinkedHashMap<>();
+        double revenue = 0;
+        for (int i = 0; i < ticketTypes.size(); i++) {
+            // Le solveur peut renvoyer 1999.9999999 pour 2000 : on arrondit au plus proche
+            int quantity = result.get(i).setScale(0, RoundingMode.HALF_UP).intValueExact();
+            quantities.put(ticketTypes.get(i), quantity);
+            revenue += (double) quantity * ticketTypes.get(i).getPrice();
+        }
+        LOGGER.info("Optimized ticket sales");
+        return new SalesPlan(quantities, revenue);
+    }
 
-        LOGGER.info("Calculated best quantity of ticket to sold");
-        return results.getValue();
+    /**
+     * Applique une recommandation de vente aux types de tickets du festival.
+     * Si une quantité est refusée, les quantités précédentes sont rétablies.
+     *
+     * @param plan la recommandation calculée par {@link #optimizeSales()}
+     * @throws FestivalException si la recommandation concerne un ticket inconnu ou ne peut pas être appliquée
+     */
+    public void applySalesPlan(SalesPlan plan) throws FestivalException {
+        for (TypeTicket ticketType : plan.quantities().keySet())
+            if (!ticketTypes.contains(ticketType))
+                throw new FestivalException(String.format("Le type de ticket \"%s\" n'appartient pas au festival", ticketType.getType()));
+
+        Map<TypeTicket, Integer> previous = new LinkedHashMap<>();
+        for (TypeTicket ticketType : plan.quantities().keySet())
+            previous.put(ticketType, ticketType.getQuantity());
+        try {
+            setQuantities(plan.quantities());
+        } catch (TypeTicketException e) {
+            try {
+                setQuantities(previous);
+            } catch (TypeTicketException impossible) {
+                throw new IllegalStateException("Les quantités précédentes ne peuvent pas être rétablies", impossible);
+            }
+            throw new FestivalException("La recommandation ne peut pas être appliquée : " + e.getMessage());
+        }
+        LOGGER.info("Applied sales plan");
+    }
+
+    /**
+     * Définit les quantités de plusieurs types de tickets, en les remettant d'abord à zéro
+     * pour ne pas dépasser un stock limité pendant le changement.
+     *
+     * @param quantities les quantités à appliquer
+     * @throws TypeTicketException si une quantité est refusée
+     */
+    private void setQuantities(Map<TypeTicket, Integer> quantities) throws TypeTicketException {
+        for (TypeTicket ticketType : quantities.keySet())
+            ticketType.setQuantity(0);
+        for (Map.Entry<TypeTicket, Integer> entry : quantities.entrySet())
+            entry.getKey().setQuantity(entry.getValue());
+    }
+
+    /**
+     * Calcule le bilan prévisionnel du festival (UC3.2) :
+     * recettes des tickets, location, cachets des artistes et coût des stocks nécessaires.
+     *
+     * @return le bilan prévisionnel
+     */
+    public Budget getBudget() {
+        List<Budget.Line> revenues = new ArrayList<>();
+        for (TypeTicket ticketType : ticketTypes)
+            revenues.add(new Budget.Line(
+                    String.format("Tickets « %s » (%d × %s €)", ticketType.getType(), ticketType.getQuantity(), formatAmount(ticketType.getPrice())),
+                    (double) ticketType.getQuantity() * ticketType.getPrice()
+            ));
+
+        List<Budget.Line> costs = new ArrayList<>();
+        costs.add(new Budget.Line(String.format("Location de l'emplacement (%s)", location), locationPrice));
+        for (Artiste artiste : artistes)
+            costs.add(new Budget.Line(String.format("Cachet de %s", artiste.getName()), artiste.getPrice()));
+        for (Stock stock : stocks)
+            costs.add(new Budget.Line(
+                    String.format("Stock « %s » (%d × %s €)", stock.getName(), stock.getRequiredQuantity(), formatAmount(stock.getPrix())),
+                    stock.getRequiredQuantity() * stock.getPrix()
+            ));
+        return new Budget(revenues, costs);
+    }
+
+    /**
+     * Retourne le nombre de personnes attendues : la somme des tickets mis en vente.
+     *
+     * @return le nombre de personnes attendues
+     */
+    public long getExpectedAttendance() {
+        return ticketTypes.stream().mapToLong(TypeTicket::getQuantity).sum();
+    }
+
+    /**
+     * Retourne la surface occupée par les détenteurs de tickets.
+     *
+     * @return la somme, pour chaque type de ticket, de la quantité multipliée par la surface par personne (m²)
+     */
+    public double getOccupiedSurface() {
+        return ticketTypes.stream().mapToDouble(t -> (double) t.getQuantity() * t.getSurface()).sum();
+    }
+
+    /**
+     * Retourne le nombre d'agents de sécurité recommandé : un pour 100 personnes attendues, au moins 3.
+     *
+     * @return le nombre d'agents de sécurité recommandé
+     */
+    public long getRecommendedSecurityAgents() {
+        return Math.max(3, (getExpectedAttendance() + 99) / 100);
+    }
+
+    /**
+     * Formate un montant sans décimales inutiles.
+     *
+     * @param amount le montant
+     * @return le montant formaté
+     */
+    private static String formatAmount(double amount) {
+        return new BigDecimal(Double.toString(amount)).stripTrailingZeros().toPlainString();
     }
 }

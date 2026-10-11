@@ -83,4 +83,42 @@ class TicketStockTest {
         }
         assertEquals(!removed, festival.getStocks().contains(parking), "Le stock ne doit être retiré que si la suppression réussit");
     }
+
+    @Test
+    @DisplayName("C10 — modifier un type de ticket est atomique et garde les noms uniques")
+    void updateTicketTypeIsAtomic() throws Exception {
+        TypeTicket pass = new TypeTicket("Pass", 0, 30);
+        festival.addTicketType(pass);
+        new Avantage(vip, parking, 1).connect();
+        parking.setFixed(true);
+
+        assertThrows(FestivalException.class, () -> festival.updateTicketType(vip, "Pass", 10, 60, 4), "Nom déjà utilisé");
+        assertThrows(FestivalException.class, () -> festival.updateTicketType(vip, "VIP Gold", 500, 60, 4), "500 places de parking pour un stock limité à 100");
+        assertEquals("VIP", vip.getType(), "Une modification refusée ne doit rien changer");
+        assertEquals(0, vip.getQuantity());
+        assertEquals(50, vip.getPrice());
+
+        festival.updateTicketType(vip, "VIP Gold", 80, 60, 4);
+        assertEquals("VIP Gold", vip.getType());
+        assertEquals(80, vip.getQuantity());
+        assertEquals(4, vip.getSurface());
+    }
+
+    @Test
+    @DisplayName("Renommer un stock garde les noms uniques")
+    void renameStockKeepsNamesUnique() throws Exception {
+        Stock gobelet = new Stock("Gobelet", 10, false, 1);
+        festival.addStock(gobelet);
+        assertThrows(FestivalException.class, () -> festival.renameStock(gobelet, "Place de parking"));
+        festival.renameStock(gobelet, "Gobelet réutilisable");
+        assertEquals("Gobelet réutilisable", gobelet.getName());
+    }
+
+    @Test
+    @DisplayName("Une surface par ticket doit être positive, un stock peut être gratuit")
+    void surfaceAndFreeStock() {
+        assertThrows(TypeTicketException.class, () -> vip.setSurface(0));
+        assertThrows(TypeTicketException.class, () -> vip.setSurface(Float.NaN));
+        assertDoesNotThrow(() -> parking.setPrix(0));
+    }
 }

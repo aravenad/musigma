@@ -153,11 +153,11 @@ public class Stock implements Serializable {
      * Définit le prix du stock.
      *
      * @param prix le prix du stock
-     * @throws StockException si le prix est négatif ou nul (0)
+     * @throws StockException si le prix est négatif
      */
     public void setPrix(double prix) throws StockException {
-        if (prix <= 0) {
-            throw new StockException("Le prix est négatif ou nul (0), doit être défini");
+        if (prix < 0) {
+            throw new StockException("Le prix est négatif, doit être positif ou nul");
         }
         this.prix = prix;
         LOGGER.info("Set Stock.prix");
@@ -182,6 +182,25 @@ public class Stock implements Serializable {
         return avantages.stream()
                 .mapToLong(avantage -> avantage.contribution(avantage.getQuantityByTicket()))
                 .sum();
+    }
+
+    /**
+     * Retourne la quantité nécessaire de ce stock (UC3.3) : la quantité d'un stock limité,
+     * sinon la plus grande valeur entre la quantité prévue et la consommation des tickets.
+     *
+     * @return la quantité nécessaire
+     */
+    public long getRequiredQuantity() {
+        return fixed ? quantity : Math.max(quantity, getConsumedQuantity());
+    }
+
+    /**
+     * Retourne la quantité manquante pour couvrir la consommation des tickets.
+     *
+     * @return la consommation moins la quantité prévue, ou 0 si la quantité prévue suffit
+     */
+    public long getMissingQuantity() {
+        return Math.max(0, getConsumedQuantity() - quantity);
     }
 
     /**

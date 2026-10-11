@@ -1,20 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="697.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
-      fx:controller="com.musigma.controllers.workspaces.AccountingController">
-    <children>
-        <TableView fx:id="tableview" prefHeight="697.0" prefWidth="1058.0">
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="697.0" prefWidth="1058.0"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.musigma.controllers.workspaces.AccountingController">
+    <VBox minWidth="245" prefWidth="245" spacing="8.0">
+        <Button maxWidth="1.7976931348623157E308" onAction="#optimize" styleClass="accent" text="Calculer la vente optimale"/>
+        <Button fx:id="applyButton" disable="true" maxWidth="1.7976931348623157E308" onAction="#applyPlan"
+                text="Appliquer la recommandation"/>
+        <Separator/>
+        <Label fx:id="attendance" wrapText="true"/>
+        <Label fx:id="surface" wrapText="true"/>
+        <Label fx:id="security" wrapText="true"/>
+        <Separator/>
+        <Label wrapText="true" style="-fx-text-fill: -color-fg-muted;"
+               text="La vente optimale maximise la recette sans dépasser la surface du festival ni les stocks limités."/>
+        <padding>
+            <Insets left="10.0" right="8.0" top="8.0"/>
+        </padding>
+    </VBox>
+    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+        <Label styleClass="title-4" text="Recettes"/>
+        <TableView fx:id="revenuesTable" prefHeight="150.0" VBox.vgrow="SOMETIMES">
             <columns>
-                <TableColumn fx:id="previsionColumn" prefWidth="470.0" text="Prevision"/>
-                <TableColumn fx:id="montantColumn" prefWidth="586.0" text="Montant"/>
+                <TableColumn fx:id="revenueLabelColumn" prefWidth="600.0" sortable="false" text="Libellé"/>
+                <TableColumn fx:id="revenueAmountColumn" prefWidth="180.0" sortable="false" text="Montant"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Aucun type de ticket"/>
+            </placeholder>
+        </TableView>
+        <Label styleClass="title-4" text="Charges"/>
+        <TableView fx:id="costsTable" prefHeight="200.0" VBox.vgrow="SOMETIMES">
+            <columns>
+                <TableColumn fx:id="costLabelColumn" prefWidth="600.0" sortable="false" text="Libellé"/>
+                <TableColumn fx:id="costAmountColumn" prefWidth="180.0" sortable="false" text="Montant"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
             </columnResizePolicy>
         </TableView>
-    </children>
-</VBox>
+        <Label fx:id="result" styleClass="title-3"/>
+        <Label styleClass="title-4" text="Vente optimale"/>
+        <TableView fx:id="planTable" prefHeight="130.0" VBox.vgrow="SOMETIMES">
+            <columns>
+                <TableColumn fx:id="planTicketColumn" prefWidth="400.0" sortable="false" text="Type de ticket"/>
+                <TableColumn fx:id="planCurrentColumn" prefWidth="190.0" sortable="false" text="Quantité actuelle"/>
+                <TableColumn fx:id="planRecommendedColumn" prefWidth="190.0" sortable="false" text="Quantité recommandée"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Cliquez sur « Calculer la vente optimale »"/>
+            </placeholder>
+        </TableView>
+        <Label fx:id="planRevenue"/>
+        <padding>
+            <Insets bottom="8.0" right="8.0" top="4.0"/>
+        </padding>
+    </VBox>
+</HBox>

@@ -15,7 +15,7 @@
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints maxHeight="336.0" minHeight="10.0" prefHeight="142.0" valignment="CENTER"/>
+        <RowConstraints maxHeight="336.0" minHeight="10.0" prefHeight="40.0" valignment="CENTER"/>
         <RowConstraints maxHeight="539.0" minHeight="10.0" prefHeight="539.0" vgrow="SOMETIMES"/>
     </rowConstraints>
     <children>
@@ -43,28 +43,45 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" valignment="TOP"/>
                     </rowConstraints>
                     <children>
                         <Label text="Nom :"/>
                         <RequiredTextField fx:id="festivalName" prefWidth="200.0" promptText="ex: HellFest"
                                            GridPane.columnIndex="1"/>
 
-                        <Label text="Date du début:" GridPane.rowIndex="1"/>
+                        <Label text="Date de début :" GridPane.rowIndex="1"/>
                         <DatePicker fx:id="festivalStartDate" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
                                     minWidth="-Infinity" promptText="ex: 10/10/2010" GridPane.columnIndex="1"
                                     GridPane.rowIndex="1"/>
 
-                        <Label text="Emplacement :" GridPane.rowIndex="2"/>
+                        <Label text="Dernier jour :" GridPane.rowIndex="2"/>
+                        <DatePicker fx:id="festivalEndDate" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                                    minWidth="-Infinity" promptText="ex: 12/10/2010" GridPane.columnIndex="1"
+                                    GridPane.rowIndex="2"/>
+
+                        <Label text="Emplacement :" GridPane.rowIndex="3"/>
                         <RequiredTextField fx:id="festivalLocation" prefWidth="200.0" promptText="ex: Lyon"
-                                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                           GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-                        <Label text="Superficie de la fosse (m²) :" GridPane.rowIndex="3"/>
+                        <Label text="Superficie de la fosse (m²) :" GridPane.rowIndex="4"/>
                         <FloatTextField fx:id="festivalArea" notNull="true" positive="true" prefWidth="200.0"
-                                        promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                        <Label text="Prix de l'emplacement (€) :" GridPane.rowIndex="4"/>
-                        <FloatTextField fx:id="festivalLocationPrice" positive="true" prefWidth="200.0"
                                         promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                        <Label text="Prix de l'emplacement (€) :" GridPane.rowIndex="5"/>
+                        <FloatTextField fx:id="festivalLocationPrice" positive="true" prefWidth="200.0"
+                                        promptText="ex: 1000" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+                        <Label text="Scènes :" GridPane.rowIndex="6"/>
+                        <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                            <ListView fx:id="scenesList" prefHeight="110.0" prefWidth="200.0"/>
+                            <HBox spacing="8.0">
+                                <Button onAction="#addScene" text="Ajouter"/>
+                                <Button onAction="#renameScene" text="Renommer"/>
+                                <Button onAction="#removeScene" text="Supprimer"/>
+                            </HBox>
+                        </VBox>
                     </children>
                 </GridPane>
             </body>

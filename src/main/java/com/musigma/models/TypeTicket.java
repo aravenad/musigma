@@ -3,6 +3,8 @@ package com.musigma.models;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.TypeTicketException;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +20,11 @@ import static com.musigma.utils.Log.getLogger;
 public class TypeTicket implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Surface occupée par défaut par un détenteur de ticket (m²), selon la densité d'une fosse de concert.
+     */
+    public static final float DEFAULT_SURFACE = .42f;
 
     /**
      * Logger de la class
@@ -39,6 +46,10 @@ public class TypeTicket implements Serializable {
      * Prix unitaire du ticket
      */
     private float price;
+    /**
+     * Surface occupée par chaque détenteur de ce ticket (m²)
+     */
+    private float surface = DEFAULT_SURFACE;
 
     /**
      * Constructeur de la classe TypeTicket.
@@ -130,6 +141,41 @@ public class TypeTicket implements Serializable {
             throw new TypeTicketException("Le prix est négatif, doit être positif");
         this.price = price;
         LOGGER.info("Set TypeTicket.price");
+    }
+
+    /**
+     * Retourne la surface occupée par chaque détenteur de ce ticket.
+     *
+     * @return la surface en m²
+     */
+    public float getSurface() {
+        return surface;
+    }
+
+    /**
+     * Définit la surface occupée par chaque détenteur de ce ticket (ex : 4 m² pour un VIP, 2 m² sinon).
+     *
+     * @param surface la surface en m²
+     * @throws TypeTicketException si la surface n'est pas strictement positive
+     */
+    public void setSurface(float surface) throws TypeTicketException {
+        if (!(surface > 0))
+            throw new TypeTicketException("La surface par ticket est négative ou nulle, doit être positive");
+        this.surface = surface;
+        LOGGER.info("Set TypeTicket.surface");
+    }
+
+    /**
+     * Complète un type de ticket enregistré avant l'ajout de la surface par ticket.
+     *
+     * @param in le flux de lecture
+     * @throws IOException            si la lecture échoue
+     * @throws ClassNotFoundException si une classe du fichier est inconnue
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (surface <= 0)
+            surface = DEFAULT_SURFACE;
     }
 
     /**

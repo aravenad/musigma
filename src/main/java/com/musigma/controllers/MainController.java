@@ -23,7 +23,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -65,6 +65,7 @@ public class MainController {
 
     private static final WorkspaceController.WorkspaceRegister[] WORKSPACES = {
             HomeController.REGISTER,
+            ArtistController.REGISTER,
             CalendarController.REGISTER,
             StockController.REGISTER,
             TicketController.REGISTER,
@@ -294,7 +295,7 @@ public class MainController {
                 () -> {
                     loadFestival(new Festival(
                             "Nouveau festival",
-                            LocalDateTime.now(),
+                            LocalDate.now().atStartOfDay(),
                             0,
                             1,
                             "Quelque part sur Terre"

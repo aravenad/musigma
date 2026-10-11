@@ -2,38 +2,28 @@
 
 <?import com.calendarfx.view.CalendarView?>
 <?import com.musigma.controllers.components.IntTextField?>
-<?import com.musigma.controllers.components.RequiredTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="695.0" minHeight="695.0" prefHeight="695.0"
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="697.0" prefWidth="1058.0"
       xmlns="http://javafx.com/javafx/22" fx:controller="com.musigma.controllers.workspaces.CalendarController">
     <children>
-        <HBox alignment="CENTER_LEFT" maxHeight="46.0" minHeight="46.0" prefHeight="46.0" prefWidth="1057.0"
-              spacing="10" style="-color-danger-fg: -color-neutral-muted">
+        <HBox alignment="CENTER_LEFT" spacing="8.0">
             <children>
-                <Label text="Début :"/>
-                <IntTextField fx:id="dateDebut" maxHeight="-Infinity" promptText="ex (en h) :  12"/>
-                <Label text="Fin :"/>
-                <IntTextField fx:id="dateFin" maxHeight="-Infinity" promptText="ex (en h) : 14"/>
-                <Label text="Artiste :"/>
-                <RequiredTextField fx:id="nomEvent" maxHeight="-Infinity" promptText="ex : Michael Jackson"/>
-                <Label text="Scene :"/>
-                <IntTextField fx:id="scene" maxHeight="-Infinity" promptText="ex : 1"/>
-                <Button fx:id="addEventButton" mnemonicParsing="false" text="Ajouter"/>
+                <ComboBox fx:id="artisteChoice" prefWidth="170.0" promptText="Artiste"/>
+                <ComboBox fx:id="sceneChoice" prefWidth="175.0" promptText="Scène"/>
+                <DatePicker fx:id="dayChoice" prefWidth="140.0" promptText="Jour"/>
+                <ComboBox fx:id="timeChoice" prefWidth="95.0" promptText="Heure"/>
+                <IntTextField fx:id="durationField" maxHeight="-Infinity" prefWidth="80.0" positive="true" notNull="true"
+                              promptText="Durée"/>
+                <Label text="min"/>
+                <Button onAction="#planRepresentation" styleClass="accent" text="Planifier"/>
             </children>
-            <VBox.margin>
-                <Insets/>
-            </VBox.margin>
-            <opaqueInsets>
-                <Insets/>
-            </opaqueInsets>
             <padding>
-                <Insets left="10.0"/>
+                <Insets bottom="6.0" left="10.0" right="10.0" top="6.0"/>
             </padding>
         </HBox>
-        <CalendarView fx:id="calendarView" maxHeight="650.0" maxWidth="-Infinity" minHeight="650.0" minWidth="-Infinity"
-                      prefHeight="650.0" prefWidth="1057.0"/>
+        <CalendarView fx:id="calendarView" VBox.vgrow="ALWAYS"/>
     </children>
 </VBox>

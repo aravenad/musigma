@@ -24,6 +24,8 @@ class PlanningTest {
     @BeforeEach
     void setUp() throws FestivalException, ArtisteException {
         festival = new Festival("Festival", LocalDateTime.now().plusDays(1), 0, 1000, "Grenoble");
+        festival.addScene("Scène 1");
+        festival.addScene("Scène 2");
         artiste = new Artiste("Gorillaz", "Pop", 1000);
         festival.addArtiste(artiste);
     }

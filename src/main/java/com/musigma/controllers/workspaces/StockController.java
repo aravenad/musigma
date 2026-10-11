@@ -9,20 +9,19 @@ import com.musigma.controllers.components.IntTextField;
 import com.musigma.controllers.components.RequiredTextField;
 import com.musigma.models.Festival;
 import com.musigma.models.Stock;
+import com.musigma.utils.exceptionMethods.Runner;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.Callback;
 
-import java.util.List;
-
-import static com.musigma.controllers.Dialogs.askValidForm;
-import static com.musigma.controllers.Dialogs.tryCatch;
+import static com.musigma.controllers.Dialogs.*;
 
 /**
- * Contrôleur pour l'espace de travail Stock.
+ * Contrôleur pour l'espace de travail Stock (UC3.3) : stocks du festival, limites et besoins des tickets.
  */
 public class StockController extends WorkspaceController {
     /**
@@ -31,8 +30,8 @@ public class StockController extends WorkspaceController {
      *
      * @see com.musigma.controllers.WorkspaceController
      */
-    public static WorkspaceRegister REGISTER = new WorkspaceRegister(
-            "Stock",
+    public static final WorkspaceRegister REGISTER = new WorkspaceRegister(
+            "Stocks",
             "/com/musigma/images/icons/stock.png",
             "/com/musigma/views/stock-view.fxml"
     );
@@ -41,10 +40,13 @@ public class StockController extends WorkspaceController {
     TableView<Stock> tableView;
 
     @FXML
-    TableColumn<Stock, String> nameColumn;
+    TableColumn<Stock, String> nameColumn, consumedColumn;
 
     @FXML
     TableColumn<Stock, Integer> quantityColumn;
+
+    @FXML
+    TableColumn<Stock, Boolean> fixedColumn;
 
     @FXML
     TableColumn<Stock, Double> priceColumn;
@@ -53,132 +55,151 @@ public class StockController extends WorkspaceController {
     TableColumn<Stock, Void> actionColumn;
 
     @FXML
-    Label total;
+    Label total, missing;
 
     /**
-     * Initialise le contrôleur. Charge les stocks du festival dans la table. Définit les colonnes de la table. Définit les listeners pour les champs de saisie.
-     * Définit un bouton de suppression pour chaque ligne de la table. Définit la modification des noms, quantités et prix des stocks.
+     * Initialise le contrôleur : charge les stocks du festival dans la table et rend leurs valeurs modifiables.
      *
      * @param festival le festival
      */
+    @Override
     public void initialize(Festival festival) {
         super.initialize(festival);
-        tableView.getItems().addAll(festival.getStocks());
-        tableView.setEditable(true); // Permet l'édition de la TableView
+        tableView.getItems().setAll(festival.getStocks());
+        tableView.setEditable(true);
 
         nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
-        nameColumn.setCellFactory(TextFieldTableCell.forTableColumn()); // Permet l'édition des noms
-        nameColumn.setOnEditCommit(event -> {
-            Stock stock = event.getRowValue();
-            tryCatch(
-                    "Impossible de modifier le nom du stock",
-                    () -> stock.setName(event.getNewValue()));
-        });
+        nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        nameColumn.setOnEditCommit(event -> commit(
+                "Impossible de renommer le stock",
+                () -> festival.renameStock(event.getRowValue(), event.getNewValue())
+        ));
 
         quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
-        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); // Permet l'édition des quantités
-        quantityColumn.setOnEditCommit(event -> {
-            Stock stock = event.getRowValue();
-            tryCatch(
-                    "Impossible de modifier la quantité du stock",
-                    () -> stock.setQuantity(event.getNewValue()));
+        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        quantityColumn.setOnEditCommit(event -> commit(
+                "Impossible de modifier la quantité du stock",
+                () -> event.getRowValue().setQuantity(event.getNewValue())
+        ));
+
+        fixedColumn.setCellValueFactory(f -> {
+            Stock stock = f.getValue();
+            SimpleBooleanProperty fixed = new SimpleBooleanProperty(stock.isFixed());
+            fixed.addListener((observable, oldValue, newValue) -> commit(
+                    "Impossible de changer la limite du stock",
+                    () -> stock.setFixed(newValue)
+            ));
+            return fixed;
         });
+        fixedColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fixedColumn));
+
+        consumedColumn.setCellValueFactory(f -> new SimpleStringProperty(consumption(f.getValue())));
 
         priceColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getPrix()));
-        priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter())); // Permet l'édition des prix
-        priceColumn.setOnEditCommit(event -> {
-            Stock stock = event.getRowValue();
-            tryCatch(
-                    "Impossible de modifier le prix du stock",
-                    () -> stock.setPrix(event.getNewValue()));
-        });
-        addDeleteButtonToTable();
-    }
+        priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        priceColumn.setOnEditCommit(event -> commit(
+                "Impossible de modifier le prix du stock",
+                () -> event.getRowValue().setPrix(event.getNewValue())
+        ));
 
-    /**
-     * Ajoute un bouton de suppression à la table, crée une colonne d'action avec le bouton de suppression.
-     * Lorsque le bouton est cliqué, la ligne correspondante est supprimée de la table.
-     * La méthode est appelée dans la méthode initialize.
-     *
-     * @see #initialize(Festival)
-     */
-    private void addDeleteButtonToTable() {
-        actionColumn = new TableColumn<>("Actions");
-        Callback<TableColumn<Stock, Void>, TableCell<Stock, Void>> cellFactory = new Callback<>() {
-            @Override
-            public TableCell<Stock, Void> call(final TableColumn<Stock, Void> param) {
-                return new TableCell<>() {
+        actionColumn.setCellFactory(column -> new TableCell<>() {
+            private final Button deleteButton = new Button("Supprimer");
 
-                    @Override
-                    public void updateItem(Void item, boolean isEmpty) {
-                        super.updateItem(item, isEmpty);
-                        Button btn = new Button("Supprimer");
-                        if (isEmpty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(btn);
-                            btn.setOnAction((e) -> {
-                                Stock stock = getTableView().getItems().get(getIndex());
-                                tryCatch(
-                                        "Impossible de supprimer le stock",
-                                        () -> {
-                                            festival.removeStock(stock);
-                                            getTableView().getItems().remove(stock);
-                                            totalPrix();
-                                        });
-                            });
-                        }
-                    }
-                };
+            {
+                deleteButton.setOnAction(e -> deleteStock(getTableView().getItems().get(getIndex())));
             }
-        };
-        actionColumn.setCellFactory(cellFactory);
-        tableView.getColumns().add(actionColumn);
+
+            @Override
+            public void updateItem(Void item, boolean isEmpty) {
+                super.updateItem(item, isEmpty);
+                setGraphic(isEmpty ? null : deleteButton);
+            }
+        });
+        refreshTotals();
     }
 
     /**
-     * Ajoute un stock à la table.
-     * Si les champs de saisie sont valides, un stock est créé et ajouté à la table.
-     * Sinon, les champs de saisie invalides sont surlignés en rouge.
-     * La méthode est appelée lorsqu'on clique sur le bouton "Ajouter".
+     * Décrit ce que les tickets consomment d'un stock, et ce qui manque pour un stock non limité.
+     *
+     * @param stock le stock
+     * @return la consommation, suivie du manque éventuel
+     */
+    private static String consumption(Stock stock) {
+        long missing = stock.isFixed() ? 0 : stock.getMissingQuantity();
+        return missing > 0
+                ? String.format("%d (manque %d)", stock.getConsumedQuantity(), missing)
+                : Long.toString(stock.getConsumedQuantity());
+    }
+
+    /**
+     * Applique une modification de la table au modèle, puis réaffiche la table :
+     * une valeur refusée retrouve ainsi sa valeur précédente.
+     *
+     * @param errorMsg     le message d'erreur si le modèle refuse la modification
+     * @param modification la modification du modèle
+     */
+    private void commit(String errorMsg, Runner modification) {
+        tryCatch(errorMsg, modification);
+        tableView.refresh();
+        refreshTotals();
+    }
+
+    /**
+     * Supprime un stock après confirmation s'il est utilisé par des tickets.
+     *
+     * @param stock le stock à supprimer
+     */
+    private void deleteStock(Stock stock) {
+        if (!stock.getAvantages().isEmpty() && !confirm(
+                "Supprimer le stock",
+                String.format("Le stock « %s » est utilisé par %d avantage(s) de tickets, qui seront aussi supprimés. Continuer ?",
+                        stock.getName(), stock.getAvantages().size())
+        ))
+            return;
+        tryCatch(
+                "Impossible de supprimer le stock",
+                () -> {
+                    festival.removeStock(stock);
+                    tableView.getItems().remove(stock);
+                    refreshTotals();
+                });
+    }
+
+    /**
+     * Ajoute un stock à partir d'un formulaire.
      */
     @FXML
     private void addStock() {
         CustomValidField<RequiredTextField> stockName = new CustomValidField<>("Nom", new RequiredTextField());
         CustomValidField<IntTextField> quantity = new CustomValidField<>("Quantité", new IntTextField(true, true));
-        CustomValidField<FloatTextField> price = new CustomValidField<>("Prix", new FloatTextField(true, false));
+        CustomValidField<FloatTextField> price = new CustomValidField<>("Prix unitaire (€)", new FloatTextField(true, false));
+        CustomValidField<CheckBox> fixed = new CustomValidField<>("Limité", new CheckBox("Les tickets ne peuvent pas dépasser cette quantité"));
 
         askValidForm(
                 "Ajouter un stock",
                 "Ajout d'un stock impossible",
-                new CustomValidField[]{stockName, quantity, price},
+                new CustomValidField[]{stockName, quantity, price, fixed},
                 () -> {
                     Stock stock = new Stock(
                             stockName.node.getText(),
                             quantity.node.getValue(),
-                            false,
+                            fixed.node.isSelected(),
                             price.node.getValue()
                     );
                     festival.addStock(stock);
                     tableView.getItems().add(stock);
-                    totalPrix();
+                    refreshTotals();
                 }
         );
     }
 
     /**
-     * Calcule le prix total des stocks.
+     * Affiche le coût total des stocks nécessaires et les stocks insuffisants.
      */
-    private void totalPrix() {
-        List<Stock> stocks = tableView.getItems();
-        if (stocks.size() == 0)
-            total.setText("");
-        else {
-            double t = 0;
-            for (Stock stock : stocks) {
-                t += stock.getPrix() * stock.getQuantity();
-            }
-            total.setText(String.format("Total : %.2f €", t));
-        }
+    private void refreshTotals() {
+        double cost = festival.getStocks().stream().mapToDouble(stock -> stock.getRequiredQuantity() * stock.getPrix()).sum();
+        total.setText(festival.getStocks().isEmpty() ? "" : String.format("Coût des stocks nécessaires : %.2f €", cost));
+        long insufficient = festival.getStocks().stream().filter(stock -> !stock.isFixed() && stock.getMissingQuantity() > 0).count();
+        missing.setText(insufficient == 0 ? "" : String.format("%d stock(s) insuffisant(s) pour les tickets prévus", insufficient));
     }
 }

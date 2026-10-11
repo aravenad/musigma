@@ -66,14 +66,17 @@ public class TicketController extends WorkspaceController {
     private void addTicket() {
         CustomValidField<RequiredTextField> nameTicket = new CustomValidField<>("Nom", new RequiredTextField());
         CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, true));
-        CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix", new FloatTextField(true, false));
+        CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
+        CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
+        surfaceTicket.node.setValue(TypeTicket.DEFAULT_SURFACE);
 
         askValidForm(
                 "Ajouter un type de ticket",
                 "Ajout d'un type de ticket impossible",
-                new CustomValidField[]{nameTicket, quantiteTicket, priceTicket},
+                new CustomValidField[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
                 () -> {
                     TypeTicket ticket = new TypeTicket(nameTicket.node.getText(), quantiteTicket.node.getValue(), priceTicket.node.getValue());
+                    ticket.setSurface(surfaceTicket.node.getValue());
                     festival.addTicketType(ticket);
                     createTab(ticket);
                 }
@@ -95,17 +98,23 @@ public class TicketController extends WorkspaceController {
             nameTicket.node.setText(ticket.getType());
             CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, true));
             quantiteTicket.node.setValue(ticket.getQuantity());
-            CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix", new FloatTextField(true, false));
+            CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
             priceTicket.node.setValue(ticket.getPrice());
+            CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
+            surfaceTicket.node.setValue(ticket.getSurface());
 
             askValidForm(
                     "Modifier le ticket " + ticket.getType(),
                     "Modification d'un type de ticket impossible",
-                    new CustomValidField[]{nameTicket, quantiteTicket, priceTicket},
+                    new CustomValidField[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
                     () -> {
-                        ticket.setType(nameTicket.node.getText());
-                        ticket.setQuantity(quantiteTicket.node.getValue());
-                        ticket.setPrice(priceTicket.node.getValue());
+                        festival.updateTicketType(
+                                ticket,
+                                nameTicket.node.getText(),
+                                quantiteTicket.node.getValue(),
+                                priceTicket.node.getValue(),
+                                surfaceTicket.node.getValue()
+                        );
                         tabPane.getTabs().clear();
                         restoreTab();
                     }
@@ -277,17 +286,38 @@ public class TicketController extends WorkspaceController {
      */
     private void renameTab(Tab tab, TypeTicket ticket, boolean isFirstTab) {
         if (isFirstTab) {
-            tab.setText(ticket.getType() + " (" + ticket.getQuantity() + " tickets, " + ticket.getPrice() + " €)");
+            tab.setText(tabTitle(ticket));
         } else {
             tab.setText(ticket.getType());
         }
 
         tab.setOnSelectionChanged(e -> {
             if (tab.isSelected()) {
-                tab.setText(ticket.getType() + " (" + ticket.getQuantity() + " tickets, " + ticket.getPrice() + " €)");
+                tab.setText(tabTitle(ticket));
             } else if (!isFirstTab) {
                 tab.setText(ticket.getType());
             }
         });
+    }
+
+    /**
+     * Retourne le titre détaillé de l'onglet d'un type de ticket.
+     *
+     * @param ticket le type de ticket
+     * @return le nom, la quantité, le prix et la surface du ticket
+     */
+    private static String tabTitle(TypeTicket ticket) {
+        return String.format("%s (%d tickets, %s €, %s m²/pers.)",
+                ticket.getType(), ticket.getQuantity(), formatNumber(ticket.getPrice()), formatNumber(ticket.getSurface()));
+    }
+
+    /**
+     * Formate un nombre sans décimales inutiles.
+     *
+     * @param value le nombre
+     * @return le nombre formaté
+     */
+    private static String formatNumber(float value) {
+        return new java.math.BigDecimal(Float.toString(value)).stripTrailingZeros().toPlainString();
     }
 }

@@ -8,6 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -17,6 +19,8 @@ import javafx.stage.Stage;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import static com.musigma.controllers.MainController.ICON_PATH;
@@ -33,6 +37,21 @@ public class Dialogs {
     // Nom de fichier par défaut et extension pour le dialog
     private static final String FILENAME = "Musigma";
     private static final String EXT_NAME = "*.mgm";
+
+    /**
+     * Affichage des messages d'erreur : une boîte de dialogue, sauf si un test le remplace.
+     */
+    private static Consumer<String> errorDisplay = Dialogs::showErrorAlert;
+
+    /**
+     * Remplace l'affichage des messages d'erreur, par exemple pour les relever dans un test
+     * sans ouvrir de boîte de dialogue bloquante.
+     *
+     * @param display le nouvel affichage, ou null pour revenir aux boîtes de dialogue
+     */
+    public static void setErrorDisplay(Consumer<String> display) {
+        errorDisplay = display == null ? Dialogs::showErrorAlert : display;
+    }
 
     /**
      * Méthode pour exécuter une opération encapsulée dans un bloc try-catch.
@@ -56,6 +75,15 @@ public class Dialogs {
      */
     public static void showError(String errorMsg) {
         LOGGER.severe(errorMsg);
+        errorDisplay.accept(errorMsg);
+    }
+
+    /**
+     * Affiche un message d'erreur dans une boîte de dialogue bloquante.
+     *
+     * @param errorMsg le message d'erreur à afficher
+     */
+    private static void showErrorAlert(String errorMsg) {
         Alert alert = new Alert(
                 Alert.AlertType.ERROR,
                 String.format("L'application a rencontré une erreur :\n%s", errorMsg)
@@ -82,6 +110,41 @@ public class Dialogs {
             showError(String.format("%s : %s", errorMsg, e.getMessage()));
             Arrays.stream(e.getStackTrace()).forEach(error -> LOGGER.severe(String.format("%s : %s", errorMsg, error)));
         }
+    }
+
+    /**
+     * Demande un texte à l'utilisateur.
+     *
+     * @param title   titre de la fenêtre
+     * @param header  question posée
+     * @param initial texte proposé par défaut
+     * @return le texte saisi, ou vide si l'utilisateur a annulé
+     */
+    public static Optional<String> askText(String title, String header, String initial) {
+        TextInputDialog dialog = new TextInputDialog(initial);
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+        ((Stage) dialog.getDialogPane().getScene().getWindow())
+                .getIcons()
+                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
+        return dialog.showAndWait();
+    }
+
+    /**
+     * Demande une confirmation à l'utilisateur.
+     *
+     * @param title   titre de la fenêtre
+     * @param message question posée
+     * @return true si l'utilisateur a confirmé
+     */
+    public static boolean confirm(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        ((Stage) alert.getDialogPane().getScene().getWindow())
+                .getIcons()
+                .add(new Image(Objects.requireNonNull(Dialogs.class.getResourceAsStream(ICON_PATH))));
+        return alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
     }
 
     /**

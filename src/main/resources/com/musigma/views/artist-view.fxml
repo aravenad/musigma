@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="697.0" prefWidth="1058.0"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.musigma.controllers.workspaces.ArtistController">
+    <VBox minWidth="200" prefWidth="200" spacing="8.0">
+        <Button maxWidth="1.7976931348623157E308" onAction="#addArtiste" text="Engager un artiste"/>
+        <Separator/>
+        <Label fx:id="totalFees" wrapText="true"/>
+        <Label fx:id="freeTime" wrapText="true"/>
+        <Separator/>
+        <Label wrapText="true" style="-fx-text-fill: -color-fg-muted;"
+               text="Double-cliquez sur une valeur pour la modifier. Les représentations se planifient dans l'espace Planning."/>
+        <padding>
+            <Insets left="10.0" right="8.0" top="8.0"/>
+        </padding>
+    </VBox>
+    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+        <TableView fx:id="artistsTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="nameColumn" prefWidth="260.0" text="Nom"/>
+                <TableColumn fx:id="genreColumn" prefWidth="180.0" text="Genre"/>
+                <TableColumn fx:id="feeColumn" prefWidth="140.0" text="Cachet (€)"/>
+                <TableColumn fx:id="countColumn" prefWidth="130.0" text="Représentations"/>
+                <TableColumn fx:id="actionColumn" prefWidth="110.0" sortable="false" text="Actions"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Aucun artiste engagé"/>
+            </placeholder>
+        </TableView>
+        <Label fx:id="representationsTitle" text="Représentations">
+            <padding>
+                <Insets left="8.0"/>
+            </padding>
+        </Label>
+        <TableView fx:id="representationsTable" prefHeight="200.0" minHeight="160.0">
+            <columns>
+                <TableColumn fx:id="sceneColumn" prefWidth="260.0" text="Scène"/>
+                <TableColumn fx:id="startColumn" prefWidth="260.0" text="Début"/>
+                <TableColumn fx:id="durationColumn" prefWidth="160.0" text="Durée"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Sélectionnez un artiste pour voir ses représentations"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+</HBox>
