@@ -1,29 +1,51 @@
-# Musigma
+# Méga SAÉ – Musigma (groupe E1-06)
 
-Application de bureau (JavaFX) d'aide à l'organisation de festivals de musique, réalisée en 2024 pour la « Méga SAÉ » du BUT Informatique (IUT2 Grenoble, groupe E1-06).
+Projet de fin de première année de BUT Informatique (IUT2 Grenoble, avril à juin 2024) : une application de bureau
+pour aider à organiser un festival de musique. Le sujet demandait un outil d'aide et de pilotage pour des organisateurs
+d'événements, sous forme d'application avec interface graphique. On en a fait **Musigma**, en Java avec JavaFX.
 
-Un fichier `.mgm` contient un festival : ses dates et scènes, ses artistes et leurs représentations, ses types de tickets et leurs avantages, ses stocks, et le bilan prévisionnel qui en découle.
+La version rendue en juin 2024 est marquée par le tag [`rendu-code`](https://github.com/aravenad/musigma/tree/rendu-code). J'ai repris le projet seul
+en octobre 2026 pour terminer les cas d'utilisation prévus et corriger les bugs.
 
-## Fonctionnalités
+![Le planning d'un festival dans Musigma](guide/images/03-planning.png)
 
-| Espace | Cas d'utilisation | Contenu |
-|---|---|---|
-| Accueil | UC1 Créer festival | Nom, dates, lieu, surface, prix de location, scènes |
-| Artistes | UC4.1 Engager artiste | Artistes, genres, cachets, représentations de chaque artiste |
-| Planning | UC4.2 Planifier représentation | Un calendrier par scène ; déplacement, durée et suppression vérifiés (pas de chevauchement sur une scène) |
-| Stocks | UC3.3 Modéliser stocks | Ressources limitées ou non, consommation par les tickets, manques |
-| Tickets | UC3.1 Créer type de ticket | Prix, quantité, surface par personne, avantages puisés dans les stocks |
-| Prévision | UC3.2 Simuler recettes | Bilan recettes/charges, vente optimale des tickets (programmation linéaire en nombres entiers) |
+## Ce qu'il y a dans l'application
 
-Affichage : thème clair ou sombre, zoom (Ctrl + / Ctrl - / Ctrl 0), aide contextuelle sous la barre de menus, infobulles sur le menu de gauche. Le guide d'utilisation s'ouvre avec F1.
+Un fichier `.mgm` contient un festival entier. L'application est découpée en six espaces, un par cas d'utilisation
+du dossier de conception :
 
-## Utilisation
+- **Accueil** (UC1 Créer festival) : nom, dates, lieu, surface, prix de location et scènes
+- **Artistes** (UC4.1 Engager artiste) : genres, cachets et représentations de chaque artiste
+- **Planning** (UC4.2 Planifier représentation) : un calendrier par scène, où l'on déplace et allonge les
+  représentations à la souris ; deux concerts ne peuvent pas se chevaucher sur la même scène
+- **Stocks** (UC3.3 Modéliser stocks) : ressources limitées ou non, ce que les tickets en consomment et ce qui manque
+- **Tickets** (UC3.1 Créer type de ticket) : prix, quantité, surface par personne et avantages pris dans les stocks
+- **Prévision** (UC3.2 Simuler recettes) : bilan des recettes et des charges, et le nombre de tickets de chaque type à
+  vendre pour gagner le plus (programmation linéaire en nombres entiers)
 
-Prérequis : un JDK 17 ou plus récent. Maven est fourni par le wrapper `mvnw`.
+Il y a aussi un thème clair et un thème sombre, un zoom (Ctrl + / Ctrl - / Ctrl 0), une aide contextuelle sous la barre
+de menus, des infobulles sur le menu de gauche et un guide d'utilisation qui s'ouvre avec F1.
+
+## Lancer l'application
+
+Il faut Java 17 ou plus récent. Le plus simple est de prendre l'application déjà construite,
+[`genevent.jar`](out/artifacts/genevent_jar/genevent.jar), qui marche sous Windows, Linux et macOS Intel :
+
+```bash
+java -jar genevent.jar
+```
+
+Depuis les sources, il faut un JDK 17 ou plus récent ; Maven est fourni par le wrapper `mvnw`, rien d'autre à installer :
 
 ```bash
 ./mvnw javafx:run
 ```
+
+Les préférences (fichiers récents, thème, zoom, aide) sont enregistrées dans le profil de l'utilisateur via
+`java.util.prefs`. Les logs sont écrits dans le dossier temporaire (`musigma-*.log`) ; passer `com.musigma.level` à
+`FINE` dans `src/main/resources/logging.properties` pour avoir le détail des modifications du modèle.
+
+## Les autres commandes
 
 | Commande | Rôle |
 |---|---|
@@ -32,21 +54,44 @@ Prérequis : un JDK 17 ou plus récent. Maven est fourni par le wrapper `mvnw`.
 | `./mvnw compile spotbugs:check` | Analyse statique SpotBugs |
 | `./mvnw pmd:check pmd:cpd-check` | Analyse statique PMD et détection de code dupliqué |
 | `./mvnw javadoc:javadoc` | Javadoc dans `target/reports/apidocs` |
-| `./mvnw -Pdist package` | Application distribuable `out/artifacts/genevent_jar/genevent.jar`, à lancer avec `java -jar genevent.jar` (Java 17+, Windows, Linux ou macOS Intel) |
-| `python3 guide/generer.py` | Guide d'utilisation (F1) régénéré depuis `guide/guide.html` ; `--captures` refait aussi les captures d'écran (nécessite Chrome et pdftotext) |
+| `./mvnw -Pdist package` | Reconstruit `out/artifacts/genevent_jar/genevent.jar` |
+| `python3 guide/generer.py` | Régénère le guide d'utilisation (F1) depuis `guide/guide.html` ; `--captures` refait aussi les captures d'écran (il faut Chrome et pdftotext) |
 
-Les préférences (fichiers récents, thème, zoom, aide) sont enregistrées dans le profil de l'utilisateur via `java.util.prefs`.
-Les logs sont écrits dans le dossier temporaire (`musigma-*.log`) ; passer `com.musigma.level` à `FINE` dans `src/main/resources/logging.properties` pour le détail des modifications du modèle.
+## Arborescence
 
-## Architecture
+```
+├── pom.xml                    dépendances et plugins Maven
+├── src/
+│   ├── main/
+│   │   ├── java/com/musigma/
+│   │   │   ├── models/        le modèle : Festival, Artiste, Representation, Stock, TypeTicket, Bilan…
+│   │   │   ├── controllers/   la fenêtre principale et les dialogues
+│   │   │   │   ├── workspaces/    un contrôleur par espace (Accueil, Artistes, Planning…)
+│   │   │   │   └── components/    les champs de saisie validés (texte requis, entier, décimal)
+│   │   │   └── utils/         logs et préférences
+│   │   └── resources/com/musigma/
+│   │       ├── views/         les vues FXML
+│   │       ├── styles/        la feuille de style
+│   │       ├── images/        le logo et les icônes du menu
+│   │       └── guide/         le guide d'utilisation en PDF
+│   └── test/                  les tests JUnit 5
+├── guide/                     les sources du guide et le script qui le génère
+└── out/artifacts/genevent_jar/
+    └── genevent.jar           l'application prête à lancer
+```
 
-Architecture MVC :
+## Nos choix
 
-- `com.musigma.models` : le modèle. `Festival` est la racine : toute modification qui engage plusieurs objets passe par lui (planification, suppressions en cascade, modification atomique d'un ticket, optimisation, bilan) afin de garder des données cohérentes.
-- `com.musigma.controllers` : la fenêtre principale, un contrôleur par espace de travail (`workspaces`) et des champs de saisie validés (`components`).
-- `src/main/resources/com/musigma/views` : les vues FXML.
+L'application suit une architecture **MVC** : le modèle dans `com.musigma.models`, les contrôleurs dans
+`com.musigma.controllers` et les vues en FXML. `Festival` est la racine du modèle : toute modification qui touche
+plusieurs objets passe par lui (planification, suppressions en cascade, modification d'un ticket, optimisation, bilan),
+pour que les données restent cohérentes.
 
-## Écarts avec le dossier de conception
+Le calcul de la vente optimale reprend notre rapport de méthodes numériques : maximiser la recette sous les contraintes
+des stocks limités et de la surface du festival. Sur l'exemple du rapport (tickets VIP à 4 m², non VIP à 2 m²), il
+trouve bien 205 000 €.
+
+### Écarts avec le dossier de conception
 
 | Dossier de conception | Réalisation | Raison |
 |---|---|---|
@@ -54,9 +99,18 @@ Architecture MVC :
 | `Representation.startDate: LocalDateTime` | `decalageDebut` en minutes depuis le début du festival | Déplacer le festival déplace ses représentations |
 | `Stock.absoluteQuantity: Integer \| null` | `quantite` + `limite` + quantité nécessaire calculée | L'écran Stocks a besoin d'une quantité prévue même pour un stock illimité (coût) |
 | `TypeTicket.id` | Nom unique dans le festival | Le nom suffit à identifier un type de ticket pour l'utilisateur |
-| — | `TypeTicket.surface`, `Festival.fin`, `Festival.scenes` | Surface par ticket du modèle mathématique (rapport R2.09) ; dates et scènes de l'UC1 |
-| Contrainte de surface à 0,42 m²/personne | Surface propre à chaque type de ticket (0,42 m² par défaut) | Exemple du rapport : VIP 4 m², Non-VIP 2 m² → 205 000 € |
+| Absent | `TypeTicket.surface`, `Festival.fin`, `Festival.scenes` | Surface par ticket du modèle mathématique (rapport R2.09) ; dates et scènes de l'UC1 |
+| Contrainte de surface à 0,42 m²/personne | Surface propre à chaque type de ticket (0,42 m² par défaut) | Exemple du rapport : VIP 4 m², non VIP 2 m² → 205 000 € |
+
+La réservation d'un emplacement de stand (UC2) et le choix des titres joués par un artiste (UC4.3) étaient en
+priorité 3 dans le dossier de conception : ils ne sont pas réalisés.
 
 ## Équipe
 
 ARAVENA BRAVO Damien (chef de projet), BENDRIS Naël, GIMBERT Bastien, GIBELLO Grégoire, BARTHES Cyril, MAILLET Lucas.
+
+## Crédits
+
+- Sujet : « Méga SAÉ » du département Informatique de l'IUT2 Grenoble (SAÉ S2.01, S2.02, S2.05 et S2.06)
+- Interface : JavaFX, avec AtlantaFX pour les thèmes et CalendarFX pour le planning
+- Optimisation : ojAlgo
