@@ -75,10 +75,27 @@ Les préférences (fichiers récents, thème, zoom, aide) sont enregistrées dan
 │   │       ├── images/        le logo et les icônes du menu
 │   │       └── guide/         le guide d'utilisation en PDF
 │   └── test/                  les tests JUnit 5
+├── conception/                nos documents de conception de 2024 (PDF)
 ├── guide/                     les sources du guide et le script qui le génère
 └── out/artifacts/genevent_jar/
     └── genevent.jar           l'application prête à lancer
 ```
+
+## Documents de conception
+
+Nos rendus de juin 2024, tels quels :
+
+- [Note de cadrage](conception/note-de-cadrage.pdf) : besoins, analyse des risques, matrice de criticité et rôles (RACI)
+- [Dossier de conception](conception/dossier-de-conception.pdf) : cas d'utilisation décrits, diagrammes de classes, de
+  séquence et d'objets
+- [Conception des interfaces](conception/conception-des-interfaces.pdf) : personas, maquettes et critères ergonomiques
+- [Optimisation des ventes de tickets](conception/optimisation-des-ventes.pdf) : le modèle linéaire, résolu
+  graphiquement puis en R
+- [Bilan de projet](conception/bilan-de-projet.pdf) : ce qui a marché, ce qu'on aurait dû organiser autrement
+
+Seule la page 3 du dossier de conception est retirée : elle reprenait les consignes du modèle fourni par l'IUT. Le
+sommaire la cite encore, et les numéros de page sont ceux d'origine. Le code a évolué depuis ces documents : les écarts
+sont listés plus bas.
 
 ## Nos choix
 
