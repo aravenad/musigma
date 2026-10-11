@@ -10,14 +10,14 @@
         <Button maxWidth="1.7976931348623157E308" onAction="#addTicket" text="Ajouter un type"/>
         <Button fx:id="editButton" maxWidth="1.7976931348623157E308" onAction="#updTicket" text="Modifier le type">
             <tooltip>
-                <Tooltip text="Modifier le nom, la quantité, le prix ou la surface du type de ticket sélectionné"/>
+                <Tooltip prefWidth="320.0" wrapText="true" text="Modifier le nom, la quantité, le prix ou la surface du type de ticket sélectionné"/>
             </tooltip>
         </Button>
         <Button fx:id="removeButton" maxWidth="1.7976931348623157E308" onAction="#removeTicket" text="Supprimer le type"/>
         <Separator/>
         <Button fx:id="addAvantageButton" maxWidth="1.7976931348623157E308" onAction="#addAvantage" text="Ajouter un avantage">
             <tooltip>
-                <Tooltip text="Inclure dans le ticket sélectionné un objet puisé dans un stock (ex : 1 gobelet, 1 place de parking)"/>
+                <Tooltip prefWidth="320.0" wrapText="true" text="Inclure dans le ticket sélectionné un objet puisé dans un stock (ex : 1 gobelet, 1 place de parking)"/>
             </tooltip>
         </Button>
         <Separator/>

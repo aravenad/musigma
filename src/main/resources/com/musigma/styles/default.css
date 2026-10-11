@@ -16,6 +16,15 @@
     -fx-text-fill: -color-fg-default;
 }
 
+.helpBar .helpClose {
+    -fx-padding: 0.1em 0.5em;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.helpBar .helpClose:hover {
+    -fx-text-fill: -color-danger-fg;
+}
+
 .helpBar .helpIcon {
     -fx-background-color: -color-accent-emphasis;
     -fx-background-radius: 1em;

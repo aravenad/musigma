@@ -6,6 +6,7 @@ import com.calendarfx.model.Entry;
 import com.calendarfx.model.Interval;
 import com.calendarfx.view.CalendarView;
 import com.musigma.controllers.WorkspaceController;
+import com.musigma.controllers.components.CustomValidField;
 import com.musigma.controllers.components.IntTextField;
 import com.musigma.models.Artiste;
 import com.musigma.models.Festival;
@@ -17,7 +18,10 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.musigma.controllers.Dialogs.*;
@@ -40,7 +44,7 @@ public class CalendarController extends WorkspaceController {
             "Planning",
             "/com/musigma/images/icons/calendar.png",
             "/com/musigma/views/calendar-view.fxml",
-            "Choisissez un artiste, une scène, un jour, une heure et une durée, puis cliquez sur Planifier. Glissez une représentation pour la déplacer, tirez son bord pour changer sa durée, clic droit pour la supprimer."
+            "Choisissez un artiste, une scène, un jour, une heure et une durée, puis cliquez sur Planifier. Glissez une représentation pour la déplacer, tirez son bord pour changer sa durée, double-cliquez pour la modifier, clic droit pour la supprimer."
     );
 
     /**
@@ -100,8 +104,14 @@ public class CalendarController extends WorkspaceController {
         // Les représentations se créent par le formulaire, qui demande l'artiste et la scène
         calendarView.setEntryFactory(param -> null);
         calendarView.setContextMenuCallback(param -> null);
-        calendarView.setEntryDetailsCallback(param -> false);
+        calendarView.setEntryDetailsCallback(param -> {
+            editRepresentation(param.getEntry());
+            return true;
+        });
         calendarView.setEntryContextMenuCallback(param -> entryContextMenu(param.getEntry()));
+        // La semaine affichée commence le premier jour du festival : un festival d'au plus 7 jours tient
+        // dans une seule semaine, où l'on peut glisser une représentation d'un jour à l'autre
+        calendarView.setWeekFields(WeekFields.of(festival.getStart().getDayOfWeek(), 1));
         calendarView.setShowAddCalendarButton(false);
         calendarView.setShowPrintButton(false);
         calendarView.setShowDeveloperConsole(false);
@@ -129,24 +139,41 @@ public class CalendarController extends WorkspaceController {
         sceneChoice.getItems().setAll(festival.getScenes());
         sceneChoice.getSelectionModel().selectFirst();
 
+        restrictToFestivalDays(dayChoice);
+        dayChoice.setValue(festival.getStart().toLocalDate());
+
+        timeChoice.getItems().setAll(timeChoices());
+        timeChoice.setValue(LocalTime.of(20, 0));
+        durationField.setValue(60);
+    }
+
+    /**
+     * Limite un sélecteur de date aux jours du festival.
+     *
+     * @param picker le sélecteur de date
+     */
+    private void restrictToFestivalDays(DatePicker picker) {
         LocalDate firstDay = festival.getStart().toLocalDate();
         LocalDate lastDay = festival.getEnd().minusNanos(1).toLocalDate();
-        dayChoice.setDayCellFactory(picker -> new DateCell() {
+        picker.setDayCellFactory(p -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 setDisable(empty || date.isBefore(firstDay) || date.isAfter(lastDay));
             }
         });
-        dayChoice.setValue(firstDay);
+    }
 
-        for (LocalTime time = LocalTime.MIDNIGHT; ; time = time.plusMinutes(TIME_STEP)) {
-            timeChoice.getItems().add(time);
-            if (time.equals(LocalTime.MIDNIGHT.minusMinutes(TIME_STEP)))
-                break;
-        }
-        timeChoice.setValue(LocalTime.of(20, 0));
-        durationField.setValue(60);
+    /**
+     * Retourne les heures proposées dans les formulaires, de minuit à 23 h 45 par pas de {@value #TIME_STEP} minutes.
+     *
+     * @return les heures proposées
+     */
+    private static List<LocalTime> timeChoices() {
+        List<LocalTime> times = new ArrayList<>();
+        for (int minutes = 0; minutes < 24 * 60; minutes += TIME_STEP)
+            times.add(LocalTime.MIDNIGHT.plusMinutes(minutes));
+        return times;
     }
 
     /**
@@ -278,6 +305,8 @@ public class CalendarController extends WorkspaceController {
      * @return le menu permettant de supprimer la représentation
      */
     private ContextMenu entryContextMenu(Entry<?> entry) {
+        MenuItem edit = new MenuItem("Modifier la représentation…");
+        edit.setOnAction(e -> editRepresentation(entry));
         MenuItem delete = new MenuItem("Supprimer la représentation");
         delete.setOnAction(e -> tryCatch(
                 "Suppression de la représentation impossible",
@@ -288,6 +317,64 @@ public class CalendarController extends WorkspaceController {
                     syncing = false;
                 }
         ));
-        return new ContextMenu(delete);
+        return new ContextMenu(edit, delete);
+    }
+
+    /**
+     * Modifie la scène, le jour, l'heure et la durée d'une représentation à partir d'un formulaire.
+     * Permet notamment de la déplacer vers une autre semaine ou une autre scène, ce que le glisser-déposer ne permet pas.
+     *
+     * @param entry l'entrée de la représentation
+     */
+    @SuppressWarnings("unchecked")
+    private void editRepresentation(Entry<?> entry) {
+        Entry<Representation> representationEntry = (Entry<Representation>) entry;
+        Representation representation = representationEntry.getUserObject();
+        LocalDateTime start = festival.getStart().plusMinutes(representation.getStartDelta());
+
+        CustomValidField<ComboBox<String>> scene = new CustomValidField<>("Scène", new ComboBox<>()) {
+            @Override
+            public boolean isValid() {
+                return node.getValue() != null;
+            }
+        };
+        scene.node.getItems().setAll(festival.getScenes());
+        scene.node.setValue(representation.getScene());
+        CustomValidField<DatePicker> day = new CustomValidField<>("Jour", new DatePicker(start.toLocalDate())) {
+            @Override
+            public boolean isValid() {
+                return node.getValue() != null;
+            }
+        };
+        restrictToFestivalDays(day.node);
+        CustomValidField<ComboBox<LocalTime>> time = new CustomValidField<>("Heure", new ComboBox<>()) {
+            @Override
+            public boolean isValid() {
+                return node.getValue() != null;
+            }
+        };
+        time.node.getItems().setAll(timeChoices());
+        time.node.setValue(start.toLocalTime());
+        CustomValidField<IntTextField> duration = new CustomValidField<>("Durée (min)", new IntTextField(true, true));
+        duration.node.setValue(representation.getDuration());
+
+        askValidForm(
+                "Modifier la représentation de " + representation.getArtiste().getName(),
+                "Modification de la représentation impossible",
+                new CustomValidField<?>[]{scene, day, time, duration},
+                () -> {
+                    festival.updateRepresentation(
+                            representation,
+                            minutesSinceStart(day.node.getValue().atTime(time.node.getValue())),
+                            duration.node.getValue(),
+                            scene.node.getValue()
+                    );
+                    syncing = true;
+                    representationEntry.setInterval(intervalOf(representation));
+                    representationEntry.setCalendar(calendars.get(representation.getScene()));
+                    syncing = false;
+                    calendarView.setDate(day.node.getValue());
+                }
+        );
     }
 }

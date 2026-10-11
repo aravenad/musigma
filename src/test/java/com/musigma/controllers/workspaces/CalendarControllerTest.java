@@ -99,6 +99,12 @@ class CalendarControllerTest {
     }
 
     @Test
+    @DisplayName("La semaine affichée commence le premier jour du festival")
+    void weekStartsOnFestivalFirstDay() throws Exception {
+        assertEquals(festival.getStart().getDayOfWeek(), onFxThread(() -> controller.calendarView.getWeekFields().getFirstDayOfWeek()));
+    }
+
+    @Test
     @DisplayName("C3 — déplacer une entrée déplace la représentation")
     void moveEntryUpdatesModel() throws Exception {
         onFxThread(() -> {

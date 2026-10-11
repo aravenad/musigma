@@ -326,7 +326,7 @@ public class MainController {
         pageButtonBox.setPadding(new Insets(8));
         Tooltip tooltip = new Tooltip(register.name + "\n" + register.help);
         tooltip.setWrapText(true);
-        tooltip.setMaxWidth(320);
+        tooltip.setPrefWidth(320);
         Tooltip.install(pageButtonBox, tooltip);
 
         register.openButton = pageButtonBox;
@@ -387,6 +387,15 @@ public class MainController {
     private void toggleHelp() {
         settings.setHelpVisible(helpItem.isSelected());
         applyHelpVisibility();
+    }
+
+    /**
+     * Masque l'aide contextuelle depuis sa croix de fermeture.
+     */
+    @FXML
+    private void hideHelp() {
+        helpItem.setSelected(false);
+        toggleHelp();
     }
 
     private void applyHelpVisibility() {
