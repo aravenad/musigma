@@ -32,6 +32,7 @@ Prérequis : un JDK 17 ou plus récent. Maven est fourni par le wrapper `mvnw`.
 | `./mvnw compile spotbugs:check` | Analyse statique SpotBugs |
 | `./mvnw pmd:check pmd:cpd-check` | Analyse statique PMD et détection de code dupliqué |
 | `./mvnw javadoc:javadoc` | Javadoc dans `target/reports/apidocs` |
+| `./mvnw -Pdist package` | Application distribuable `out/artifacts/genevent_jar/genevent.jar`, à lancer avec `java -jar genevent.jar` (Java 17+, Windows, Linux ou macOS Intel) |
 
 Les préférences (fichiers récents, thème, zoom, aide) sont enregistrées dans le profil de l'utilisateur via `java.util.prefs`.
 Les logs sont écrits dans le dossier temporaire (`musigma-*.log`) ; passer `com.musigma.level` à `FINE` dans `src/main/resources/logging.properties` pour le détail des modifications du modèle.
@@ -49,15 +50,11 @@ Architecture MVC :
 | Dossier de conception | Réalisation | Raison |
 |---|---|---|
 | `Festival` singleton | Instance ordinaire, une par fenêtre | Testable, et ouvrir un autre festival remplace simplement l'instance |
-| `Representation.startDate: LocalDateTime` | `startDelta` en minutes depuis le début du festival | Déplacer le festival déplace ses représentations |
-| `Stock.absoluteQuantity: Integer \| null` | `quantity` + `fixed` (limité) + quantité nécessaire calculée | L'écran Stocks a besoin d'une quantité prévue même pour un stock illimité (coût) |
+| `Representation.startDate: LocalDateTime` | `decalageDebut` en minutes depuis le début du festival | Déplacer le festival déplace ses représentations |
+| `Stock.absoluteQuantity: Integer \| null` | `quantite` + `limite` + quantité nécessaire calculée | L'écran Stocks a besoin d'une quantité prévue même pour un stock illimité (coût) |
 | `TypeTicket.id` | Nom unique dans le festival | Le nom suffit à identifier un type de ticket pour l'utilisateur |
-| — | `TypeTicket.surface`, `Festival.end`, `Festival.scenes` | Surface par ticket du modèle mathématique (rapport R2.09) ; dates et scènes de l'UC1 |
+| — | `TypeTicket.surface`, `Festival.fin`, `Festival.scenes` | Surface par ticket du modèle mathématique (rapport R2.09) ; dates et scènes de l'UC1 |
 | Contrainte de surface à 0,42 m²/personne | Surface propre à chaque type de ticket (0,42 m² par défaut) | Exemple du rapport : VIP 4 m², Non-VIP 2 m² → 205 000 € |
-
-## Convention de commits
-
-Un commit par changement cohérent, sur `master`. Message en anglais à l'impératif, court (≤ 72 caractères) : `Fix ...`, `Add ...`, `Remove ...`. Le corps, séparé par une ligne vide, explique le pourquoi et liste les points importants.
 
 ## Équipe
 
