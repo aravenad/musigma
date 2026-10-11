@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Guide d'utilisation – Musigma</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.2cm 2.2cm 2.4cm;
+            @bottom-center {
+                content: counter(page);
+                font-family: "Noto Sans", "Liberation Sans", sans-serif;
+                font-size: 9pt;
+                color: #6e6e73;
+            }
+        }
+
+        @page :first {
+            @bottom-center {
+                content: none;
+            }
+        }
+
+        :root {
+            --accent: #30304d;
+            --bleu: #0a6cff;
+            --gris: #6e6e73;
+        }
+
+        body {
+            font-family: "Noto Sans", "Liberation Sans", sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.5;
+            color: #1d1d1f;
+            margin: 0;
+        }
+
+        /* Couverture */
+        .couverture {
+            height: 24.5cm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            break-after: page;
+        }
+
+        .couverture p {
+            text-align: center;
+            margin: 0;
+        }
+
+        .couverture h1 {
+            font-size: 34pt;
+            font-weight: 400;
+            letter-spacing: 1pt;
+            margin: 0;
+        }
+
+        .couverture .produit {
+            font-size: 30pt;
+            margin: 0 0 0.6cm;
+        }
+
+        .couverture .etablissement {
+            font-variant: small-caps;
+            font-size: 9.5pt;
+            text-decoration: underline;
+        }
+
+        .couverture .version {
+            color: var(--gris);
+            font-size: 9.5pt;
+            margin-top: 0.2cm;
+        }
+
+        .couverture .auteurs {
+            text-align: left;
+            margin: 2.2cm auto 0;
+            width: 100%;
+            font-size: 9.5pt;
+        }
+
+        .couverture .auteurs h2 {
+            font-size: 9.5pt;
+            font-weight: 400;
+            font-variant: small-caps;
+            text-decoration: underline;
+            border: none;
+            margin: 0 0 0.2cm;
+            color: inherit;
+        }
+
+        .couverture .logos {
+            margin-top: 2cm;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2cm;
+        }
+
+        .couverture .logos img {
+            height: 2.6cm;
+        }
+
+        /* Sommaire et table des figures */
+        .tables {
+            break-after: page;
+        }
+
+        .tables h2 {
+            font-size: 15pt;
+        }
+
+        .sommaire {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.2cm;
+        }
+
+        .sommaire li {
+            display: flex;
+            align-items: baseline;
+            margin: 0.12cm 0;
+        }
+
+        .sommaire li a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .sommaire li .points {
+            flex: 1;
+            border-bottom: 1px dotted #a0a0a5;
+            margin: 0 0.2cm;
+            transform: translateY(-3pt);
+        }
+
+        /* Corps */
+        h2 {
+            color: var(--accent);
+            font-size: 17pt;
+            font-weight: 600;
+            margin: 0.9cm 0 0.3cm;
+            border-bottom: 2px solid #e5e5ea;
+            padding-bottom: 0.1cm;
+            break-after: avoid;
+        }
+
+        h3 {
+            color: var(--accent);
+            font-size: 12pt;
+            margin: 0.5cm 0 0.15cm;
+            break-after: avoid;
+        }
+
+        section.chapitre {
+            break-before: page;
+        }
+
+        section.chapitre:first-of-type h2 {
+            margin-top: 0;
+        }
+
+        p {
+            margin: 0.15cm 0 0.3cm;
+            text-align: justify;
+        }
+
+        ul {
+            margin: 0.1cm 0 0.3cm;
+            padding-left: 0.6cm;
+        }
+
+        li {
+            margin: 0.06cm 0;
+        }
+
+        figure {
+            margin: 0.4cm 0 0.5cm;
+            text-align: center;
+            break-inside: avoid;
+        }
+
+        figure img {
+            max-width: 100%;
+            max-height: 9.3cm;
+            border: 1px solid #d2d2d7;
+            border-radius: 3px;
+        }
+
+        figure img.menu {
+            width: 6.5cm;
+        }
+
+        figcaption {
+            color: var(--bleu);
+            font-style: italic;
+            font-size: 9pt;
+            margin-top: 0.15cm;
+        }
+
+        .bouton {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        kbd {
+            font-family: inherit;
+            font-size: 9pt;
+            border: 1px solid #c7c7cc;
+            border-bottom-width: 2px;
+            border-radius: 3px;
+            padding: 0 4px;
+            white-space: nowrap;
+        }
+
+        .encadre {
+            border-left: 4px solid var(--bleu);
+            background: #f2f6ff;
+            padding: 0.2cm 0.35cm;
+            margin: 0.3cm 0;
+            break-inside: avoid;
+        }
+
+        .encadre.attention {
+            border-left-color: #ff9500;
+            background: #fff7ec;
+        }
+
+        .encadre p {
+            margin: 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 0.2cm 0 0.4cm;
+            font-size: 9.5pt;
+            break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #d2d2d7;
+            padding: 0.1cm 0.2cm;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f5f5f7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="couverture">
+    <h1>GUIDE D’UTILISATION</h1>
+    <p class="produit">Musigma</p>
+    <p class="etablissement">Université Grenoble Alpes – IUT2 – Département Informatique</p>
+    <p class="version">Version 2 – octobre 2026</p>
+    <div class="auteurs">
+        <h2>Auteurs</h2>
+        <ul>
+            <li>[E1] ARAVENA BRAVO Damien</li>
+            <li>[E1] GIBELLO Grégoire</li>
+        </ul>
+    </div>
+    <div class="logos">
+        <img src="images/uga.png" alt="Université Grenoble Alpes">
+        <img src="images/musigma.png" alt="Musigma">
+    </div>
+</div>
+
+<div class="tables">
+    <h2>Table des matières</h2>
+    <ol class="sommaire" id="sommaire"></ol>
+    <h2>Table des figures</h2>
+    <ol class="sommaire" id="figures"></ol>
+</div>
+
+<section class="chapitre" id="interface">
+    <h2>1. Présentation de l’interface</h2>
+    <p>Lorsque vous lancez Musigma, vous arrivez sur une fenêtre composée de quatre éléments :</p>
+    <ul>
+        <li>le <strong>menu des espaces de travail</strong>, à gauche, toujours visible ;</li>
+        <li>la <strong>barre de menus</strong> en haut : <em>Fichier</em>, <em>Affichage</em> et <em>Aide</em> ;</li>
+        <li>l’<strong>aide contextuelle</strong>, juste en dessous, qui explique en une phrase l’espace ouvert ;</li>
+        <li>l’<strong>espace de travail</strong>, au centre, qui change selon l’espace choisi.</li>
+    </ul>
+    <p>Le menu de gauche donne accès à six espaces de travail :</p>
+    <table>
+        <tr><th>Espace</th><th>Rôle</th></tr>
+        <tr><td>Accueil</td><td>Les informations générales du festival : dates, lieu, surface, prix de location et scènes.</td></tr>
+        <tr><td>Artistes</td><td>Les artistes engagés, leur genre musical et leur cachet.</td></tr>
+        <tr><td>Planning</td><td>Les représentations des artistes, scène par scène.</td></tr>
+        <tr><td>Stocks</td><td>Les ressources et fournitures du festival (gobelets, places de parking, T-shirts…).</td></tr>
+        <tr><td>Tickets</td><td>Les types de tickets mis en vente et les avantages qu’ils incluent.</td></tr>
+        <tr><td>Prévision</td><td>Le bilan prévisionnel et la vente de tickets la plus rentable.</td></tr>
+    </table>
+    <p>Survolez un espace du menu de gauche pour afficher une infobulle qui le décrit. La croix à droite de
+        l’aide contextuelle la masque ; vous pouvez la réafficher par le menu <em>Affichage › Aide contextuelle</em>.</p>
+    <p>La fenêtre peut être redimensionnée et agrandie : l’espace de travail occupe toute la place disponible.</p>
+</section>
+
+<section class="chapitre" id="accueil">
+    <h2>2. Premiers pas : l’espace Accueil</h2>
+    <p>Au premier lancement, Musigma crée un festival vide. Ensuite, il rouvre automatiquement le dernier festival
+        enregistré. Commencez par l’espace <span class="bouton">Accueil</span> :</p>
+    <figure>
+        <img src="images/01-accueil.png" alt="Espace Accueil">
+        <figcaption>Figure 1 – Espace Accueil</figcaption>
+    </figure>
+    <p>Renseignez le nom du festival, son emplacement, la superficie de la fosse (en m²) et le prix de location de
+        l’emplacement. Chaque modification est prise en compte immédiatement ; un champ mal rempli est souligné en
+        rouge avec la raison sous le champ.</p>
+    <h3>Dates du festival</h3>
+    <p>Choisissez la <strong>date de début</strong> et le <strong>dernier jour</strong> du festival. Changer la date
+        de début décale tout le festival : sa durée et ses représentations suivent. Le dernier jour ne peut pas
+        précéder le début, ni couper une représentation déjà planifiée.</p>
+    <h3>Scènes</h3>
+    <p>Un festival compte au moins une scène, la « Scène principale ». Les boutons sous la liste permettent
+        d’<span class="bouton">Ajouter</span>, de <span class="bouton">Renommer</span> (les représentations suivent le
+        nouveau nom) et de <span class="bouton">Supprimer</span> une scène. Une scène qui accueille encore des
+        représentations ne peut pas être supprimée.</p>
+</section>
+
+<section class="chapitre" id="artistes">
+    <h2>3. Engager les artistes</h2>
+    <p>L’espace <span class="bouton">Artistes</span> réunit les artistes engagés pour le festival :</p>
+    <figure>
+        <img src="images/02-artistes.png" alt="Espace Artistes">
+        <figcaption>Figure 2 – Espace Artistes</figcaption>
+    </figure>
+    <ul>
+        <li><span class="bouton">Engager un artiste</span> : indiquez son nom, son genre musical et son cachet.</li>
+        <li>Double-cliquez sur un nom, un genre ou un cachet pour le modifier.</li>
+        <li>Sélectionnez un artiste pour voir ses représentations dans le tableau du bas.</li>
+        <li><span class="bouton">Retirer</span> : l’artiste quitte le festival avec toutes ses représentations, après
+            confirmation.</li>
+    </ul>
+    <p>À gauche, Musigma affiche le total des cachets et le temps encore libre sur l’ensemble des scènes. Si ce temps
+        devient inférieur à une heure, une confirmation vous est demandée avant d’engager un nouvel artiste.</p>
+</section>
+
+<section class="chapitre" id="planning">
+    <h2>4. Organiser le planning</h2>
+    <p>L’espace <span class="bouton">Planning</span> présente les représentations dans un calendrier. Chaque scène
+        a sa couleur ; le bouton <span class="bouton">Calendriers</span> permet d’afficher ou de masquer des scènes.
+        La semaine affichée commence le premier jour du festival.</p>
+    <figure>
+        <img src="images/03-planning.png" alt="Espace Planning">
+        <figcaption>Figure 3 – Espace Planning</figcaption>
+    </figure>
+    <h3>Planifier une représentation</h3>
+    <p>Dans la barre au-dessus du calendrier, choisissez l’artiste, la scène, le jour, l’heure de début et la durée en
+        minutes, puis cliquez sur <span class="bouton">Planifier</span>. Seuls les artistes engagés dans l’espace
+        Artistes sont proposés.</p>
+    <h3>Modifier une représentation</h3>
+    <ul>
+        <li><strong>Glisser</strong> une représentation la déplace, à une autre heure ou un autre jour de la semaine affichée.</li>
+        <li><strong>Tirer son bord</strong> haut ou bas change son heure de début ou sa durée.</li>
+        <li><strong>Double-cliquer</strong> (ou clic droit › <em>Modifier la représentation…</em>) ouvre un formulaire
+            pour changer sa scène, son jour, son heure et sa durée, y compris vers une autre semaine.</li>
+        <li><strong>Clic droit › Supprimer la représentation</strong> la retire du planning.</li>
+    </ul>
+    <div class="encadre attention">
+        <p>Deux représentations ne peuvent pas se chevaucher sur la même scène, et une représentation doit se terminer
+            avant la fin du festival. Une modification qui ne respecte pas ces règles est refusée : un message
+            l’explique et la représentation reprend sa place.</p>
+    </div>
+</section>
+
+<section class="chapitre" id="stocks">
+    <h2>5. Gérer les stocks</h2>
+    <p>L’espace <span class="bouton">Stocks</span> liste les ressources du festival :</p>
+    <figure>
+        <img src="images/04-stocks.png" alt="Espace Stocks">
+        <figcaption>Figure 4 – Espace Stocks</figcaption>
+    </figure>
+    <p><span class="bouton">Ajouter stock</span> demande le nom de l’objet, sa quantité, son prix unitaire et s’il
+        est <strong>limité</strong> :</p>
+    <ul>
+        <li>un stock <strong>limité</strong> est une ressource que les tickets ne peuvent pas dépasser, par exemple
+            3&#8239;000&nbsp;places de parking ;</li>
+        <li>pour un stock <strong>non limité</strong>, la quantité est ce que vous prévoyez d’acheter, par exemple
+            1&#8239;500&nbsp;T-shirts.</li>
+    </ul>
+    <p>La colonne <em>Consommation</em> indique ce que demandent les tickets mis en vente. Si un stock non limité ne
+        suffit pas, le manque est indiqué (ici, 500&nbsp;T-shirts). Le coût des stocks nécessaires est affiché à gauche.
+        Double-cliquez sur une valeur pour la modifier ; <span class="bouton">Supprimer</span> retire un stock et les
+        avantages qui l’utilisent, après confirmation.</p>
+</section>
+
+<section class="chapitre" id="tickets">
+    <h2>6. Gérer les tickets</h2>
+    <p>L’espace <span class="bouton">Tickets</span> présente les types de tickets en haut et les avantages du type
+        sélectionné en bas :</p>
+    <figure>
+        <img src="images/05-tickets.png" alt="Espace Tickets">
+        <figcaption>Figure 5 – Espace Tickets</figcaption>
+    </figure>
+    <h3>Types de tickets</h3>
+    <p><span class="bouton">Ajouter un type</span> demande son nom (unique dans le festival), la quantité mise en vente,
+        son prix et la <strong>surface occupée par personne</strong> : 0,42&nbsp;m² par défaut, plus pour un ticket qui
+        offre plus d’espace (par exemple 4&nbsp;m² pour un VIP). <span class="bouton">Modifier le type</span> (ou un
+        double-clic sur la ligne) et <span class="bouton">Supprimer le type</span> agissent sur le type sélectionné.</p>
+    <h3>Avantages</h3>
+    <p>Un avantage est un objet d’un stock inclus dans le ticket, par exemple un gobelet ou une place de parking.
+        <span class="bouton">Ajouter un avantage</span> demande le stock et la quantité par ticket. Double-cliquez sur
+        une quantité pour la modifier ; <span class="bouton">Retirer</span> supprime l’avantage.</p>
+    <div class="encadre attention">
+        <p>Créez d’abord l’objet dans l’espace Stocks. Pour un stock limité, l’ensemble des tickets qui l’utilisent
+            ne peut pas dépasser sa quantité : une quantité de tickets ou d’avantages trop élevée est refusée.</p>
+    </div>
+</section>
+
+<section class="chapitre" id="prevision">
+    <h2>7. Prévisions</h2>
+    <p>L’espace <span class="bouton">Prévision</span> présente le bilan prévisionnel du festival :</p>
+    <figure>
+        <img src="images/06-prevision.png" alt="Espace Prévision">
+        <figcaption>Figure 6 – Espace Prévision</figcaption>
+    </figure>
+    <ul>
+        <li><strong>Recettes</strong> : la vente de chaque type de ticket.</li>
+        <li><strong>Charges</strong> : la location de l’emplacement, les cachets des artistes et le coût des stocks
+            nécessaires.</li>
+        <li><strong>Résultat prévisionnel</strong> : en vert pour un bénéfice, en rouge pour une perte.</li>
+    </ul>
+    <p>À gauche s’affichent le nombre de personnes attendues, la surface qu’elles occupent et le nombre d’agents de
+        sécurité recommandé (un pour cent personnes, trois au minimum).</p>
+    <h3>Vente optimale</h3>
+    <p><span class="bouton">Calculer la vente optimale</span> recherche le nombre de tickets de chaque type qui
+        maximise la recette, sans dépasser la superficie du festival ni les stocks limités. Le résultat s’affiche à
+        côté des quantités actuelles, sans rien modifier. <span class="bouton">Appliquer la recommandation</span>
+        reporte ces quantités dans les types de tickets et met le bilan à jour.</p>
+    <div class="encadre">
+        <p>Dans l’exemple ci-dessus, avec 14&#8239;000&nbsp;m², 8&#8239;000&nbsp;gobelets et 3&#8239;000&nbsp;places de parking, la vente optimale est
+            de 2&#8239;000&nbsp;tickets VIP et 3&#8239;000&nbsp;tickets Non-VIP, pour une recette de 205&#8239;000&nbsp;€.</p>
+    </div>
+</section>
+
+<section class="chapitre" id="menus">
+    <h2>8. Barre de menus</h2>
+    <h3>Menu Fichier</h3>
+    <figure>
+        <img class="menu" src="images/07-menu-fichier.png" alt="Menu Fichier">
+        <figcaption>Figure 7 – Menu Fichier</figcaption>
+    </figure>
+    <p>Le menu <em>Fichier</em> permet de créer un nouveau festival, d’ouvrir un festival, de rouvrir l’un des dix
+        derniers fichiers utilisés, d’enregistrer le festival au format <strong>.mgm</strong> et de quitter Musigma.
+        Si le festival a été modifié depuis le dernier enregistrement, Musigma propose de l’enregistrer avant de le
+        fermer, y compris lorsque vous fermez la fenêtre.</p>
+    <h3>Menu Affichage</h3>
+    <figure>
+        <img class="menu" src="images/08-menu-affichage.png" alt="Menu Affichage">
+        <figcaption>Figure 8 – Menu Affichage</figcaption>
+    </figure>
+    <p>Le menu <em>Affichage</em> permet de passer au <strong>thème sombre</strong>, d’afficher ou masquer l’aide
+        contextuelle et de régler le <strong>zoom</strong> de l’interface. Ces réglages sont conservés d’une session à
+        l’autre.</p>
+    <figure>
+        <img src="images/09-theme-sombre.png" alt="Thème sombre">
+        <figcaption>Figure 9 – Thème sombre</figcaption>
+    </figure>
+    <h3>Menu Aide et raccourcis</h3>
+    <p>Le menu <em>Aide › Guide d’utilisation</em> ouvre ce guide.</p>
+    <table>
+        <tr><th>Raccourci</th><th>Action</th></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td><td>Nouveau festival</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td><td>Ouvrir un festival</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>Enregistrer</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>Maj</kbd> + <kbd>S</kbd></td><td>Enregistrer sous</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>Q</kbd></td><td>Quitter</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>+</kbd> / <kbd>Ctrl</kbd> + <kbd>-</kbd> / <kbd>Ctrl</kbd> + <kbd>0</kbd></td><td>Zoom avant, zoom arrière, taille normale</td></tr>
+        <tr><td><kbd>F1</kbd></td><td>Guide d’utilisation</td></tr>
+    </table>
+</section>
+
+<script>
+    // Sommaire et table des figures, construits à partir des titres ; les numéros de page sont
+    // ajoutés par guide/generer.py, qui les lit dans une première version du PDF.
+    const pages = window.PAGES || {};
+    function ligne(liste, texte, cible) {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#${cible}">${texte}</a><span class="points"></span><span>${pages[texte] || ''}</span>`;
+        liste.appendChild(li);
+    }
+    document.querySelectorAll('section.chapitre').forEach(s => ligne(document.getElementById('sommaire'), s.querySelector('h2').textContent, s.id));
+    document.querySelectorAll('figcaption').forEach((f, i) => {
+        f.parentElement.id = 'figure-' + (i + 1);
+        ligne(document.getElementById('figures'), f.textContent, f.parentElement.id);
+    });
+</script>
+</body>
+</html>

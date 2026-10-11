@@ -43,3 +43,6 @@ docs/
 ### Application distribuable, versionnée (./mvnw -Pdist package) ###
 !out/artifacts/genevent_jar/genevent.jar
 previousSession.ser
+
+### Fichier temporaire de guide/generer.py ###
+guide/.guide-impression.html

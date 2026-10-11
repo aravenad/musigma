@@ -33,6 +33,7 @@ Prérequis : un JDK 17 ou plus récent. Maven est fourni par le wrapper `mvnw`.
 | `./mvnw pmd:check pmd:cpd-check` | Analyse statique PMD et détection de code dupliqué |
 | `./mvnw javadoc:javadoc` | Javadoc dans `target/reports/apidocs` |
 | `./mvnw -Pdist package` | Application distribuable `out/artifacts/genevent_jar/genevent.jar`, à lancer avec `java -jar genevent.jar` (Java 17+, Windows, Linux ou macOS Intel) |
+| `python3 guide/generer.py` | Guide d'utilisation (F1) régénéré depuis `guide/guide.html` ; `--captures` refait aussi les captures d'écran (nécessite Chrome et pdftotext) |
 
 Les préférences (fichiers récents, thème, zoom, aide) sont enregistrées dans le profil de l'utilisateur via `java.util.prefs`.
 Les logs sont écrits dans le dossier temporaire (`musigma-*.log`) ; passer `com.musigma.level` à `FINE` dans `src/main/resources/logging.properties` pour le détail des modifications du modèle.
