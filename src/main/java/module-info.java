@@ -5,14 +5,10 @@ module com.musigma {
     requires javafx.controls;
     requires javafx.fxml;
 
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires org.kordamp.bootstrapfx.core;
     requires java.logging;
     requires java.desktop;
     requires atlantafx.base;
     requires com.calendarfx.view;
-    requires java.rmi;
     requires ojalgo;
 
     opens com.musigma to javafx.fxml;
