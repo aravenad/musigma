@@ -24,27 +24,27 @@ class PlanningTest {
     @BeforeEach
     void setUp() throws FestivalException, ArtisteException {
         festival = new Festival("Festival", LocalDateTime.now().plusDays(1), 0, 1000, "Grenoble");
-        festival.addScene("Scène 1");
-        festival.addScene("Scène 2");
+        festival.ajouterScene("Scène 1");
+        festival.ajouterScene("Scène 2");
         artiste = new Artiste("Gorillaz", "Pop", 1000);
-        festival.addArtiste(artiste);
+        festival.ajouterArtiste(artiste);
     }
 
     @Test
     @DisplayName("M1 — deux représentations simultanées sur deux scènes différentes sont conservées")
     void simultaneousRepresentationsOnDifferentScenes() throws FestivalException, RepresentationException {
-        festival.addRepresentation(new Representation(600, 60, "Scène 1", artiste));
-        festival.addRepresentation(new Representation(600, 60, "Scène 2", artiste));
+        festival.ajouterRepresentation(new Representation(600, 60, "Scène 1", artiste));
+        festival.ajouterRepresentation(new Representation(600, 60, "Scène 2", artiste));
         assertEquals(2, festival.getRepresentations().size(), "Une représentation simultanée sur une autre scène ne doit pas être perdue");
     }
 
     @Test
     @DisplayName("M2 — une collision sur la même scène est détectée même si une autre scène s'intercale")
     void collisionHiddenByAnotherScene() throws FestivalException, RepresentationException {
-        festival.addRepresentation(new Representation(600, 120, "Scène 1", artiste)); // 10h00-12h00
-        festival.addRepresentation(new Representation(660, 30, "Scène 2", artiste));  // 11h00-11h30
+        festival.ajouterRepresentation(new Representation(600, 120, "Scène 1", artiste)); // 10h00-12h00
+        festival.ajouterRepresentation(new Representation(660, 30, "Scène 2", artiste));  // 11h00-11h30
         Representation colliding = new Representation(690, 60, "Scène 1", artiste);   // 11h30-12h30
-        assertThrows(FestivalException.class, () -> festival.addRepresentation(colliding), "La représentation chevauche la première sur la Scène 1");
+        assertThrows(FestivalException.class, () -> festival.ajouterRepresentation(colliding), "La représentation chevauche la première sur la Scène 1");
         assertFalse(festival.getRepresentations().contains(colliding));
     }
 
@@ -53,11 +53,11 @@ class PlanningTest {
     void artisteRepresentationCycle() throws RepresentationException {
         Representation representation = new Representation(600, 60, "Scène 1", artiste);
         assertDoesNotThrow(() -> {
-            festival.addRepresentation(representation);
+            festival.ajouterRepresentation(representation);
             artiste.hashCode();
             representation.hashCode();
             artiste.equals(new Artiste("Gorillaz", "Pop", 1000));
-            festival.isModified();
+            festival.estModifie();
         });
     }
 
@@ -66,16 +66,16 @@ class PlanningTest {
     void updateRepresentationChecksCollision() throws FestivalException, RepresentationException {
         Representation first = new Representation(600, 60, "Scène 1", artiste);
         Representation second = new Representation(600, 60, "Scène 2", artiste);
-        festival.addRepresentation(first);
-        festival.addRepresentation(second);
+        festival.ajouterRepresentation(first);
+        festival.ajouterRepresentation(second);
 
-        assertThrows(FestivalException.class, () -> festival.updateRepresentation(second, 630, 60, "Scène 1"), "Le créneau est occupé par la première représentation");
+        assertThrows(FestivalException.class, () -> festival.modifierRepresentation(second, 630, 60, "Scène 1"), "Le créneau est occupé par la première représentation");
         assertEquals("Scène 2", second.getScene(), "Un déplacement refusé ne doit rien modifier");
-        assertThrows(RepresentationException.class, () -> festival.updateRepresentation(second, 700, -5, "Scène 1"), "Durée invalide");
-        assertDoesNotThrow(() -> festival.updateRepresentation(second, 660, 60, "Scène 1"), "Le créneau suivant est libre");
+        assertThrows(RepresentationException.class, () -> festival.modifierRepresentation(second, 700, -5, "Scène 1"), "Durée invalide");
+        assertDoesNotThrow(() -> festival.modifierRepresentation(second, 660, 60, "Scène 1"), "Le créneau suivant est libre");
         assertEquals(List.of(first, second), festival.getRepresentations(), "Les représentations sont triées par début");
-        assertFalse(festival.isSceneFree("Scène 1", 650, 30));
-        assertTrue(festival.isSceneFree("Scène 2", 650, 30));
+        assertFalse(festival.estSceneLibre("Scène 1", 650, 30));
+        assertTrue(festival.estSceneLibre("Scène 2", 650, 30));
     }
 
     @Test
@@ -93,7 +93,7 @@ class PlanningTest {
     @DisplayName("M6 — planifier une représentation la rattache à son artiste")
     void representationLinkedToArtiste() throws FestivalException, RepresentationException {
         Representation representation = new Representation(600, 60, "Scène 1", artiste);
-        festival.addRepresentation(representation);
+        festival.ajouterRepresentation(representation);
         assertTrue(artiste.getRepresentations().contains(representation));
     }
 
@@ -101,15 +101,15 @@ class PlanningTest {
     @DisplayName("M6 — seul un artiste engagé au festival peut être planifié (UC4.1 avant UC4.2)")
     void representationRequiresEngagedArtiste() throws ArtisteException, RepresentationException {
         Artiste notEngaged = new Artiste("Inconnu", "Jazz", 10);
-        assertThrows(FestivalException.class, () -> festival.addRepresentation(new Representation(600, 60, "Scène 1", notEngaged)));
+        assertThrows(FestivalException.class, () -> festival.ajouterRepresentation(new Representation(600, 60, "Scène 1", notEngaged)));
     }
 
     @Test
     @DisplayName("M6 — retirer un artiste retire ses représentations")
     void removeArtisteRemovesRepresentations() throws FestivalException, RepresentationException {
         Representation representation = new Representation(600, 60, "Scène 1", artiste);
-        festival.addRepresentation(representation);
-        festival.removeArtiste(artiste);
+        festival.ajouterRepresentation(representation);
+        festival.retirerArtiste(artiste);
         assertFalse(festival.getRepresentations().contains(representation));
     }
 }

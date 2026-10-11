@@ -3,8 +3,6 @@ package com.musigma.models;
 import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.TypeTicketException;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,12 +17,12 @@ import static com.musigma.utils.Log.getLogger;
  */
 public final class TypeTicket implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Surface occupée par défaut par un détenteur de ticket (m²), selon la densité d'une fosse de concert.
      */
-    public static final float DEFAULT_SURFACE = .42f;
+    public static final float SURFACE_PAR_DEFAUT = .42f;
 
     /**
      * Logger de la class
@@ -41,30 +39,30 @@ public final class TypeTicket implements Serializable {
     /**
      * Quantité de tickets disponibles
      */
-    private int quantity;
+    private int quantite;
     /**
      * Prix unitaire du ticket
      */
-    private float price;
+    private float prix;
     /**
      * Surface occupée par chaque détenteur de ce ticket (m²)
      */
-    private float surface = DEFAULT_SURFACE;
+    private float surface = SURFACE_PAR_DEFAUT;
 
     /**
      * Constructeur de la classe TypeTicket.
      *
      * @param type     Type de ticket
-     * @param quantity Quantité de tickets disponibles
-     * @param price    Prix unitaire du ticket
+     * @param quantite Quantité de tickets disponibles
+     * @param prix    Prix unitaire du ticket
      * @throws TypeTicketException si le type est null ou vide
      */
-    public TypeTicket(String type, int quantity, float price) throws TypeTicketException {
+    public TypeTicket(String type, int quantite, float prix) throws TypeTicketException {
         LOGGER.fine("Initialized TypeTicket");
         avantages = new ArrayList<>();
         setType(type);
-        setQuantity(quantity);
-        setPrice(price);
+        setQuantite(quantite);
+        setPrix(prix);
         LOGGER.fine("Created TypeTicket");
     }
 
@@ -95,30 +93,30 @@ public final class TypeTicket implements Serializable {
      *
      * @return la quantité de tickets disponibles
      */
-    public int getQuantity() {
-        return quantity;
+    public int getQuantite() {
+        return quantite;
     }
 
     /**
      * Définit la quantité de tickets disponibles.
      *
-     * @param quantity la quantité de tickets disponibles
+     * @param quantite la quantité de tickets disponibles
      * @throws TypeTicketException si la quantité n'est pas positive, ou si l'ensemble des tickets
      *                             consommant un stock limité dépasse ce stock
      */
-    public void setQuantity(int quantity) throws TypeTicketException {
-        if (quantity < 0)
+    public void setQuantite(int quantite) throws TypeTicketException {
+        if (quantite < 0)
             throw new TypeTicketException("La quantité est négative, doit être positive");
         for (Avantage avantage : avantages) {
-            long delta = (long) (quantity - this.quantity) * avantage.getQuantityByTicket();
-            if (avantage.getStock().exceedsLimit(delta))
+            long delta = (long) (quantite - this.quantite) * avantage.getQuantiteParTicket();
+            if (avantage.getStock().depasseLimite(delta))
                 throw new TypeTicketException(String.format(
                         "Le stock limité \"%s\" ne suffit pas pour %d tickets \"%s\"",
-                        avantage.getStock().getName(), quantity, type
+                        avantage.getStock().getNom(), quantite, type
                 ));
         }
-        this.quantity = quantity;
-        LOGGER.fine("Set TypeTicket.quantity");
+        this.quantite = quantite;
+        LOGGER.fine("Set TypeTicket.quantite");
     }
 
     /**
@@ -126,21 +124,21 @@ public final class TypeTicket implements Serializable {
      *
      * @return le prix unitaire du ticket
      */
-    public float getPrice() {
-        return price;
+    public float getPrix() {
+        return prix;
     }
 
     /**
      * Définit le prix unitaire du ticket.
      *
-     * @param price le prix unitaire du ticket
+     * @param prix le prix unitaire du ticket
      * @throws TypeTicketException si le prix n'est pas positif
      */
-    public void setPrice(float price) throws TypeTicketException {
-        if (price < 0)
+    public void setPrix(float prix) throws TypeTicketException {
+        if (prix < 0)
             throw new TypeTicketException("Le prix est négatif, doit être positif");
-        this.price = price;
-        LOGGER.fine("Set TypeTicket.price");
+        this.prix = prix;
+        LOGGER.fine("Set TypeTicket.prix");
     }
 
     /**
@@ -148,8 +146,8 @@ public final class TypeTicket implements Serializable {
      *
      * @return la recette en euros
      */
-    public double getRevenue() {
-        return (double) quantity * price;
+    public double getRecette() {
+        return (double) quantite * prix;
     }
 
     /**
@@ -175,19 +173,6 @@ public final class TypeTicket implements Serializable {
     }
 
     /**
-     * Complète un type de ticket enregistré avant l'ajout de la surface par ticket.
-     *
-     * @param in le flux de lecture
-     * @throws IOException            si la lecture échoue
-     * @throws ClassNotFoundException si une classe du fichier est inconnue
-     */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        if (surface <= 0)
-            surface = DEFAULT_SURFACE;
-    }
-
-    /**
      * Retourne la liste des avantages associés à ce type de ticket.
      *
      * @return la liste des avantages, non modifiable
@@ -203,16 +188,16 @@ public final class TypeTicket implements Serializable {
      * @param avantage l'avantage à ajouter
      * @throws TypeTicketException si l'avantage est null ou concerne un autre type de ticket
      * @throws AvantageException   si l'avantage ne peut pas être connecté
-     * @see Avantage#connect()
+     * @see Avantage#connecter()
      */
-    public void addAvantage(Avantage avantage) throws TypeTicketException, AvantageException {
+    public void ajouterAvantage(Avantage avantage) throws TypeTicketException, AvantageException {
         if (avantage == null)
             throw new TypeTicketException("L'avantage est null, doit être défini");
-        if (avantage.getTicketType() != this)
+        if (avantage.getTypeTicket() != this)
             throw new TypeTicketException("L'avantage concerne un autre type de ticket");
         if (avantages.contains(avantage))
             return;
-        avantage.connect();
+        avantage.connecter();
     }
 
     /**
@@ -220,30 +205,30 @@ public final class TypeTicket implements Serializable {
      *
      * @param avantage l'avantage à supprimer
      * @throws TypeTicketException si l'avantage n'est pas trouvé dans la liste
-     * @see Avantage#disconnect()
+     * @see Avantage#deconnecter()
      */
-    public void removeAvantage(Avantage avantage) throws TypeTicketException {
+    public void retirerAvantage(Avantage avantage) throws TypeTicketException {
         if (!avantages.contains(avantage))
             throw new TypeTicketException("L'avantage n'a pas été trouvé");
-        avantage.detach();
+        avantage.detacher();
     }
 
     /**
-     * Ajoute l'avantage à la liste, sans vérification. Réservé à {@link Avantage#connect()}.
+     * Ajoute l'avantage à la liste, sans vérification. Réservé à {@link Avantage#connecter()}.
      *
      * @param avantage l'avantage à ajouter
      */
-    void link(Avantage avantage) {
+    void lier(Avantage avantage) {
         avantages.add(avantage);
         LOGGER.fine("Added Avantage to TypeTicket.avantages");
     }
 
     /**
-     * Retire l'avantage de la liste, sans vérification. Réservé à {@link Avantage#detach()}.
+     * Retire l'avantage de la liste, sans vérification. Réservé à {@link Avantage#detacher()}.
      *
      * @param avantage l'avantage à retirer
      */
-    void unlink(Avantage avantage) {
+    void delier(Avantage avantage) {
         avantages.remove(avantage);
         LOGGER.fine("Removed Avantage from TypeTicket.avantages");
     }

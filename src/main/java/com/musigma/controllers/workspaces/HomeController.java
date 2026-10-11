@@ -60,34 +60,34 @@ public class HomeController extends WorkspaceController {
         // Liaison des champs de texte avec les propriétés du festival
         festivalName.bind(
                 "Mise à jour du nom du festival impossible",
-                festival.getName(), festival::setName
+                festival.getNom(), festival::setNom
         );
         festivalLocation.bind(
                 "Mise à jour de l'emplacement du festival impossible",
-                festival.getLocation(), festival::setLocation
+                festival.getEmplacement(), festival::setEmplacement
         );
         festivalArea.bindValue(
                 "Mise à jour de l'aire de l'emplacement du festival impossible",
-                festival.getArea(), festival::setArea
+                festival.getSuperficie(), festival::setSuperficie
         );
         festivalLocationPrice.bindValue(
                 "Mise à jour du prix de l'emplacement du festival impossible",
-                festival.getLocationPrice(), festival::setLocationPrice
+                festival.getPrixLocation(), festival::setPrixLocation
         );
 
         // Le premier jour ne peut pas être passé, le dernier jour ne peut pas précéder le premier
         festivalStartDate.setDayCellFactory(picker -> disabledBefore(LocalDate::now));
-        festivalEndDate.setDayCellFactory(picker -> disabledBefore(() -> festival.getStart().toLocalDate()));
+        festivalEndDate.setDayCellFactory(picker -> disabledBefore(() -> festival.getDebut().toLocalDate()));
         refreshDates();
         bindDate(
                 festivalStartDate,
                 "Changement de la date de début impossible",
-                date -> festival.setStart(date.atStartOfDay())
+                date -> festival.setDebut(date.atStartOfDay())
         );
         bindDate(
                 festivalEndDate,
                 "Changement de la date de fin impossible",
-                date -> festival.setEnd(date.plusDays(1).atStartOfDay())
+                date -> festival.setFin(date.plusDays(1).atStartOfDay())
         );
 
         refreshScenes();
@@ -134,8 +134,8 @@ public class HomeController extends WorkspaceController {
      */
     private void refreshDates() {
         refreshingDates = true;
-        festivalStartDate.setValue(festival.getStart().toLocalDate());
-        festivalEndDate.setValue(festival.getEnd().minusNanos(1).toLocalDate());
+        festivalStartDate.setValue(festival.getDebut().toLocalDate());
+        festivalEndDate.setValue(festival.getFin().minusNanos(1).toLocalDate());
         refreshingDates = false;
     }
 
@@ -154,7 +154,7 @@ public class HomeController extends WorkspaceController {
         askText("Ajouter une scène", "Nom de la nouvelle scène :", "").ifPresent(name -> tryCatch(
                 "Ajout de la scène impossible",
                 () -> {
-                    festival.addScene(name);
+                    festival.ajouterScene(name);
                     refreshScenes();
                 }
         ));
@@ -173,7 +173,7 @@ public class HomeController extends WorkspaceController {
         askText("Renommer la scène", "Nouveau nom de la scène :", scene).ifPresent(name -> tryCatch(
                 "Renommage de la scène impossible",
                 () -> {
-                    festival.renameScene(scene, name);
+                    festival.renommerScene(scene, name);
                     refreshScenes();
                 }
         ));
@@ -192,7 +192,7 @@ public class HomeController extends WorkspaceController {
         tryCatch(
                 "Suppression de la scène impossible",
                 () -> {
-                    festival.removeScene(scene);
+                    festival.supprimerScene(scene);
                     refreshScenes();
                 }
         );

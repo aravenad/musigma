@@ -89,7 +89,7 @@ public class CalendarController extends WorkspaceController {
     public void initialize(Festival festival) {
         super.initialize(festival);
 
-        CalendarSource source = new CalendarSource(festival.getName());
+        CalendarSource source = new CalendarSource(festival.getNom());
         Calendar.Style[] styles = Calendar.Style.values();
         for (int i = 0; i < festival.getScenes().size(); i++) {
             String scene = festival.getScenes().get(i);
@@ -111,16 +111,16 @@ public class CalendarController extends WorkspaceController {
         calendarView.setEntryContextMenuCallback(param -> entryContextMenu(param.getEntry()));
         // La semaine affichée commence le premier jour du festival : un festival d'au plus 7 jours tient
         // dans une seule semaine, où l'on peut glisser une représentation d'un jour à l'autre
-        calendarView.setWeekFields(WeekFields.of(festival.getStart().getDayOfWeek(), 1));
+        calendarView.setWeekFields(WeekFields.of(festival.getDebut().getDayOfWeek(), 1));
         calendarView.setShowAddCalendarButton(false);
         calendarView.setShowPrintButton(false);
         calendarView.setShowDeveloperConsole(false);
         calendarView.setShowSearchField(false);
-        calendarView.setDate(festival.getStart().toLocalDate());
+        calendarView.setDate(festival.getDebut().toLocalDate());
         calendarView.showWeekPage();
         // Affiche d'abord l'heure de la première représentation, sinon le début d'après-midi
         calendarView.setRequestedTime(festival.getRepresentations().stream()
-                .map(r -> festival.getStart().plusMinutes(r.getStartDelta()).toLocalTime())
+                .map(r -> festival.getDebut().plusMinutes(r.getDecalageDebut()).toLocalTime())
                 .min(LocalTime::compareTo)
                 .map(time -> time.minusHours(Math.min(1, time.getHour())))
                 .orElse(LocalTime.of(14, 0)));
@@ -140,7 +140,7 @@ public class CalendarController extends WorkspaceController {
         sceneChoice.getSelectionModel().selectFirst();
 
         restrictToFestivalDays(dayChoice);
-        dayChoice.setValue(festival.getStart().toLocalDate());
+        dayChoice.setValue(festival.getDebut().toLocalDate());
 
         timeChoice.getItems().setAll(timeChoices());
         timeChoice.setValue(LocalTime.of(20, 0));
@@ -153,8 +153,8 @@ public class CalendarController extends WorkspaceController {
      * @param picker le sélecteur de date
      */
     private void restrictToFestivalDays(DatePicker picker) {
-        LocalDate firstDay = festival.getStart().toLocalDate();
-        LocalDate lastDay = festival.getEnd().minusNanos(1).toLocalDate();
+        LocalDate firstDay = festival.getDebut().toLocalDate();
+        LocalDate lastDay = festival.getFin().minusNanos(1).toLocalDate();
         picker.setDayCellFactory(p -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -204,7 +204,7 @@ public class CalendarController extends WorkspaceController {
                             scene,
                             artiste
                     );
-                    festival.addRepresentation(representation);
+                    festival.ajouterRepresentation(representation);
                     addEntry(representation);
                     calendarView.setDate(day);
                 }
@@ -218,7 +218,7 @@ public class CalendarController extends WorkspaceController {
      * @return le nombre de minutes, négatif si la date précède le festival
      */
     private int minutesSinceStart(LocalDateTime dateTime) {
-        return (int) Duration.between(festival.getStart(), dateTime).toMinutes();
+        return (int) Duration.between(festival.getDebut(), dateTime).toMinutes();
     }
 
     /**
@@ -227,7 +227,7 @@ public class CalendarController extends WorkspaceController {
      * @param representation la représentation
      */
     private void addEntry(Representation representation) {
-        Entry<Representation> entry = new Entry<>(representation.getArtiste().getName());
+        Entry<Representation> entry = new Entry<>(representation.getArtiste().getNom());
         entry.setUserObject(representation);
         entry.setInterval(intervalOf(representation));
         entry.intervalProperty().addListener((observable, oldInterval, newInterval) -> onIntervalChanged(entry, oldInterval, newInterval));
@@ -244,8 +244,8 @@ public class CalendarController extends WorkspaceController {
      * @return l'intervalle allant du début à la fin de la représentation
      */
     private Interval intervalOf(Representation representation) {
-        LocalDateTime start = festival.getStart().plusMinutes(representation.getStartDelta());
-        return new Interval(start, start.plusMinutes(representation.getDuration()));
+        LocalDateTime start = festival.getDebut().plusMinutes(representation.getDecalageDebut());
+        return new Interval(start, start.plusMinutes(representation.getDuree()));
     }
 
     /**
@@ -260,7 +260,7 @@ public class CalendarController extends WorkspaceController {
             return;
         Representation representation = entry.getUserObject();
         try {
-            festival.updateRepresentation(
+            festival.modifierRepresentation(
                     representation,
                     minutesSinceStart(newInterval.getStartDateTime()),
                     (int) Duration.between(newInterval.getStartDateTime(), newInterval.getEndDateTime()).toMinutes(),
@@ -287,9 +287,9 @@ public class CalendarController extends WorkspaceController {
         Representation representation = entry.getUserObject();
         try {
             if (newCalendar == null)
-                festival.removeRepresentation(representation);
+                festival.supprimerRepresentation(representation);
             else
-                festival.updateRepresentation(representation, representation.getStartDelta(), representation.getDuration(), newCalendar.getName());
+                festival.modifierRepresentation(representation, representation.getDecalageDebut(), representation.getDuree(), newCalendar.getName());
         } catch (Exception e) {
             syncing = true;
             entry.setCalendar(oldCalendar);
@@ -311,7 +311,7 @@ public class CalendarController extends WorkspaceController {
         delete.setOnAction(e -> tryCatch(
                 "Suppression de la représentation impossible",
                 () -> {
-                    festival.removeRepresentation((Representation) entry.getUserObject());
+                    festival.supprimerRepresentation((Representation) entry.getUserObject());
                     syncing = true;
                     entry.removeFromCalendar();
                     syncing = false;
@@ -330,7 +330,7 @@ public class CalendarController extends WorkspaceController {
     private void editRepresentation(Entry<?> entry) {
         Entry<Representation> representationEntry = (Entry<Representation>) entry;
         Representation representation = representationEntry.getUserObject();
-        LocalDateTime start = festival.getStart().plusMinutes(representation.getStartDelta());
+        LocalDateTime start = festival.getDebut().plusMinutes(representation.getDecalageDebut());
 
         CustomValidField<ComboBox<String>> scene = new CustomValidField<>("Scène", new ComboBox<>()) {
             @Override
@@ -356,14 +356,14 @@ public class CalendarController extends WorkspaceController {
         time.node.getItems().setAll(timeChoices());
         time.node.setValue(start.toLocalTime());
         CustomValidField<IntTextField> duration = new CustomValidField<>("Durée (min)", new IntTextField(true, true));
-        duration.node.setValue(representation.getDuration());
+        duration.node.setValue(representation.getDuree());
 
         askValidForm(
-                "Modifier la représentation de " + representation.getArtiste().getName(),
+                "Modifier la représentation de " + representation.getArtiste().getNom(),
                 "Modification de la représentation impossible",
                 new CustomValidField<?>[]{scene, day, time, duration},
                 () -> {
-                    festival.updateRepresentation(
+                    festival.modifierRepresentation(
                             representation,
                             minutesSinceStart(day.node.getValue().atTime(time.node.getValue())),
                             duration.node.getValue(),

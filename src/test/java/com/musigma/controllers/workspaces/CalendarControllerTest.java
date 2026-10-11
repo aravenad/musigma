@@ -35,14 +35,14 @@ class CalendarControllerTest {
     void setUp() throws Exception {
         LocalDateTime start = LocalDate.now().plusDays(1).atStartOfDay();
         festival = new Festival("Festival", start, 0, 1000, "Grenoble");
-        festival.setEnd(start.plusDays(2));
-        festival.addScene("Chapiteau");
+        festival.setFin(start.plusDays(2));
+        festival.ajouterScene("Chapiteau");
         artiste = new Artiste("Gorillaz", "Pop", 1000);
-        festival.addArtiste(artiste);
-        first = new Representation(20 * 60, 60, Festival.DEFAULT_SCENE, artiste);   // 20h-21h
-        second = new Representation(22 * 60, 60, Festival.DEFAULT_SCENE, artiste);  // 22h-23h
-        festival.addRepresentation(first);
-        festival.addRepresentation(second);
+        festival.ajouterArtiste(artiste);
+        first = new Representation(20 * 60, 60, Festival.SCENE_PAR_DEFAUT, artiste);   // 20h-21h
+        second = new Representation(22 * 60, 60, Festival.SCENE_PAR_DEFAUT, artiste);  // 22h-23h
+        festival.ajouterRepresentation(first);
+        festival.ajouterRepresentation(second);
 
         errors = new ArrayList<>();
         Dialogs.setErrorDisplay(errors::add);
@@ -70,7 +70,7 @@ class CalendarControllerTest {
 
     private List<Entry<?>> entries(String scene) {
         List<Entry<?>> entries = new ArrayList<>();
-        calendar(scene).findEntries(festival.getStart().toLocalDate(), festival.getEnd().toLocalDate(), ZoneId.systemDefault())
+        calendar(scene).findEntries(festival.getDebut().toLocalDate(), festival.getFin().toLocalDate(), ZoneId.systemDefault())
                 .values().forEach(entries::addAll);
         return entries;
     }
@@ -87,12 +87,12 @@ class CalendarControllerTest {
     @DisplayName("C1 — chaque scène est un calendrier et chaque représentation y figure à sa date réelle")
     void entriesMatchModel() throws Exception {
         onFxThread(() -> {
-            assertEquals(List.of(Festival.DEFAULT_SCENE, "Chapiteau"),
+            assertEquals(List.of(Festival.SCENE_PAR_DEFAUT, "Chapiteau"),
                     controller.calendarView.getCalendarSources().get(0).getCalendars().stream().map(Calendar::getName).toList());
-            assertEquals(2, entries(Festival.DEFAULT_SCENE).size());
+            assertEquals(2, entries(Festival.SCENE_PAR_DEFAUT).size());
             Entry<Representation> entry = entryOf(first);
-            assertEquals(festival.getStart().plusHours(20), entry.getStartAsLocalDateTime());
-            assertEquals(festival.getStart().plusHours(21), entry.getEndAsLocalDateTime());
+            assertEquals(festival.getDebut().plusHours(20), entry.getStartAsLocalDateTime());
+            assertEquals(festival.getDebut().plusHours(21), entry.getEndAsLocalDateTime());
             assertEquals("Gorillaz", entry.getTitle());
             return null;
         });
@@ -101,7 +101,7 @@ class CalendarControllerTest {
     @Test
     @DisplayName("La semaine affichée commence le premier jour du festival")
     void weekStartsOnFestivalFirstDay() throws Exception {
-        assertEquals(festival.getStart().getDayOfWeek(), onFxThread(() -> controller.calendarView.getWeekFields().getFirstDayOfWeek()));
+        assertEquals(festival.getDebut().getDayOfWeek(), onFxThread(() -> controller.calendarView.getWeekFields().getFirstDayOfWeek()));
     }
 
     @Test
@@ -109,12 +109,12 @@ class CalendarControllerTest {
     void moveEntryUpdatesModel() throws Exception {
         onFxThread(() -> {
             Entry<Representation> entry = entryOf(first);
-            entry.setInterval(festival.getStart().plusDays(1).plusHours(18), festival.getStart().plusDays(1).plusHours(19).plusMinutes(30));
+            entry.setInterval(festival.getDebut().plusDays(1).plusHours(18), festival.getDebut().plusDays(1).plusHours(19).plusMinutes(30));
             return null;
         });
         assertEquals(List.of(), errors);
-        assertEquals(24 * 60 + 18 * 60, first.getStartDelta());
-        assertEquals(90, first.getDuration());
+        assertEquals(24 * 60 + 18 * 60, first.getDecalageDebut());
+        assertEquals(90, first.getDuree());
     }
 
     @Test
@@ -122,12 +122,12 @@ class CalendarControllerTest {
     void collidingMoveIsReverted() throws Exception {
         Entry<Representation> entry = onFxThread(() -> {
             Entry<Representation> e = entryOf(first);
-            e.setInterval(festival.getStart().plusHours(21).plusMinutes(30), festival.getStart().plusHours(22).plusMinutes(30));
+            e.setInterval(festival.getDebut().plusHours(21).plusMinutes(30), festival.getDebut().plusHours(22).plusMinutes(30));
             return e;
         });
         assertEquals(1, errors.size(), "La collision avec la représentation de 22h doit être signalée");
-        assertEquals(20 * 60, first.getStartDelta(), "Le modèle ne doit pas changer");
-        assertEquals(festival.getStart().plusHours(20), onFxThread(entry::getStartAsLocalDateTime), "L'entrée doit revenir à 20h");
+        assertEquals(20 * 60, first.getDecalageDebut(), "Le modèle ne doit pas changer");
+        assertEquals(festival.getDebut().plusHours(20), onFxThread(entry::getStartAsLocalDateTime), "L'entrée doit revenir à 20h");
     }
 
     @Test

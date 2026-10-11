@@ -15,7 +15,7 @@ import static com.musigma.utils.Log.getLogger;
  */
 public final class Artiste implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Logger de la classe Artiste.
@@ -28,7 +28,7 @@ public final class Artiste implements Serializable {
     /**
      * Nom de l'artiste.
      */
-    private String name;
+    private String nom;
     /**
      * Genre musical de l'artiste.
      */
@@ -36,22 +36,22 @@ public final class Artiste implements Serializable {
     /**
      * Prix de l'artiste.
      */
-    private float price;
+    private float cachet;
 
     /**
      * Constructeur de la classe Artiste.
      *
-     * @param name  le nom de l'artiste
+     * @param nom  le nom de l'artiste
      * @param genre le genre musical de l'artiste
-     * @param price le prix de l'artiste
+     * @param cachet le prix de l'artiste
      * @throws ArtisteException si les valeurs des paramètres ne sont pas valides
      */
-    public Artiste(String name, String genre, float price) throws ArtisteException {
+    public Artiste(String nom, String genre, float cachet) throws ArtisteException {
         LOGGER.fine("Initialized Artiste");
         representations = new ArrayList<>();
-        setName(name);
+        setNom(nom);
         setGenre(genre);
-        setPrice(price);
+        setCachet(cachet);
         LOGGER.fine("Created Artiste");
     }
 
@@ -60,21 +60,21 @@ public final class Artiste implements Serializable {
      *
      * @return le nom de l'artiste
      */
-    public String getName() {
-        return name;
+    public String getNom() {
+        return nom;
     }
 
     /**
      * Défini le nom de l'artiste.
      *
-     * @param name le nom de l'artiste
+     * @param nom le nom de l'artiste
      * @throws ArtisteException si le nom est null ou vide
      */
-    public void setName(String name) throws ArtisteException {
-        if (name == null || name.isBlank())
+    public void setNom(String nom) throws ArtisteException {
+        if (nom == null || nom.isBlank())
             throw new ArtisteException("Le nom est null ou vide, doit être défini");
-        this.name = name;
-        LOGGER.fine("Set Artiste.name");
+        this.nom = nom;
+        LOGGER.fine("Set Artiste.nom");
     }
 
     /**
@@ -104,31 +104,31 @@ public final class Artiste implements Serializable {
      *
      * @return le prix de l'artiste
      */
-    public float getPrice() {
-        return price;
+    public float getCachet() {
+        return cachet;
     }
 
     /**
      * Défini le prix de l'artiste.
      *
-     * @param price le prix de l'artiste
+     * @param cachet le prix de l'artiste
      * @throws ArtisteException si le prix est négatif
      */
-    public void setPrice(float price) throws ArtisteException {
-        if (price < 0)
+    public void setCachet(float cachet) throws ArtisteException {
+        if (cachet < 0)
             throw new ArtisteException("Le prix est négatif, doit être positif");
-        this.price = price;
-        LOGGER.fine("Set Artiste.price");
+        this.cachet = cachet;
+        LOGGER.fine("Set Artiste.cachet");
     }
 
     /**
      * Ajoute une représentation à la liste des représentations de l'artiste.
-     * Appelée par {@link Festival#addRepresentation} lors de la planification.
+     * Appelée par {@link Festival#ajouterRepresentation} lors de la planification.
      *
      * @param representation la représentation à ajouter
      * @throws ArtisteException si la représentation est null ou concerne un autre artiste
      */
-    void addRepresentation(Representation representation) throws ArtisteException {
+    void ajouterRepresentation(Representation representation) throws ArtisteException {
         if (representation == null)
             throw new ArtisteException("La représentation est null, doit être défini");
         if (representation.getArtiste() != this)
@@ -139,12 +139,12 @@ public final class Artiste implements Serializable {
 
     /**
      * Supprime une représentation de la liste des représentations de l'artiste.
-     * Appelée par {@link Festival#removeRepresentation}.
+     * Appelée par {@link Festival#supprimerRepresentation}.
      *
      * @param representation la représentation à supprimer
      * @throws ArtisteException si la représentation n'a pas été trouvée
      */
-    void removeRepresentation(Representation representation) throws ArtisteException {
+    void supprimerRepresentation(Representation representation) throws ArtisteException {
         if (!representations.remove(representation))
             throw new ArtisteException("La représentation n'a pas été trouvée");
         LOGGER.fine("Removed Representation from Artiste.representations");
@@ -161,6 +161,6 @@ public final class Artiste implements Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return nom;
     }
 }

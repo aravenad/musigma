@@ -27,18 +27,18 @@ class RepresentationTest {
     }
 
     @Test
-    void setStartDelta() {
-        assertDoesNotThrow(() -> representation.setStartDelta(200), "La différence de temps doit pouvoir être changée sans exception");
-        assertEquals(200, representation.getStartDelta(), "La différence de temps doit être changée pour le nouveau valide");
-        assertThrows(RepresentationException.class, () -> representation.setStartDelta(-100), "La différence de temps ne doit pas pouvoir être négative");
+    void setDecalageDebut() {
+        assertDoesNotThrow(() -> representation.setDecalageDebut(200), "La différence de temps doit pouvoir être changée sans exception");
+        assertEquals(200, representation.getDecalageDebut(), "La différence de temps doit être changée pour le nouveau valide");
+        assertThrows(RepresentationException.class, () -> representation.setDecalageDebut(-100), "La différence de temps ne doit pas pouvoir être négative");
     }
 
     @Test
-    void setDuration() {
-        assertDoesNotThrow(() -> representation.setDuration(120), "La durée doit pouvoir être changée sans exception");
-        assertEquals(120, representation.getDuration(), "La durée doit être changée pour le nouveau valide");
-        assertThrows(RepresentationException.class, () -> representation.setDuration(0), "La durée ne doit pas pouvoir être nulle");
-        assertThrows(RepresentationException.class, () -> representation.setDuration(-30), "La durée ne doit pas pouvoir être négative");
+    void setDuree() {
+        assertDoesNotThrow(() -> representation.setDuree(120), "La durée doit pouvoir être changée sans exception");
+        assertEquals(120, representation.getDuree(), "La durée doit être changée pour le nouveau valide");
+        assertThrows(RepresentationException.class, () -> representation.setDuree(0), "La durée ne doit pas pouvoir être nulle");
+        assertThrows(RepresentationException.class, () -> representation.setDuree(-30), "La durée ne doit pas pouvoir être négative");
     }
 
     @Test

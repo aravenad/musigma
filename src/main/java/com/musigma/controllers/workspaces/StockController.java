@@ -69,26 +69,26 @@ public class StockController extends WorkspaceController {
         tableView.getItems().setAll(festival.getStocks());
         tableView.setEditable(true);
 
-        nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
+        nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getNom()));
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         nameColumn.setOnEditCommit(event -> commit(
                 "Impossible de renommer le stock",
-                () -> festival.renameStock(event.getRowValue(), event.getNewValue())
+                () -> festival.renommerStock(event.getRowValue(), event.getNewValue())
         ));
 
-        quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantity()));
+        quantityColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantite()));
         quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         quantityColumn.setOnEditCommit(event -> commit(
                 "Impossible de modifier la quantité du stock",
-                () -> event.getRowValue().setQuantity(event.getNewValue())
+                () -> event.getRowValue().setQuantite(event.getNewValue())
         ));
 
         fixedColumn.setCellValueFactory(f -> {
             Stock stock = f.getValue();
-            SimpleBooleanProperty fixed = new SimpleBooleanProperty(stock.isFixed());
+            SimpleBooleanProperty fixed = new SimpleBooleanProperty(stock.estLimite());
             fixed.addListener((observable, oldValue, newValue) -> commit(
                     "Impossible de changer la limite du stock",
-                    () -> stock.setFixed(newValue)
+                    () -> stock.setLimite(newValue)
             ));
             return fixed;
         });
@@ -126,10 +126,10 @@ public class StockController extends WorkspaceController {
      * @return la consommation, suivie du manque éventuel
      */
     private static String consumption(Stock stock) {
-        long missing = stock.isFixed() ? 0 : stock.getMissingQuantity();
+        long missing = stock.estLimite() ? 0 : stock.getQuantiteManquante();
         return missing > 0
-                ? String.format("%d (manque %d)", stock.getConsumedQuantity(), missing)
-                : Long.toString(stock.getConsumedQuantity());
+                ? String.format("%d (manque %d)", stock.getQuantiteConsommee(), missing)
+                : Long.toString(stock.getQuantiteConsommee());
     }
 
     /**
@@ -154,13 +154,13 @@ public class StockController extends WorkspaceController {
         if (!stock.getAvantages().isEmpty() && !confirm(
                 "Supprimer le stock",
                 String.format("Le stock « %s » est utilisé par %d avantage(s) de tickets, qui seront aussi supprimés. Continuer ?",
-                        stock.getName(), stock.getAvantages().size())
+                        stock.getNom(), stock.getAvantages().size())
         ))
             return;
         tryCatch(
                 "Impossible de supprimer le stock",
                 () -> {
-                    festival.removeStock(stock);
+                    festival.supprimerStock(stock);
                     tableView.getItems().remove(stock);
                     refreshTotals();
                 });
@@ -187,7 +187,7 @@ public class StockController extends WorkspaceController {
                             fixed.node.isSelected(),
                             price.node.getValue()
                     );
-                    festival.addStock(stock);
+                    festival.ajouterStock(stock);
                     tableView.getItems().add(stock);
                     refreshTotals();
                 }
@@ -198,8 +198,8 @@ public class StockController extends WorkspaceController {
      * Affiche le coût total des stocks nécessaires et les stocks insuffisants.
      */
     private void refreshTotals() {
-        total.setText(festival.getStocks().isEmpty() ? "" : String.format("Coût des stocks nécessaires : %.2f €", festival.getStocksCost()));
-        int insufficient = festival.getInsufficientStocks().size();
+        total.setText(festival.getStocks().isEmpty() ? "" : String.format("Coût des stocks nécessaires : %.2f €", festival.getCoutStocks()));
+        int insufficient = festival.getStocksInsuffisants().size();
         missing.setText(insufficient == 0 ? "" : String.format("%d stock(s) insuffisant(s) pour les tickets prévus", insufficient));
     }
 }

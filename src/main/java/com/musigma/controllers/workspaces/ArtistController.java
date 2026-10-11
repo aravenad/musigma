@@ -81,11 +81,11 @@ public class ArtistController extends WorkspaceController {
         artistsTable.getItems().setAll(festival.getArtistes());
         artistsTable.setEditable(true);
 
-        nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getName()));
+        nameColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getNom()));
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         nameColumn.setOnEditCommit(event -> commit(
                 "Impossible de renommer l'artiste",
-                () -> event.getRowValue().setName(event.getNewValue())
+                () -> event.getRowValue().setNom(event.getNewValue())
         ));
 
         genreColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getGenre()));
@@ -95,11 +95,11 @@ public class ArtistController extends WorkspaceController {
                 () -> event.getRowValue().setGenre(event.getNewValue())
         ));
 
-        feeColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>((double) f.getValue().getPrice()));
+        feeColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>((double) f.getValue().getCachet()));
         feeColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         feeColumn.setOnEditCommit(event -> commit(
                 "Impossible de modifier le cachet de l'artiste",
-                () -> event.getRowValue().setPrice(event.getNewValue().floatValue())
+                () -> event.getRowValue().setCachet(event.getNewValue().floatValue())
         ));
 
         countColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getRepresentations().size()));
@@ -120,9 +120,9 @@ public class ArtistController extends WorkspaceController {
 
         sceneColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getScene()));
         startColumn.setCellValueFactory(f -> new SimpleStringProperty(
-                festival.getStart().plusMinutes(f.getValue().getStartDelta()).format(DATE_FORMAT)
+                festival.getDebut().plusMinutes(f.getValue().getDecalageDebut()).format(DATE_FORMAT)
         ));
-        durationColumn.setCellValueFactory(f -> new SimpleStringProperty(formatDuration(f.getValue().getDuration())));
+        durationColumn.setCellValueFactory(f -> new SimpleStringProperty(formatDuration(f.getValue().getDuree())));
         artistsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldArtiste, artiste) -> showRepresentations(artiste));
 
         refreshSummary();
@@ -153,7 +153,7 @@ public class ArtistController extends WorkspaceController {
             representationsTable.getItems().clear();
             return;
         }
-        representationsTitle.setText("Représentations de " + artiste.getName());
+        representationsTitle.setText("Représentations de " + artiste.getNom());
         representationsTable.getItems().setAll(
                 festival.getRepresentations().stream().filter(r -> r.getArtiste() == artiste).toList()
         );
@@ -179,10 +179,10 @@ public class ArtistController extends WorkspaceController {
      */
     @FXML
     private void addArtiste() {
-        if (festival.getFreeMinutes() < FULL_SCHEDULE_THRESHOLD && !confirm(
+        if (festival.getMinutesLibres() < FULL_SCHEDULE_THRESHOLD && !confirm(
                 "Planning presque plein",
                 String.format("Il ne reste que %s de libre sur l'ensemble des scènes. Engager quand même un artiste ?",
-                        formatDuration(Math.max(0, festival.getFreeMinutes())))
+                        formatDuration(Math.max(0, festival.getMinutesLibres())))
         ))
             return;
 
@@ -196,7 +196,7 @@ public class ArtistController extends WorkspaceController {
                 new CustomValidField<?>[]{name, genre, fee},
                 () -> {
                     Artiste artiste = new Artiste(name.node.getText(), genre.node.getText(), fee.node.getValue());
-                    festival.addArtiste(artiste);
+                    festival.ajouterArtiste(artiste);
                     artistsTable.getItems().add(artiste);
                     artistsTable.getSelectionModel().select(artiste);
                     refreshSummary();
@@ -213,13 +213,13 @@ public class ArtistController extends WorkspaceController {
         int count = artiste.getRepresentations().size();
         if (count > 0 && !confirm(
                 "Retirer l'artiste",
-                String.format("%s a %d représentation(s) planifiée(s), qui seront supprimées. Continuer ?", artiste.getName(), count)
+                String.format("%s a %d représentation(s) planifiée(s), qui seront supprimées. Continuer ?", artiste.getNom(), count)
         ))
             return;
         tryCatch(
                 "Impossible de retirer l'artiste",
                 () -> {
-                    festival.removeArtiste(artiste);
+                    festival.retirerArtiste(artiste);
                     artistsTable.getItems().remove(artiste);
                     refreshSummary();
                 }
@@ -230,7 +230,7 @@ public class ArtistController extends WorkspaceController {
      * Affiche le total des cachets et le temps encore libre dans le planning.
      */
     private void refreshSummary() {
-        totalFees.setText(String.format("Total des cachets : %.2f €", festival.getTotalFees()));
-        freeTime.setText(String.format("Temps libre sur les scènes : %s", formatDuration(Math.max(0, festival.getFreeMinutes()))));
+        totalFees.setText(String.format("Total des cachets : %.2f €", festival.getTotalCachets()));
+        freeTime.setText(String.format("Temps libre sur les scènes : %s", formatDuration(Math.max(0, festival.getMinutesLibres()))));
     }
 }

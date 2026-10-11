@@ -75,10 +75,10 @@ public class TicketController extends WorkspaceController {
     public void initialize(Festival festival) {
         super.initialize(festival);
         typeColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getType()));
-        quantityColumn.setCellValueFactory(f -> new SimpleStringProperty(Integer.toString(f.getValue().getQuantity())));
-        priceColumn.setCellValueFactory(f -> new SimpleStringProperty(formatNumber(f.getValue().getPrice())));
+        quantityColumn.setCellValueFactory(f -> new SimpleStringProperty(Integer.toString(f.getValue().getQuantite())));
+        priceColumn.setCellValueFactory(f -> new SimpleStringProperty(formatNumber(f.getValue().getPrix())));
         surfaceColumn.setCellValueFactory(f -> new SimpleStringProperty(formatNumber(f.getValue().getSurface())));
-        revenueColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().getRevenue())));
+        revenueColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().getRecette())));
         ticketsTable.setRowFactory(table -> {
             TableRow<TypeTicket> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -88,14 +88,14 @@ public class TicketController extends WorkspaceController {
             return row;
         });
 
-        stockColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getStock().getName()));
-        quantityByTicketColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantityByTicket()));
+        stockColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getStock().getNom()));
+        quantityByTicketColumn.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getQuantiteParTicket()));
         quantityByTicketColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         quantityByTicketColumn.setOnEditCommit(event -> commit(
                 "Impossible de modifier la quantité de l'avantage",
-                () -> event.getRowValue().setQuantityByTicket(event.getNewValue())
+                () -> event.getRowValue().setQuantiteParTicket(event.getNewValue())
         ));
-        consumptionColumn.setCellValueFactory(f -> new SimpleStringProperty(Long.toString(f.getValue().getTotalQuantity())));
+        consumptionColumn.setCellValueFactory(f -> new SimpleStringProperty(Long.toString(f.getValue().getQuantiteTotale())));
         avantageActionColumn.setCellFactory(column -> new TableCell<>() {
             private final Button deleteButton = new Button("Retirer");
 
@@ -104,7 +104,7 @@ public class TicketController extends WorkspaceController {
                     Avantage avantage = getTableView().getItems().get(getIndex());
                     commit(
                             "Impossible de retirer l'avantage",
-                            () -> avantage.getTicketType().removeAvantage(avantage)
+                            () -> avantage.getTypeTicket().retirerAvantage(avantage)
                     );
                 });
             }
@@ -146,11 +146,11 @@ public class TicketController extends WorkspaceController {
      */
     private void refresh() {
         TypeTicket selected = selected();
-        ticketsTable.getItems().setAll(festival.getTicketTypes());
-        if (selected != null && festival.getTicketTypes().contains(selected))
+        ticketsTable.getItems().setAll(festival.getTypesTicket());
+        if (selected != null && festival.getTypesTicket().contains(selected))
             ticketsTable.getSelectionModel().select(selected);
         ticketsTable.refresh();
-        totalRevenue.setText(String.format("Recette des tickets : %s", CURRENCY.format(festival.getBudget().totalRevenue())));
+        totalRevenue.setText(String.format("Recette des tickets : %s", CURRENCY.format(festival.getBilan().totalRecettes())));
         refreshAvantages();
     }
 
@@ -187,7 +187,7 @@ public class TicketController extends WorkspaceController {
         CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, false));
         CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
         CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
-        surfaceTicket.node.setValue(TypeTicket.DEFAULT_SURFACE);
+        surfaceTicket.node.setValue(TypeTicket.SURFACE_PAR_DEFAUT);
 
         askValidForm(
                 "Ajouter un type de ticket",
@@ -196,7 +196,7 @@ public class TicketController extends WorkspaceController {
                 () -> {
                     TypeTicket ticket = new TypeTicket(nameTicket.node.getText(), quantiteTicket.node.getValue(), priceTicket.node.getValue());
                     ticket.setSurface(surfaceTicket.node.getValue());
-                    festival.addTicketType(ticket);
+                    festival.ajouterTypeTicket(ticket);
                     refresh();
                     ticketsTable.getSelectionModel().select(ticket);
                 }
@@ -214,9 +214,9 @@ public class TicketController extends WorkspaceController {
         CustomValidField<RequiredTextField> nameTicket = new CustomValidField<>("Nom", new RequiredTextField());
         nameTicket.node.setText(ticket.getType());
         CustomValidField<IntTextField> quantiteTicket = new CustomValidField<>("Quantité", new IntTextField(true, false));
-        quantiteTicket.node.setValue(ticket.getQuantity());
+        quantiteTicket.node.setValue(ticket.getQuantite());
         CustomValidField<FloatTextField> priceTicket = new CustomValidField<>("Prix (€)", new FloatTextField(true, false));
-        priceTicket.node.setValue(ticket.getPrice());
+        priceTicket.node.setValue(ticket.getPrix());
         CustomValidField<FloatTextField> surfaceTicket = new CustomValidField<>("Surface par personne (m²)", new FloatTextField(true, true));
         surfaceTicket.node.setValue(ticket.getSurface());
 
@@ -225,7 +225,7 @@ public class TicketController extends WorkspaceController {
                 "Modification du type de ticket impossible",
                 new CustomValidField<?>[]{nameTicket, quantiteTicket, priceTicket, surfaceTicket},
                 () -> {
-                    festival.updateTicketType(
+                    festival.modifierTypeTicket(
                             ticket,
                             nameTicket.node.getText(),
                             quantiteTicket.node.getValue(),
@@ -250,7 +250,7 @@ public class TicketController extends WorkspaceController {
             return;
         commit(
                 "Impossible de supprimer le type de ticket",
-                () -> festival.removeTicketType(ticket)
+                () -> festival.supprimerTypeTicket(ticket)
         );
     }
 
@@ -285,7 +285,7 @@ public class TicketController extends WorkspaceController {
                             ticket,
                             stockAvantage.node.getSelectionModel().getSelectedItem(),
                             quantityByTicket.node.getValue()
-                    ).connect();
+                    ).connecter();
                     refresh();
                 }
         );

@@ -30,37 +30,37 @@ class TypeTicketTest {
     }
 
     @Test
-    void setQuantity() throws TypeTicketException, StockException, AvantageException {
-        assertDoesNotThrow(() -> ticket.setQuantity(10), "Le nombre de ticket doit pouvoir être changé par un nouveau valide");
-        assertEquals(10, ticket.getQuantity(), "Le nombre de ticket doit être changé par le nouveau valide");
-        assertThrows(TypeTicketException.class, () -> ticket.setQuantity(-100), "Le nombre de ticket ne doit pas pouvoir être changé par un nouveau invalide car négatif");
-        stock.setFixed(true);
-        ticket.addAvantage(avantage);
-        assertThrows(TypeTicketException.class, () -> ticket.setQuantity(10000), "La quantité par ticket multipié par le nombre de ticket ne doit pas surpasser les stocks limités");
-        stock.setFixed(false);
-        assertDoesNotThrow(() -> avantage.setQuantityByTicket(10000), "La quantité par ticket multipié par le nombre de ticket peut surpasser les stocks illimités");
+    void setQuantite() throws TypeTicketException, StockException, AvantageException {
+        assertDoesNotThrow(() -> ticket.setQuantite(10), "Le nombre de ticket doit pouvoir être changé par un nouveau valide");
+        assertEquals(10, ticket.getQuantite(), "Le nombre de ticket doit être changé par le nouveau valide");
+        assertThrows(TypeTicketException.class, () -> ticket.setQuantite(-100), "Le nombre de ticket ne doit pas pouvoir être changé par un nouveau invalide car négatif");
+        stock.setLimite(true);
+        ticket.ajouterAvantage(avantage);
+        assertThrows(TypeTicketException.class, () -> ticket.setQuantite(10000), "La quantité par ticket multipié par le nombre de ticket ne doit pas surpasser les stocks limités");
+        stock.setLimite(false);
+        assertDoesNotThrow(() -> avantage.setQuantiteParTicket(10000), "La quantité par ticket multipié par le nombre de ticket peut surpasser les stocks illimités");
     }
 
     @Test
-    void setPrice() {
-        assertDoesNotThrow(() -> ticket.setPrice(200), "Le prix du ticket doit pouvoir être changé par un nouveau valide");
-        assertEquals(200, ticket.getPrice(), "Le prix du ticket doit être changé par le nouveau valide");
-        assertThrows(TypeTicketException.class, () -> ticket.setPrice(-100), "Le prix du ticket ne doit pas pouvoir être changé par un nouveau invalide car négatif");
+    void setPrix() {
+        assertDoesNotThrow(() -> ticket.setPrix(200), "Le prix du ticket doit pouvoir être changé par un nouveau valide");
+        assertEquals(200, ticket.getPrix(), "Le prix du ticket doit être changé par le nouveau valide");
+        assertThrows(TypeTicketException.class, () -> ticket.setPrix(-100), "Le prix du ticket ne doit pas pouvoir être changé par un nouveau invalide car négatif");
     }
 
     @Test
-    void addAvantage() {
-        assertDoesNotThrow(() -> ticket.addAvantage(avantage), "Le type de ticket doit pouvoir ajouté un avantage");
+    void ajouterAvantage() {
+        assertDoesNotThrow(() -> ticket.ajouterAvantage(avantage), "Le type de ticket doit pouvoir ajouté un avantage");
         assertTrue(ticket.getAvantages().contains(avantage), "Le type de ticket doit avoir ajouté l'avantage");
-        assertThrows(TypeTicketException.class, () -> ticket.addAvantage(null), "Le type de ticket ne doit pas pouvoir ajouter null comme avantage");
+        assertThrows(TypeTicketException.class, () -> ticket.ajouterAvantage(null), "Le type de ticket ne doit pas pouvoir ajouter null comme avantage");
         assertFalse(ticket.getAvantages().contains(null), "Le type de ticket ne doit pas avoir ajouté null comme un nouvel avantage");
     }
 
     @Test
-    void removeAvantage() throws TypeTicketException, AvantageException {
-        ticket.addAvantage(avantage);
-        assertDoesNotThrow(() -> ticket.removeAvantage(avantage), "Le type de ticket doit pouvoir retirer un de ses avantages");
+    void retirerAvantage() throws TypeTicketException, AvantageException {
+        ticket.ajouterAvantage(avantage);
+        assertDoesNotThrow(() -> ticket.retirerAvantage(avantage), "Le type de ticket doit pouvoir retirer un de ses avantages");
         assertFalse(ticket.getAvantages().contains(avantage), "Le type de ticket doit avoir retirer l'avantage de siens");
-        assertThrows(TypeTicketException.class, () -> ticket.removeAvantage(avantage), "Le type de ticket ne doit pas pouvoir retirer un avantage n'étant pas des siens");
+        assertThrows(TypeTicketException.class, () -> ticket.retirerAvantage(avantage), "Le type de ticket ne doit pas pouvoir retirer un avantage n'étant pas des siens");
     }
 }

@@ -11,12 +11,12 @@ import static com.musigma.utils.Log.getLogger;
  * La classe Avantage représente un avantage associé à un type de ticket
  * et à un stock, avec une quantité spécifique par ticket.
  * <p>
- * Un avantage n'est pris en compte qu'une fois connecté ({@link #connect()}) :
+ * Un avantage n'est pris en compte qu'une fois connecté ({@link #connecter()}) :
  * il figure alors à la fois dans les avantages de son type de ticket et dans ceux de son stock.
  */
 public final class Avantage implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Logger de la classe Avantage.
@@ -25,7 +25,7 @@ public final class Avantage implements Serializable {
     /**
      * Type de ticket associé à cet avantage.
      */
-    private final TypeTicket ticketType;
+    private final TypeTicket typeTicket;
     /**
      * Stock associé à cet avantage.
      */
@@ -33,26 +33,26 @@ public final class Avantage implements Serializable {
     /**
      * Quantité d'objet du stock par ticket.
      */
-    private int quantityByTicket;
+    private int quantiteParTicket;
 
     /**
      * Constructeur de la classe Avantage.
      *
-     * @param ticketType       le type de ticket associé à cet avantage
+     * @param typeTicket       le type de ticket associé à cet avantage
      * @param stock            le stock associé à cet avantage
-     * @param quantityByTicket la quantité de cet avantage par ticket
+     * @param quantiteParTicket la quantité de cet avantage par ticket
      * @throws AvantageException si le type de ticket ou le stock est null, si la quantité par ticket
      *                           est inférieure ou égale à zéro ou si elle dépasse un stock limité
      */
-    public Avantage(TypeTicket ticketType, Stock stock, int quantityByTicket) throws AvantageException {
+    public Avantage(TypeTicket typeTicket, Stock stock, int quantiteParTicket) throws AvantageException {
         LOGGER.fine("Initialized Avantage");
-        if (ticketType == null)
+        if (typeTicket == null)
             throw new AvantageException("Le type de ticket est null, doit être défini");
         if (stock == null)
             throw new AvantageException("Le stock est null, doit être défini");
-        this.ticketType = ticketType;
+        this.typeTicket = typeTicket;
         this.stock = stock;
-        setQuantityByTicket(quantityByTicket);
+        setQuantiteParTicket(quantiteParTicket);
         LOGGER.fine("Created Avantage");
     }
 
@@ -61,8 +61,8 @@ public final class Avantage implements Serializable {
      *
      * @return true si l'avantage est connecté, false sinon
      */
-    public boolean isConnected() {
-        return ticketType.getAvantages().contains(this);
+    public boolean estConnecte() {
+        return typeTicket.getAvantages().contains(this);
     }
 
     /**
@@ -71,13 +71,13 @@ public final class Avantage implements Serializable {
      * @throws AvantageException si un avantage existe déjà pour ce stock sur ce type de ticket,
      *                           ou si la consommation dépasse un stock limité
      */
-    public void connect() throws AvantageException {
-        if (ticketType.getAvantages().stream().anyMatch(av -> av.getStock() == stock))
+    public void connecter() throws AvantageException {
+        if (typeTicket.getAvantages().stream().anyMatch(av -> av.getStock() == stock))
             throw new AvantageException("Un avantage identique existe déjà pour ce stock");
-        if (stock.exceedsLimit(contribution(quantityByTicket)))
+        if (stock.depasseLimite(consommation(quantiteParTicket)))
             throw new AvantageException("La quantité par ticket multipliée par le nombre de tickets surpasse le stock limité");
-        ticketType.link(this);
-        stock.link(this);
+        typeTicket.lier(this);
+        stock.lier(this);
         LOGGER.fine("Connected stock and ticket from avantage");
     }
 
@@ -86,18 +86,18 @@ public final class Avantage implements Serializable {
      *
      * @throws AvantageException si l'avantage n'est pas connecté
      */
-    public void disconnect() throws AvantageException {
-        if (!isConnected())
+    public void deconnecter() throws AvantageException {
+        if (!estConnecte())
             throw new AvantageException("L'avantage n'est pas connecté");
-        detach();
+        detacher();
     }
 
     /**
      * Retire cet avantage de son type de ticket et de son stock, sans vérification.
      */
-    void detach() {
-        ticketType.unlink(this);
-        stock.unlink(this);
+    void detacher() {
+        typeTicket.delier(this);
+        stock.delier(this);
         LOGGER.fine("Disconnected stock and ticket from avantage");
     }
 
@@ -106,24 +106,24 @@ public final class Avantage implements Serializable {
      *
      * @return la quantité d'objet du stock par ticket
      */
-    public int getQuantityByTicket() {
-        return quantityByTicket;
+    public int getQuantiteParTicket() {
+        return quantiteParTicket;
     }
 
     /**
      * Définit la quantité d'objet du stock par ticket.
      *
-     * @param quantityByTicket la quantité d'objet du stock par ticket
+     * @param quantiteParTicket la quantité d'objet du stock par ticket
      * @throws AvantageException si la quantité est inférieure ou égale à zéro, ou si elle dépasse un stock limité
      */
-    public void setQuantityByTicket(int quantityByTicket) throws AvantageException {
-        if (quantityByTicket <= 0)
+    public void setQuantiteParTicket(int quantiteParTicket) throws AvantageException {
+        if (quantiteParTicket <= 0)
             throw new AvantageException("La quantité par ticket est inférieure ou égale à zéro, doit être positive");
-        long current = isConnected() ? contribution(this.quantityByTicket) : 0;
-        if (stock.exceedsLimit(contribution(quantityByTicket) - current))
+        long actuelle = estConnecte() ? consommation(this.quantiteParTicket) : 0;
+        if (stock.depasseLimite(consommation(quantiteParTicket) - actuelle))
             throw new AvantageException("La quantité par ticket multipliée par le nombre de tickets surpasse le stock limité");
-        this.quantityByTicket = quantityByTicket;
-        LOGGER.fine("Set Avantage.quantityByTicket");
+        this.quantiteParTicket = quantiteParTicket;
+        LOGGER.fine("Set Avantage.quantiteParTicket");
     }
 
     /**
@@ -131,18 +131,18 @@ public final class Avantage implements Serializable {
      *
      * @return le nombre de tickets multiplié par la quantité par ticket
      */
-    public long getTotalQuantity() {
-        return contribution(quantityByTicket);
+    public long getQuantiteTotale() {
+        return consommation(quantiteParTicket);
     }
 
     /**
      * Retourne la quantité du stock consommée par cet avantage pour une quantité par ticket donnée.
      *
-     * @param quantityByTicket la quantité par ticket
+     * @param quantiteParTicket la quantité par ticket
      * @return le nombre de tickets multiplié par la quantité par ticket
      */
-    long contribution(int quantityByTicket) {
-        return (long) ticketType.getQuantity() * quantityByTicket;
+    long consommation(int quantiteParTicket) {
+        return (long) typeTicket.getQuantite() * quantiteParTicket;
     }
 
     /**
@@ -150,8 +150,8 @@ public final class Avantage implements Serializable {
      *
      * @return le type de ticket associé à cet avantage
      */
-    public TypeTicket getTicketType() {
-        return ticketType;
+    public TypeTicket getTypeTicket() {
+        return typeTicket;
     }
 
     /**

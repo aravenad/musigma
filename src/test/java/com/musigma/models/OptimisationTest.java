@@ -29,28 +29,28 @@ class OptimisationTest {
         Festival festival = festival(14000);
         Stock gobelet = new Stock("Gobelet", 8000, true, 1);
         Stock parking = new Stock("Place de parking", 3000, true, 1);
-        festival.addStock(gobelet);
-        festival.addStock(parking);
+        festival.ajouterStock(gobelet);
+        festival.ajouterStock(parking);
 
         TypeTicket vip = new TypeTicket("VIP", 0, 50);
         vip.setSurface(4);
         TypeTicket nonVip = new TypeTicket("Non-VIP", 0, 35);
         nonVip.setSurface(2);
-        festival.addTicketType(vip);
-        festival.addTicketType(nonVip);
-        new Avantage(vip, gobelet, 1).connect();
-        new Avantage(vip, parking, 1).connect();
-        new Avantage(nonVip, gobelet, 2).connect();
+        festival.ajouterTypeTicket(vip);
+        festival.ajouterTypeTicket(nonVip);
+        new Avantage(vip, gobelet, 1).connecter();
+        new Avantage(vip, parking, 1).connecter();
+        new Avantage(nonVip, gobelet, 2).connecter();
 
-        SalesPlan plan = festival.optimizeSales();
-        assertEquals(205000, plan.revenue(), 1e-6);
-        assertEquals(2000, plan.quantities().get(vip));
-        assertEquals(3000, plan.quantities().get(nonVip));
-        assertEquals(0, vip.getQuantity(), "Calculer une recommandation ne modifie pas le festival");
+        PlanDeVente plan = festival.optimiserVentes();
+        assertEquals(205000, plan.recette(), 1e-6);
+        assertEquals(2000, plan.quantites().get(vip));
+        assertEquals(3000, plan.quantites().get(nonVip));
+        assertEquals(0, vip.getQuantite(), "Calculer une recommandation ne modifie pas le festival");
 
-        festival.applySalesPlan(plan);
-        assertEquals(2000, vip.getQuantity());
-        assertEquals(3000, nonVip.getQuantity());
+        festival.appliquerPlanDeVente(plan);
+        assertEquals(2000, vip.getQuantite());
+        assertEquals(3000, nonVip.getQuantite());
     }
 
     @Test
@@ -58,14 +58,14 @@ class OptimisationTest {
     void fractionalOptimum() throws FestivalException, StockException, TypeTicketException, AvantageException {
         Festival festival = festival(100000);
         Stock gobelet = new Stock("Gobelet", 8001, true, 1);
-        festival.addStock(gobelet);
+        festival.ajouterStock(gobelet);
         TypeTicket ticket = new TypeTicket("Simple", 0, 10);
-        festival.addTicketType(ticket);
-        new Avantage(ticket, gobelet, 2).connect();
+        festival.ajouterTypeTicket(ticket);
+        new Avantage(ticket, gobelet, 2).connecter();
 
-        SalesPlan plan = festival.optimizeSales();
-        assertEquals(4000, plan.quantities().get(ticket), "8001 gobelets à 2 par ticket : 4000 tickets au plus");
-        assertEquals(40000, plan.revenue(), 1e-6);
+        PlanDeVente plan = festival.optimiserVentes();
+        assertEquals(4000, plan.quantites().get(ticket), "8001 gobelets à 2 par ticket : 4000 tickets au plus");
+        assertEquals(40000, plan.recette(), 1e-6);
     }
 
     @Test
@@ -73,11 +73,11 @@ class OptimisationTest {
     void ticketWithoutAvantageIsBoundedByArea() throws FestivalException, TypeTicketException {
         Festival festival = festival(1000);
         TypeTicket ticket = new TypeTicket("Simple", 0, 10);
-        festival.addTicketType(ticket);
+        festival.ajouterTypeTicket(ticket);
 
-        SalesPlan plan = festival.optimizeSales();
-        assertEquals((int) (1000 / TypeTicket.DEFAULT_SURFACE), plan.quantities().get(ticket));
-        assertEquals(10.0 * plan.quantities().get(ticket), plan.revenue(), 1e-6);
+        PlanDeVente plan = festival.optimiserVentes();
+        assertEquals((int) (1000 / TypeTicket.SURFACE_PAR_DEFAUT), plan.quantites().get(ticket));
+        assertEquals(10.0 * plan.quantites().get(ticket), plan.recette(), 1e-6);
     }
 
     @Test
@@ -85,24 +85,24 @@ class OptimisationTest {
     void applyPlanSwapsQuantitiesOnLimitedStock() throws FestivalException, StockException, TypeTicketException, AvantageException {
         Festival festival = festival(100000);
         Stock parking = new Stock("Parking", 100, true, 1);
-        festival.addStock(parking);
+        festival.ajouterStock(parking);
         TypeTicket cheap = new TypeTicket("Pass", 100, 10);
         TypeTicket vip = new TypeTicket("VIP", 0, 50);
-        festival.addTicketType(cheap);
-        festival.addTicketType(vip);
-        new Avantage(cheap, parking, 1).connect();
-        new Avantage(vip, parking, 1).connect();
+        festival.ajouterTypeTicket(cheap);
+        festival.ajouterTypeTicket(vip);
+        new Avantage(cheap, parking, 1).connecter();
+        new Avantage(vip, parking, 1).connecter();
 
-        SalesPlan plan = festival.optimizeSales();
-        assertEquals(100, plan.quantities().get(vip));
-        assertDoesNotThrow(() -> festival.applySalesPlan(plan), "Passer de 100 Pass à 100 VIP ne doit pas dépasser le parking en cours de route");
-        assertEquals(0, cheap.getQuantity());
-        assertEquals(100, vip.getQuantity());
+        PlanDeVente plan = festival.optimiserVentes();
+        assertEquals(100, plan.quantites().get(vip));
+        assertDoesNotThrow(() -> festival.appliquerPlanDeVente(plan), "Passer de 100 Pass à 100 VIP ne doit pas dépasser le parking en cours de route");
+        assertEquals(0, cheap.getQuantite());
+        assertEquals(100, vip.getQuantite());
     }
 
     @Test
     @DisplayName("Optimiser sans type de ticket est signalé")
     void noTicketType() throws FestivalException {
-        assertThrows(FestivalException.class, () -> festival(1000).optimizeSales());
+        assertThrows(FestivalException.class, () -> festival(1000).optimiserVentes());
     }
 }

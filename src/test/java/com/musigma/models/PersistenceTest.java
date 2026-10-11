@@ -30,6 +30,6 @@ class PersistenceTest {
     @DisplayName("M7 — une date de début null est refusée par une FestivalException")
     void nullStartDate() throws FestivalException {
         Festival festival = new Festival("Festival", LocalDateTime.now().plusDays(1), 0, 1000, "Grenoble");
-        assertThrows(FestivalException.class, () -> festival.setStart(null));
+        assertThrows(FestivalException.class, () -> festival.setDebut(null));
     }
 }

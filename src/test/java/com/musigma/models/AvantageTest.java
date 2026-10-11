@@ -22,29 +22,29 @@ class AvantageTest {
     }
 
     @Test
-    void setQuantityByTicket() throws StockException {
-        assertDoesNotThrow(() -> avantage.setQuantityByTicket(4), "Le prix de location de l'emplacement du festival doit pouvoir être changé par un nouveau valide");
-        assertEquals(4, avantage.getQuantityByTicket(), "Le prix de location de l'emplacement du festival doit être changé par le nouveau valide");
-        assertThrows(AvantageException.class, () -> avantage.setQuantityByTicket(-100), "Le prix de location de l'emplacement du festival ne doit pas pouvoir être changé par un nouveau invalide car négatif");
-        stock.setFixed(true);
-        assertThrows(AvantageException.class, () -> avantage.setQuantityByTicket(100), "La quantité par ticket multipié par le nombre de ticket ne doit pas surpasser les stocks limités");
-        stock.setFixed(false);
-        assertDoesNotThrow(() -> avantage.setQuantityByTicket(100), "La quantité par ticket multipié par le nombre de ticket peut surpasser les stocks illimités");
+    void setQuantiteParTicket() throws StockException {
+        assertDoesNotThrow(() -> avantage.setQuantiteParTicket(4), "Le prix de location de l'emplacement du festival doit pouvoir être changé par un nouveau valide");
+        assertEquals(4, avantage.getQuantiteParTicket(), "Le prix de location de l'emplacement du festival doit être changé par le nouveau valide");
+        assertThrows(AvantageException.class, () -> avantage.setQuantiteParTicket(-100), "Le prix de location de l'emplacement du festival ne doit pas pouvoir être changé par un nouveau invalide car négatif");
+        stock.setLimite(true);
+        assertThrows(AvantageException.class, () -> avantage.setQuantiteParTicket(100), "La quantité par ticket multipié par le nombre de ticket ne doit pas surpasser les stocks limités");
+        stock.setLimite(false);
+        assertDoesNotThrow(() -> avantage.setQuantiteParTicket(100), "La quantité par ticket multipié par le nombre de ticket peut surpasser les stocks illimités");
     }
 
     @Test
-    void add() {
-        assertDoesNotThrow(() -> avantage.connect(), "Un avantage doit pouvoir lié son stock et son type de ticket");
+    void connecter() {
+        assertDoesNotThrow(() -> avantage.connecter(), "Un avantage doit pouvoir lié son stock et son type de ticket");
         assertTrue(stock.getAvantages().contains(avantage), "L'avantage doit s'être ajouté aux avantages du stock");
         assertTrue(ticket.getAvantages().contains(avantage), "L'avantage doit s'être ajouté aux avantages du type de ticket");
-        assertThrows(AvantageException.class, () -> avantage.connect(), "Un avantage ne doit pas pouvoir lié plus d'une fois son stock et son type de ticket");
+        assertThrows(AvantageException.class, () -> avantage.connecter(), "Un avantage ne doit pas pouvoir lié plus d'une fois son stock et son type de ticket");
     }
 
     @Test
-    void remove() throws AvantageException {
-        assertThrows(AvantageException.class, () -> avantage.disconnect(), "Un avantage ne doit pouvoir délié son stock et son type de ticket si ils ne le sont pas préalablement");
-        avantage.connect();
-        assertDoesNotThrow(() -> avantage.disconnect(), "Un avantage doit pouvoir délié son stock et son type de ticket");
+    void deconnecter() throws AvantageException {
+        assertThrows(AvantageException.class, () -> avantage.deconnecter(), "Un avantage ne doit pouvoir délié son stock et son type de ticket si ils ne le sont pas préalablement");
+        avantage.connecter();
+        assertDoesNotThrow(() -> avantage.deconnecter(), "Un avantage doit pouvoir délié son stock et son type de ticket");
         assertFalse(stock.getAvantages().contains(avantage), "L'avantage doit s'être retiré des avantages du stock");
         assertFalse(ticket.getAvantages().contains(avantage), "L'avantage doit s'être retiré des avantages du type de ticket");
     }

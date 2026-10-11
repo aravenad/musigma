@@ -17,7 +17,7 @@ import static com.musigma.utils.Log.getLogger;
  */
 public final class Stock implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Logger pour afficher les logs.
@@ -30,15 +30,15 @@ public final class Stock implements Serializable {
     /**
      * Nom du stock.
      */
-    private String name;
+    private String nom;
     /**
      * Quantité du stock.
      */
-    private int quantity;
+    private int quantite;
     /**
      * Si la quantité du stock est une limite que les tickets ne peuvent pas dépasser.
      */
-    private boolean fixed;
+    private boolean limite;
     /**
      * Prix du stock.
      */
@@ -47,18 +47,18 @@ public final class Stock implements Serializable {
     /**
      * Constructeur de la classe Stock.
      *
-     * @param name     Nom du stock
-     * @param quantity Quantité absolue du stock
-     * @param fixed    Si la quantité du stock est une limite pour les tickets
+     * @param nom     Nom du stock
+     * @param quantite Quantité absolue du stock
+     * @param limite    Si la quantité du stock est une limite pour les tickets
      * @param prix     Prix du stock
      * @throws StockException si le nom est null ou vide, si la quantité est négative ou nulle (0)
      */
-    public Stock(String name, int quantity, boolean fixed, double prix) throws StockException {
+    public Stock(String nom, int quantite, boolean limite, double prix) throws StockException {
         LOGGER.fine("Initialized Stock");
         avantages = new ArrayList<>();
-        setName(name);
-        setQuantity(quantity);
-        setFixed(fixed);
+        setNom(nom);
+        setQuantite(quantite);
+        setLimite(limite);
         setPrix(prix);
         LOGGER.fine("Created Stock");
     }
@@ -68,21 +68,21 @@ public final class Stock implements Serializable {
      *
      * @return le nom du stock
      */
-    public String getName() {
-        return name;
+    public String getNom() {
+        return nom;
     }
 
     /**
      * Définit le nom du stock.
      *
-     * @param name le nom du stock
+     * @param nom le nom du stock
      * @throws StockException si le nom est null ou vide
      */
-    public void setName(String name) throws StockException {
-        if (name == null || name.isBlank())
+    public void setNom(String nom) throws StockException {
+        if (nom == null || nom.isBlank())
             throw new StockException("Le nom est null ou vide, doit être défini");
-        this.name = name;
-        LOGGER.fine("Set Stock.name");
+        this.nom = nom;
+        LOGGER.fine("Set Stock.nom");
     }
 
     /**
@@ -90,24 +90,24 @@ public final class Stock implements Serializable {
      *
      * @return true si le stock est limité, false sinon
      */
-    public boolean isFixed() {
-        return fixed;
+    public boolean estLimite() {
+        return limite;
     }
 
     /**
      * Définit si la quantité du stock est une limite pour les tickets.
      *
-     * @param fixed true pour limiter les tickets à la quantité du stock, false sinon
+     * @param limite true pour limiter les tickets à la quantité du stock, false sinon
      * @throws StockException si les tickets consomment déjà plus que la quantité du stock
      */
-    public void setFixed(boolean fixed) throws StockException {
-        if (fixed && getConsumedQuantity() > quantity)
+    public void setLimite(boolean limite) throws StockException {
+        if (limite && getQuantiteConsommee() > quantite)
             throw new StockException(String.format(
                     "Les tickets consomment déjà %d unités, le stock de %d ne peut pas être limité",
-                    getConsumedQuantity(), quantity
+                    getQuantiteConsommee(), quantite
             ));
-        this.fixed = fixed;
-        LOGGER.fine("Set Stock.fixed");
+        this.limite = limite;
+        LOGGER.fine("Set Stock.limite");
     }
 
     /**
@@ -115,29 +115,29 @@ public final class Stock implements Serializable {
      *
      * @return la quantité absolue du stock
      */
-    public int getQuantity() {
-        return quantity;
+    public int getQuantite() {
+        return quantite;
     }
 
     /**
      * Définit la quantité absolue du stock.
      *
-     * @param quantity la quantité absolue du stock
+     * @param quantite la quantité absolue du stock
      * @throws StockException si la quantité est négative ou nulle (0),
      *                        ou inférieure à ce que consomment les tickets d'un stock limité
      */
-    public void setQuantity(int quantity) throws StockException {
-        if (quantity <= 0) {
+    public void setQuantite(int quantite) throws StockException {
+        if (quantite <= 0) {
             throw new StockException("La quantité absolue est négative ou nulle (0), doit être défini");
         }
-        if (fixed && getConsumedQuantity() > quantity) {
+        if (limite && getQuantiteConsommee() > quantite) {
             throw new StockException(String.format(
                     "Les tickets consomment %d unités, le stock limité ne peut pas descendre à %d",
-                    getConsumedQuantity(), quantity
+                    getQuantiteConsommee(), quantite
             ));
         }
-        this.quantity = quantity;
-        LOGGER.fine("Set Stock.quantity");
+        this.quantite = quantite;
+        LOGGER.fine("Set Stock.quantite");
     }
 
     /**
@@ -178,9 +178,9 @@ public final class Stock implements Serializable {
      *
      * @return la quantité consommée
      */
-    public long getConsumedQuantity() {
+    public long getQuantiteConsommee() {
         return avantages.stream()
-                .mapToLong(avantage -> avantage.contribution(avantage.getQuantityByTicket()))
+                .mapToLong(avantage -> avantage.consommation(avantage.getQuantiteParTicket()))
                 .sum();
     }
 
@@ -190,8 +190,8 @@ public final class Stock implements Serializable {
      *
      * @return la quantité nécessaire
      */
-    public long getRequiredQuantity() {
-        return fixed ? quantity : Math.max(quantity, getConsumedQuantity());
+    public long getQuantiteNecessaire() {
+        return limite ? quantite : Math.max(quantite, getQuantiteConsommee());
     }
 
     /**
@@ -199,18 +199,18 @@ public final class Stock implements Serializable {
      *
      * @return la consommation moins la quantité prévue, ou 0 si la quantité prévue suffit
      */
-    public long getMissingQuantity() {
-        return Math.max(0, getConsumedQuantity() - quantity);
+    public long getQuantiteManquante() {
+        return Math.max(0, getQuantiteConsommee() - quantite);
     }
 
     /**
      * Indique si une consommation supplémentaire dépasserait la quantité d'un stock limité.
      *
-     * @param additionalConsumption la consommation ajoutée (négative si elle diminue)
+     * @param consommationSupplementaire la consommation ajoutée (négative si elle diminue)
      * @return true si le stock est limité et serait dépassé, false sinon
      */
-    boolean exceedsLimit(long additionalConsumption) {
-        return fixed && additionalConsumption > 0 && getConsumedQuantity() + additionalConsumption > quantity;
+    boolean depasseLimite(long consommationSupplementaire) {
+        return limite && consommationSupplementaire > 0 && getQuantiteConsommee() + consommationSupplementaire > quantite;
     }
 
     /**
@@ -220,16 +220,16 @@ public final class Stock implements Serializable {
      * @param avantage l'avantage à ajouter
      * @throws StockException    si l'avantage est null ou concerne un autre stock
      * @throws AvantageException si l'avantage ne peut pas être connecté
-     * @see Avantage#connect()
+     * @see Avantage#connecter()
      */
-    public void addAvantage(Avantage avantage) throws StockException, AvantageException {
+    public void ajouterAvantage(Avantage avantage) throws StockException, AvantageException {
         if (avantage == null)
             throw new StockException("L'avantage est null, doit être défini");
         if (avantage.getStock() != this)
             throw new StockException("L'avantage concerne un autre stock");
         if (avantages.contains(avantage))
             return;
-        avantage.connect();
+        avantage.connecter();
     }
 
     /**
@@ -237,37 +237,37 @@ public final class Stock implements Serializable {
      *
      * @param avantage l'avantage à supprimer
      * @throws StockException si l'avantage n'est pas trouvé dans la liste
-     * @see Avantage#disconnect()
+     * @see Avantage#deconnecter()
      */
-    public void removeAvantage(Avantage avantage) throws StockException {
+    public void retirerAvantage(Avantage avantage) throws StockException {
         if (!avantages.contains(avantage))
             throw new StockException("L'avantage n'a pas été trouvé");
-        avantage.detach();
+        avantage.detacher();
     }
 
     /**
-     * Ajoute l'avantage à la liste, sans vérification. Réservé à {@link Avantage#connect()}.
+     * Ajoute l'avantage à la liste, sans vérification. Réservé à {@link Avantage#connecter()}.
      *
      * @param avantage l'avantage à ajouter
      */
-    void link(Avantage avantage) {
+    void lier(Avantage avantage) {
         avantages.add(avantage);
         LOGGER.fine("Added Avantage to Stock.avantages");
     }
 
     /**
-     * Retire l'avantage de la liste, sans vérification. Réservé à {@link Avantage#detach()}.
+     * Retire l'avantage de la liste, sans vérification. Réservé à {@link Avantage#detacher()}.
      *
      * @param avantage l'avantage à retirer
      */
-    void unlink(Avantage avantage) {
+    void delier(Avantage avantage) {
         avantages.remove(avantage);
         LOGGER.fine("Removed Avantage from Stock.avantages");
     }
 
     @Override
     public String toString() {
-        return this.getName();
+        return this.getNom();
     }
 
 }

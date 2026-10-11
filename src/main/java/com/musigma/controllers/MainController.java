@@ -186,13 +186,13 @@ public class MainController {
      * false si l'utilisateur a annulé ou si l'enregistrement n'a pas abouti
      */
     private boolean askToSaveFestival() {
-        if (!festival.isModified()) {
-            LOGGER.fine("Festival \"" + festival.getName() + "\" didn't change");
+        if (!festival.estModifie()) {
+            LOGGER.fine("Festival \"" + festival.getNom() + "\" didn't change");
             return true;
         }
         Alert alert = new Alert(
                 Alert.AlertType.CONFIRMATION,
-                String.format("Le festival \"%s\" a été modifié, voulez-vous l'enregistrer ?", this.festival.getName()),
+                String.format("Le festival \"%s\" a été modifié, voulez-vous l'enregistrer ?", this.festival.getNom()),
                 ButtonType.YES,
                 ButtonType.NO,
                 ButtonType.CANCEL
@@ -201,8 +201,8 @@ public class MainController {
         ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
         if (result == ButtonType.YES) {
             saveFestival();
-            if (festival.isModified()) {
-                LOGGER.info("Festival \"" + festival.getName() + "\" was not saved");
+            if (festival.estModifie()) {
+                LOGGER.info("Festival \"" + festival.getNom() + "\" was not saved");
                 return false;
             }
         } else if (result != ButtonType.NO) {
@@ -220,17 +220,17 @@ public class MainController {
     private void loadFestival(Festival festival) {
         if (this.festival != null && !askToSaveFestival())
             return;
-        File file = festival.getFile();
+        File file = festival.getFichier();
         if (file != null)
             addRecentFile(file);
         tryCatch(
                 "Chargement du festival impossible",
                 () -> {
                     this.festival = festival;
-                    festival.markSaved();
+                    festival.marquerEnregistre();
                     currentWorkspace = null;
                     loadWorkspace(DEFAULT_WORKSPACE);
-                    LOGGER.info("Loaded festival \"" + festival.getName() + "\"");
+                    LOGGER.info("Loaded festival \"" + festival.getNom() + "\"");
                 });
     }
 
@@ -269,7 +269,7 @@ public class MainController {
     private void openFestival(File file) {
         tryCatch(
                 "Ouverture du fichier du festival impossible",
-                () -> loadFestival(Festival.load(file))
+                () -> loadFestival(Festival.charger(file))
         );
         if (festival == null)
             newFestival();
@@ -280,12 +280,12 @@ public class MainController {
      */
     @FXML
     private void saveFestival() {
-        if (festival.getFile() == null)
+        if (festival.getFichier() == null)
             saveFestivalAs();
         else tryCatch(
                 "Enregistrement du festival impossible",
                 "Festival enregistré",
-                festival::save
+                festival::enregistrer
         );
     }
 
@@ -294,13 +294,13 @@ public class MainController {
      */
     @FXML
     private void saveFestivalAs() {
-        File file = askFile("Enregistrer sous", festival.getName()).showSaveDialog(stage);
+        File file = askFile("Enregistrer sous", festival.getNom()).showSaveDialog(stage);
         if (file != null) tryCatch(
                 "Enregistrement du festival impossible",
                 "Festival enregistré",
                 () -> {
-                    festival.setFile(file);
-                    festival.save();
+                    festival.setFichier(file);
+                    festival.enregistrer();
                     addRecentFile(file);
                 });
     }
@@ -352,7 +352,7 @@ public class MainController {
         workspace.getChildren().setAll((Node) fxmlLoader.load());
         WorkspaceController controller = fxmlLoader.getController();
         controller.initialize(festival);
-        stage.setTitle(String.format("%s - %s - %s", APP_NAME, festival.getName(), register.name));
+        stage.setTitle(String.format("%s - %s - %s", APP_NAME, festival.getNom(), register.name));
         helpText.setText(register.help);
 
         for (WorkspaceController.WorkspaceRegister other : WORKSPACES)

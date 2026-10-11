@@ -1,9 +1,9 @@
 package com.musigma.controllers.workspaces;
 
 import com.musigma.controllers.WorkspaceController;
-import com.musigma.models.Budget;
+import com.musigma.models.Bilan;
 import com.musigma.models.Festival;
-import com.musigma.models.SalesPlan;
+import com.musigma.models.PlanDeVente;
 import com.musigma.models.TypeTicket;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -37,10 +37,10 @@ public class AccountingController extends WorkspaceController {
     private static final NumberFormat CURRENCY = NumberFormat.getCurrencyInstance(Locale.FRANCE);
 
     @FXML
-    private TableView<Budget.Line> revenuesTable, costsTable;
+    private TableView<Bilan.Ligne> revenuesTable, costsTable;
 
     @FXML
-    private TableColumn<Budget.Line, String> revenueLabelColumn, revenueAmountColumn, costLabelColumn, costAmountColumn;
+    private TableColumn<Bilan.Ligne, String> revenueLabelColumn, revenueAmountColumn, costLabelColumn, costAmountColumn;
 
     @FXML
     private TableView<TypeTicket> planTable;
@@ -57,7 +57,7 @@ public class AccountingController extends WorkspaceController {
     /**
      * Dernière recommandation calculée, ou null.
      */
-    private SalesPlan plan;
+    private PlanDeVente plan;
 
     /**
      * Initialisation de l'espace de travail : bilan et indicateurs du festival.
@@ -67,14 +67,14 @@ public class AccountingController extends WorkspaceController {
     @Override
     public void initialize(Festival festival) {
         super.initialize(festival);
-        revenueLabelColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().label()));
-        revenueAmountColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().amount())));
-        costLabelColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().label()));
-        costAmountColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().amount())));
+        revenueLabelColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().libelle()));
+        revenueAmountColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().montant())));
+        costLabelColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().libelle()));
+        costAmountColumn.setCellValueFactory(f -> new SimpleStringProperty(CURRENCY.format(f.getValue().montant())));
         planTicketColumn.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getType()));
-        planCurrentColumn.setCellValueFactory(f -> new SimpleStringProperty(Integer.toString(f.getValue().getQuantity())));
+        planCurrentColumn.setCellValueFactory(f -> new SimpleStringProperty(Integer.toString(f.getValue().getQuantite())));
         planRecommendedColumn.setCellValueFactory(f -> new SimpleStringProperty(
-                plan == null ? "" : Integer.toString(plan.quantities().get(f.getValue()))
+                plan == null ? "" : Integer.toString(plan.quantites().get(f.getValue()))
         ));
         refresh();
     }
@@ -83,21 +83,21 @@ public class AccountingController extends WorkspaceController {
      * Affiche le bilan prévisionnel et les indicateurs du festival.
      */
     private void refresh() {
-        Budget budget = festival.getBudget();
-        revenuesTable.getItems().setAll(budget.revenues());
-        costsTable.getItems().setAll(budget.costs());
+        Bilan budget = festival.getBilan();
+        revenuesTable.getItems().setAll(budget.recettes());
+        costsTable.getItems().setAll(budget.charges());
         result.setText(String.format("Résultat prévisionnel : %s (recettes %s, charges %s)",
-                CURRENCY.format(budget.result()), CURRENCY.format(budget.totalRevenue()), CURRENCY.format(budget.totalCosts())));
-        result.setStyle(budget.result() < 0 ? "-fx-text-fill: -color-danger-fg;" : "-fx-text-fill: -color-success-fg;");
+                CURRENCY.format(budget.resultat()), CURRENCY.format(budget.totalRecettes()), CURRENCY.format(budget.totalCharges())));
+        result.setStyle(budget.resultat() < 0 ? "-fx-text-fill: -color-danger-fg;" : "-fx-text-fill: -color-success-fg;");
 
-        attendance.setText(String.format("Personnes attendues : %d", festival.getExpectedAttendance()));
-        surface.setText(String.format("Surface occupée : %.0f m² sur %.0f m²", festival.getOccupiedSurface(), festival.getArea()));
-        surface.setStyle(festival.getOccupiedSurface() > festival.getArea() ? "-fx-text-fill: -color-danger-fg;" : "");
-        security.setText(String.format("Agents de sécurité recommandés : %d", festival.getRecommendedSecurityAgents()));
+        attendance.setText(String.format("Personnes attendues : %d", festival.getFrequentationAttendue()));
+        surface.setText(String.format("Surface occupée : %.0f m² sur %.0f m²", festival.getSurfaceOccupee(), festival.getSuperficie()));
+        surface.setStyle(festival.getSurfaceOccupee() > festival.getSuperficie() ? "-fx-text-fill: -color-danger-fg;" : "");
+        security.setText(String.format("Agents de sécurité recommandés : %d", festival.getAgentsSecuriteRecommandes()));
 
-        planTable.getItems().setAll(plan == null ? java.util.List.of() : plan.quantities().keySet());
+        planTable.getItems().setAll(plan == null ? java.util.List.of() : plan.quantites().keySet());
         planTable.refresh();
-        planRevenue.setText(plan == null ? "" : "Recette de la vente optimale : " + CURRENCY.format(plan.revenue()));
+        planRevenue.setText(plan == null ? "" : "Recette de la vente optimale : " + CURRENCY.format(plan.recette()));
         applyButton.setDisable(plan == null);
     }
 
@@ -109,7 +109,7 @@ public class AccountingController extends WorkspaceController {
         tryCatch(
                 "Calcul de la vente optimale impossible",
                 () -> {
-                    plan = festival.optimizeSales();
+                    plan = festival.optimiserVentes();
                     refresh();
                 }
         );
@@ -125,7 +125,7 @@ public class AccountingController extends WorkspaceController {
         tryCatch(
                 "Application de la recommandation impossible",
                 () -> {
-                    festival.applySalesPlan(plan);
+                    festival.appliquerPlanDeVente(plan);
                     refresh();
                 }
         );
