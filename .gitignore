@@ -37,7 +37,9 @@ build/
 ### Mac OS ###
 .DS_Store
 
-### Fichiers générés (javadoc : mvn javadoc:javadoc, jar : mvn package) ###
-out/
+### Fichiers générés (javadoc : mvn javadoc:javadoc) ###
 docs/
+
+### Application distribuable, versionnée (./mvnw -Pdist package) ###
+!out/artifacts/genevent_jar/genevent.jar
 previousSession.ser
