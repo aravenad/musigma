@@ -72,7 +72,6 @@ public class MainController {
     private static final String CURRENT_WORKSPACE_STYLECLASS = "currentWorkspace"; // Classe CSS pour l'espace de travail actuel
 
     private Festival festival; // Le festival actuel
-    private int festivalHash; // Hash du festival pour détecter les modifications
     private ArrayList<File> recentFiles; // Liste des fichiers récents
     private WorkspaceController.WorkspaceRegister currentWorkspace; // Espace de travail actuel
     private WorkspaceController currentWorkspaceController; // Contrôleur de l'espace de travail actuel
@@ -222,7 +221,7 @@ public class MainController {
      * @return true si l'utilisateur a choisi de sauvegarder ou de ne pas sauvegarder, false s'il a annulé
      */
     private boolean askToSaveFestival() {
-        if (festivalHash == festival.hashCode()) {
+        if (!festival.isModified()) {
             LOGGER.info("Festival\"" + festival.getName() + "\" didn't changed");
             return true;
         }
@@ -262,7 +261,7 @@ public class MainController {
                 "Chargement du festival impossible",
                 () -> {
                     this.festival = festival;
-                    festivalHash = festival.hashCode();
+                    festival.markSaved();
                     loadWorkspace(DEFAULT_WORKSPACE);
                     LOGGER.info("Loaded festival \"" + festival.getName() + "\"");
                 });
@@ -337,7 +336,6 @@ public class MainController {
                 "Festival sauvegardé",
                 () -> {
                     festival.save();
-                    festivalHash = festival.hashCode();
                     LOGGER.info("Saving current festival");
                 }
         );
@@ -359,7 +357,6 @@ public class MainController {
                     festival.setFile(file);
                     addRecentFile(file);
                     festival.save();
-                    festivalHash = festival.hashCode();
                     LOGGER.info("Saved festival as \"" + festival.getFile().getName() + "\"");
                 });
     }

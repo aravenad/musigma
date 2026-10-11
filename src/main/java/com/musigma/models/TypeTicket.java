@@ -1,10 +1,12 @@
 package com.musigma.models;
 
+import com.musigma.models.exception.AvantageException;
 import com.musigma.models.exception.TypeTicketException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static com.musigma.utils.Log.getLogger;
@@ -14,6 +16,8 @@ import static com.musigma.utils.Log.getLogger;
  * un type, une quantité, un prix et une liste d'avantages.
  */
 public class TypeTicket implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Logger de la class
@@ -88,15 +92,19 @@ public class TypeTicket implements Serializable {
      * Définit la quantité de tickets disponibles.
      *
      * @param quantity la quantité de tickets disponibles
-     * @throws TypeTicketException si la quantité n'est pas positive
+     * @throws TypeTicketException si la quantité n'est pas positive, ou si l'ensemble des tickets
+     *                             consommant un stock limité dépasse ce stock
      */
     public void setQuantity(int quantity) throws TypeTicketException {
         if (quantity < 0)
             throw new TypeTicketException("La quantité est négative, doit être positive");
         for (Avantage avantage : avantages) {
-            Stock stock = avantage.getStock();
-            if (stock.isFixed() && quantity * avantage.getQuantityByTicket() > stock.getQuantity())
-                throw new TypeTicketException("La quantité de ticket multiplé par le nombre d'avantage par ticket surpasse le stock limité");
+            long delta = (long) (quantity - this.quantity) * avantage.getQuantityByTicket();
+            if (avantage.getStock().exceedsLimit(delta))
+                throw new TypeTicketException(String.format(
+                        "Le stock limité \"%s\" ne suffit pas pour %d tickets \"%s\"",
+                        avantage.getStock().getName(), quantity, type
+                ));
         }
         this.quantity = quantity;
         LOGGER.info("Set TypeTicket.quantity");
@@ -127,49 +135,66 @@ public class TypeTicket implements Serializable {
     /**
      * Retourne la liste des avantages associés à ce type de ticket.
      *
-     * @return la liste des avantages
+     * @return la liste des avantages, non modifiable
      */
-    public ArrayList<Avantage> getAvantages() {
-        return avantages;
+    public List<Avantage> getAvantages() {
+        return Collections.unmodifiableList(avantages);
     }
 
     /**
-     * Ajoute un avantage à la liste des avantages de ce type de ticket.
+     * Ajoute un avantage à ce type de ticket en le connectant aussi à son stock.
+     * Sans effet si l'avantage est déjà connecté.
      *
      * @param avantage l'avantage à ajouter
-     * @throws TypeTicketException si l'avantage est null
+     * @throws TypeTicketException si l'avantage est null ou concerne un autre type de ticket
+     * @throws AvantageException   si l'avantage ne peut pas être connecté
+     * @see Avantage#connect()
      */
-    public void addAvantage(Avantage avantage) throws TypeTicketException {
+    public void addAvantage(Avantage avantage) throws TypeTicketException, AvantageException {
         if (avantage == null)
             throw new TypeTicketException("L'avantage est null, doit être défini");
+        if (avantage.getTicketType() != this)
+            throw new TypeTicketException("L'avantage concerne un autre type de ticket");
         if (avantages.contains(avantage))
             return;
+        avantage.connect();
+    }
+
+    /**
+     * Supprime un avantage de ce type de ticket et de son stock.
+     *
+     * @param avantage l'avantage à supprimer
+     * @throws TypeTicketException si l'avantage n'est pas trouvé dans la liste
+     * @see Avantage#disconnect()
+     */
+    public void removeAvantage(Avantage avantage) throws TypeTicketException {
+        if (!avantages.contains(avantage))
+            throw new TypeTicketException("L'avantage n'a pas été trouvé");
+        avantage.detach();
+    }
+
+    /**
+     * Ajoute l'avantage à la liste, sans vérification. Réservé à {@link Avantage#connect()}.
+     *
+     * @param avantage l'avantage à ajouter
+     */
+    void link(Avantage avantage) {
         avantages.add(avantage);
         LOGGER.info("Added Avantage to TypeTicket.avantages");
     }
 
     /**
-     * Supprime un avantage de la liste des avantages de ce type de ticket.
+     * Retire l'avantage de la liste, sans vérification. Réservé à {@link Avantage#detach()}.
      *
-     * @param avantage l'avantage à supprimer
-     * @throws TypeTicketException si l'avantage n'est pas trouvé dans la liste
+     * @param avantage l'avantage à retirer
      */
-    public void removeAvantage(Avantage avantage) throws TypeTicketException {
-        if (!avantages.remove(avantage))
-            throw new TypeTicketException("L'avantage n'a pas été trouvé");
+    void unlink(Avantage avantage) {
+        avantages.remove(avantage);
         LOGGER.info("Removed Avantage from TypeTicket.avantages");
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TypeTicket that = (TypeTicket) o;
-        return quantity == that.quantity && Float.compare(price, that.price) == 0 && Objects.equals(type, that.type) && Objects.equals(avantages, that.avantages);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, quantity, price, avantages);
+    public String toString() {
+        return type;
     }
 }

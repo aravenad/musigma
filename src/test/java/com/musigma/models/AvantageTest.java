@@ -22,7 +22,7 @@ class AvantageTest {
     }
 
     @Test
-    void setQuantityByTicket() {
+    void setQuantityByTicket() throws StockException {
         assertDoesNotThrow(() -> avantage.setQuantityByTicket(4), "Le prix de location de l'emplacement du festival doit pouvoir être changé par un nouveau valide");
         assertEquals(4, avantage.getQuantityByTicket(), "Le prix de location de l'emplacement du festival doit être changé par le nouveau valide");
         assertThrows(AvantageException.class, () -> avantage.setQuantityByTicket(-100), "Le prix de location de l'emplacement du festival ne doit pas pouvoir être changé par un nouveau invalide car négatif");
@@ -41,8 +41,8 @@ class AvantageTest {
     }
 
     @Test
-    void remove() throws TypeTicketException, AvantageException, StockException {
-        assertThrows(TypeTicketException.class, () -> avantage.disconnect(), "Un avantage ne doit pouvoir délié son stock et son type de ticket si ils ne le sont pas préalablement");
+    void remove() throws AvantageException {
+        assertThrows(AvantageException.class, () -> avantage.disconnect(), "Un avantage ne doit pouvoir délié son stock et son type de ticket si ils ne le sont pas préalablement");
         avantage.connect();
         assertDoesNotThrow(() -> avantage.disconnect(), "Un avantage doit pouvoir délié son stock et son type de ticket");
         assertFalse(stock.getAvantages().contains(avantage), "L'avantage doit s'être retiré des avantages du stock");

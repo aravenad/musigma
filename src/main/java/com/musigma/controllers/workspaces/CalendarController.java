@@ -91,7 +91,7 @@ public class CalendarController extends WorkspaceController {
                         entry.getEndTime().getHour() - entry.getStartTime().getHour(),
                         scene.getText()
                 );
-            } catch (ArtisteException | FestivalException ex) {
+            } catch (ArtisteException | FestivalException | RepresentationException ex) {
                 throw new RuntimeException(ex);
             }
         });
@@ -119,13 +119,13 @@ public class CalendarController extends WorkspaceController {
             for (Representation r : festival.getRepresentations()) {
                 if (r.getArtiste().getName().equals(event.getSource())) {
                     try {
-                        r.setStartDelta(((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute());
-                    } catch (RepresentationException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        r.setDuration((((Entry<?>) event.getSource()).getEndTime().getHour() * 60 + ((Entry<?>) event.getSource()).getEndTime().getMinute()) - ((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute());
-                    } catch (RepresentationException e) {
+                        festival.updateRepresentation(
+                                r,
+                                ((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute(),
+                                (((Entry<?>) event.getSource()).getEndTime().getHour() * 60 + ((Entry<?>) event.getSource()).getEndTime().getMinute()) - ((Entry<?>) event.getSource()).getStartTime().getHour() * 60 + ((Entry<?>) event.getSource()).getStartTime().getMinute(),
+                                r.getScene()
+                        );
+                    } catch (FestivalException | RepresentationException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -151,19 +151,38 @@ public class CalendarController extends WorkspaceController {
      * @param start       l'heure de début
      * @param duration    la durée en heures
      * @param scene       la scène
-     * @throws ArtisteException  en cas d'erreur liée à l'artiste
-     * @throws FestivalException en cas d'erreur liée au festival
+     * @throws ArtisteException        en cas d'erreur liée à l'artiste
+     * @throws FestivalException       en cas d'erreur liée au festival
+     * @throws RepresentationException en cas d'erreur liée à la représentation
      */
-    public void addRep(String artisteName, LocalDateTime start, int duration, String scene) throws ArtisteException, FestivalException {
+    public void addRep(String artisteName, LocalDateTime start, int duration, String scene) throws ArtisteException, FestivalException, RepresentationException {
         Entry<Representation> entry = new Entry<>(artisteName);
         entry.setInterval(start, start.plusHours(duration));
         Representation representation = new Representation(
                 ((start.getHour() * 60) + start.getMinute()) - ((festival.getStart().getHour() * 60) + festival.getStart().getMinute()),
                 ((start.plusHours(duration).getHour() * 60) + start.plusHours(duration).getMinute()) - ((start.getHour() * 60) + start.getMinute()),
                 scene,
-                new Artiste(artisteName, "Rock", 10)
+                findOrEngageArtiste(artisteName)
         );
         entry.setUserObject(representation);
         festival.addRepresentation(representation);
+    }
+
+    /**
+     * Retrouve un artiste engagé par son nom, ou l'engage s'il ne l'est pas encore.
+     * Palliatif en attendant l'écran de gestion des artistes (UC4.1).
+     *
+     * @param artisteName le nom de l'artiste
+     * @return l'artiste engagé au festival
+     * @throws ArtisteException  si le nom n'est pas valide
+     * @throws FestivalException si l'artiste ne peut pas être engagé
+     */
+    private Artiste findOrEngageArtiste(String artisteName) throws ArtisteException, FestivalException {
+        for (Artiste artiste : festival.getArtistes())
+            if (artiste.getName().equals(artisteName))
+                return artiste;
+        Artiste artiste = new Artiste(artisteName, "Rock", 10);
+        festival.addArtiste(artiste);
+        return artiste;
     }
 }

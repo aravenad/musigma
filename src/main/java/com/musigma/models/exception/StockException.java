@@ -5,6 +5,8 @@ package com.musigma.models.exception;
  */
 public class StockException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructeur de la classe StockError.
      *

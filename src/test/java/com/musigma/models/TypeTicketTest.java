@@ -30,7 +30,7 @@ class TypeTicketTest {
     }
 
     @Test
-    void setQuantity() throws TypeTicketException {
+    void setQuantity() throws TypeTicketException, StockException, AvantageException {
         assertDoesNotThrow(() -> ticket.setQuantity(10), "Le nombre de ticket doit pouvoir être changé par un nouveau valide");
         assertEquals(10, ticket.getQuantity(), "Le nombre de ticket doit être changé par le nouveau valide");
         assertThrows(TypeTicketException.class, () -> ticket.setQuantity(-100), "Le nombre de ticket ne doit pas pouvoir être changé par un nouveau invalide car négatif");
@@ -57,7 +57,7 @@ class TypeTicketTest {
     }
 
     @Test
-    void removeAvantage() throws TypeTicketException {
+    void removeAvantage() throws TypeTicketException, AvantageException {
         ticket.addAvantage(avantage);
         assertDoesNotThrow(() -> ticket.removeAvantage(avantage), "Le type de ticket doit pouvoir retirer un de ses avantages");
         assertFalse(ticket.getAvantages().contains(avantage), "Le type de ticket doit avoir retirer l'avantage de siens");

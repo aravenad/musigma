@@ -13,7 +13,7 @@ class RepresentationTest {
     Representation representation;
 
     @BeforeEach
-    void setUp() throws ArtisteException {
+    void setUp() throws ArtisteException, RepresentationException {
         artiste = new Artiste("DCAC", "rock", 100f);
         representation = new Representation(1, 1, "Scene Name", artiste);
     }
@@ -50,7 +50,7 @@ class RepresentationTest {
     }
 
     @Test
-    void compareTo() {
+    void compareTo() throws RepresentationException {
         Representation otherRepresentation = new Representation(5, 2, "Scene Name", artiste);
         assertTrue(representation.compareTo(otherRepresentation) < 0, "La représentation actuelle doit être antérieure à l'autre représentation");
 

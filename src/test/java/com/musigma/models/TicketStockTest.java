@@ -3,7 +3,6 @@ package com.musigma.models;
 import com.musigma.models.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -11,12 +10,10 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Défauts connus des tickets et des stocks (AUDIT.md §3.3 et C9), UC3.1 et UC3.3.
- * Ces tests échouent tant que les défauts ne sont pas corrigés : lancer avec {@code mvn test -Pbugs}.
+ * Régressions des tickets et des stocks (AUDIT.md §3.3 et C9), UC3.1 et UC3.3.
  */
-@Tag("bug")
-@DisplayName("Défauts connus — tickets et stocks")
-class TicketStockBugTest {
+@DisplayName("Tickets et stocks")
+class TicketStockTest {
 
     Festival festival;
     Stock parking;
@@ -46,7 +43,7 @@ class TicketStockBugTest {
 
     @Test
     @DisplayName("M13 — la quantité d'un stock limité reste modifiable")
-    void limitedStockQuantityCanChange() {
+    void limitedStockQuantityCanChange() throws StockException {
         parking.setFixed(true);
         assertDoesNotThrow(() -> parking.setQuantity(200));
         assertEquals(200, parking.getQuantity());
@@ -81,7 +78,7 @@ class TicketStockBugTest {
         try {
             festival.removeStock(parking);
             removed = true;
-        } catch (FestivalException | TypeTicketException | StockException e) {
+        } catch (FestivalException e) {
             removed = false;
         }
         assertEquals(!removed, festival.getStocks().contains(parking), "Le stock ne doit être retiré que si la suppression réussit");

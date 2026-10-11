@@ -90,12 +90,13 @@ class FestivalTest {
         assertThrows(FestivalException.class, () -> festival.removeArtiste(artiste), "Le festival ne doit pas pouvoir retirer un artiste s'il ne participa pas au festival");
     }
 
-    private Representation newRepresentation(int hour, int duration) {
+    private Representation newRepresentation(int hour, int duration) throws RepresentationException {
         return new Representation(hour * 60, duration, "Main Stage", artiste);
     }
 
     @Test
-    void addRepresentation() {
+    void addRepresentation() throws FestivalException, RepresentationException {
+        festival.addArtiste(artiste);
         Representation representation = newRepresentation(16, 120);
         assertDoesNotThrow(() -> festival.addRepresentation(representation), "Le festival doit pouvoir ajouter une nouvelle représentation");
         assertTrue(festival.getRepresentations().contains(representation), "Le festival doit avoir ajouter la nouvelle représentation");
@@ -116,7 +117,8 @@ class FestivalTest {
     }
 
     @Test
-    void removeRepresentation() throws FestivalException {
+    void removeRepresentation() throws FestivalException, RepresentationException {
+        festival.addArtiste(artiste);
         Representation representation = newRepresentation(16, 120);
         festival.addRepresentation(representation);
         assertDoesNotThrow(() -> festival.removeRepresentation(representation), "Le festival doit pouvoir retirer une de ces représentations");
@@ -155,7 +157,7 @@ class FestivalTest {
     }
 
     @Test
-    void save() throws FestivalException {
+    void save() throws FestivalException, RepresentationException {
         festival.addArtiste(artiste);
         festival.addTicketType(ticketType);
         festival.addRepresentation(newRepresentation(1, 1));
@@ -166,16 +168,41 @@ class FestivalTest {
     }
 
     @Test
-    void festival() throws FestivalException {
+    void festival() throws FestivalException, RepresentationException, AvantageException {
         festival.addArtiste(artiste);
         festival.addTicketType(ticketType);
+        festival.addStock(stock);
+        avantage.connect();
         festival.addRepresentation(newRepresentation(1, 1));
         File testFile = new File(String.format("%s/test2.bdd", System.getProperty("java.io.tmpdir")));
         festival.setFile(testFile);
         festival.save();
 
-        Festival clonedFestival = Festival.Festival(testFile);
-        assertEquals(festival.hashCode(), clonedFestival.hashCode(), "Le festival doit conserver son hashcode");
-        assertEquals(festival, clonedFestival, "Le festival doit conserver les informations");
+        Festival loaded = Festival.Festival(testFile);
+        assertEquals(festival.getName(), loaded.getName(), "Le festival doit conserver son nom");
+        assertEquals(festival.getStart(), loaded.getStart(), "Le festival doit conserver sa date de début");
+        assertEquals(festival.getLocation(), loaded.getLocation(), "Le festival doit conserver son emplacement");
+        assertEquals(testFile, loaded.getFile(), "Le festival chargé doit connaître son fichier");
+
+        Artiste loadedArtiste = loaded.getArtistes().get(0);
+        Representation loadedRepresentation = loaded.getRepresentations().get(0);
+        assertSame(loadedArtiste, loadedRepresentation.getArtiste(), "La représentation doit rester liée à l'artiste chargé");
+        assertTrue(loadedArtiste.getRepresentations().contains(loadedRepresentation), "L'artiste chargé doit connaître sa représentation");
+
+        Avantage loadedAvantage = loaded.getTicketTypes().get(0).getAvantages().get(0);
+        assertSame(loaded.getStocks().get(0), loadedAvantage.getStock(), "L'avantage doit rester lié au stock chargé");
+        assertTrue(loaded.getStocks().get(0).getAvantages().contains(loadedAvantage), "Le stock chargé doit connaître l'avantage");
+        assertFalse(loaded.isModified(), "Un festival tout juste chargé n'est pas modifié");
+    }
+
+    @Test
+    void isModified() throws FestivalException, StockException {
+        festival.addStock(stock);
+        festival.markSaved();
+        assertFalse(festival.isModified(), "Le festival ne doit pas être modifié juste après avoir été marqué enregistré");
+        stock.setPrix(3);
+        assertTrue(festival.isModified(), "Modifier le prix d'un stock doit modifier le festival");
+        stock.setPrix(2.5);
+        assertFalse(festival.isModified(), "Revenir à l'état enregistré ne doit plus compter comme une modification");
     }
 }

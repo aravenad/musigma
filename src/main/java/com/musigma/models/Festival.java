@@ -1,7 +1,8 @@
 package com.musigma.models;
 
+import com.musigma.models.exception.ArtisteException;
 import com.musigma.models.exception.FestivalException;
-import com.musigma.models.exception.StockException;
+import com.musigma.models.exception.RepresentationException;
 import com.musigma.models.exception.TypeTicketException;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -11,11 +12,9 @@ import org.ojalgo.optimisation.Variable;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static com.musigma.utils.Log.getLogger;
 
@@ -25,6 +24,8 @@ import static com.musigma.utils.Log.getLogger;
  * des types de tickets, de stocks et de représentations.
  */
 public class Festival implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final float AVERAGE_AREA_BY_PEOPLE = .42f;
 
@@ -47,11 +48,15 @@ public class Festival implements Serializable {
     /**
      * Liste des représentations du festival.
      */
-    private final TreeSet<Representation> representations;
+    private final ArrayList<Representation> representations;
     /**
-     * Fichier associé à ce festival.
+     * Fichier associé à ce festival, renseigné au chargement ou à l'enregistrement.
      */
-    private File file = null;
+    private transient File file = null;
+    /**
+     * État sérialisé du festival lors du dernier enregistrement, pour détecter les modifications.
+     */
+    private transient byte[] savedState = null;
     /**
      * Nom du festival.
      */
@@ -88,7 +93,7 @@ public class Festival implements Serializable {
         artistes = new ArrayList<>();
         ticketTypes = new ArrayList<>();
         stocks = new ArrayList<>();
-        representations = new TreeSet<>();
+        representations = new ArrayList<>();
         setName(name);
         setStart(start);
         setLocationPrice(locationPrice);
@@ -112,6 +117,7 @@ public class Festival implements Serializable {
             LOGGER.info(String.format("Reading file %s", file.getAbsolutePath()));
             Festival festival = (Festival) ois.readObject();
             festival.file = file;
+            festival.markSaved();
             LOGGER.info(String.format("Loaded festival \"%s\" from file %s", festival.getName(), file.getAbsolutePath()));
             return festival;
         } catch (IOException e) {
@@ -129,15 +135,49 @@ public class Festival implements Serializable {
     public void save() throws FestivalException {
         if (file == null)
             throw new FestivalException("Le fichier du festival n'a pas été spécifié");
-        try (
-                FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(this);
-            LOGGER.info(String.format("Saved festival 0x%x to file %s", super.hashCode(), file.getAbsolutePath()));
-        } catch (Exception e) {
-            throw new FestivalException("Le festival n'arrive pas à enregister le fichier");
+        try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath())) {
+            byte[] state = serialize();
+            fos.write(state);
+            savedState = state;
+            LOGGER.info(String.format("Saved festival \"%s\" to file %s", name, file.getAbsolutePath()));
+        } catch (IOException e) {
+            throw new FestivalException("Le festival n'arrive pas à enregister le fichier : " + e.getMessage());
         }
+    }
+
+    /**
+     * Considère l'état actuel du festival comme enregistré.
+     * Les modifications ultérieures seront signalées par {@link #isModified()}.
+     *
+     * @throws IllegalStateException si le festival ne peut pas être sérialisé
+     */
+    public void markSaved() {
+        savedState = serialize();
+    }
+
+    /**
+     * Indique si le festival a été modifié depuis le dernier enregistrement ou chargement,
+     * en comparant son état sérialisé à celui enregistré.
+     *
+     * @return true si le festival a été modifié, false sinon
+     */
+    public boolean isModified() {
+        return savedState == null || !Arrays.equals(savedState, serialize());
+    }
+
+    /**
+     * Sérialise le festival et tout ce qu'il contient.
+     *
+     * @return le festival sérialisé
+     */
+    private byte[] serialize() {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(bytes)) {
+            oos.writeObject(this);
+        } catch (IOException e) {
+            throw new IllegalStateException("Le festival ne peut pas être sérialisé", e);
+        }
+        return bytes.toByteArray();
     }
 
     /**
@@ -198,14 +238,16 @@ public class Festival implements Serializable {
      * Définit la date de début du festival.
      *
      * @param start la date de début du festival
-     * @throws FestivalException si la date est antérieure à la date actuelle
+     * @throws FestivalException si la date est null ou antérieure à la date actuelle
      */
     public void setStart(LocalDateTime start) throws FestivalException {
+        if (start == null)
+            throw new FestivalException("La date de début est null, doit être définie");
         if (LocalDate.now().isAfter(start.toLocalDate())) {
-            throw new FestivalException("La date est antérieure à la date d'aujourd'hui, doit précéder la date d'aujourd'hui");
+            throw new FestivalException("La date est antérieure à la date d'aujourd'hui, doit être aujourd'hui ou plus tard");
         }
         this.start = start;
-        LOGGER.info("Set Festival.name");
+        LOGGER.info("Set Festival.start");
     }
 
     /**
@@ -278,63 +320,125 @@ public class Festival implements Serializable {
      * Ajoute un artiste à la liste des artistes du festival.
      *
      * @param artiste l'artiste à ajouter
-     * @throws FestivalException si l'artiste est null
+     * @throws FestivalException si l'artiste est null ou déjà engagé
      */
     public void addArtiste(Artiste artiste) throws FestivalException {
         if (artiste == null)
             throw new FestivalException("L'artiste est null, doit être défini");
+        if (artistes.contains(artiste))
+            throw new FestivalException(String.format("L'artiste \"%s\" est déjà engagé", artiste.getName()));
         artistes.add(artiste);
         LOGGER.info("Added Artiste to Festival.artistes");
     }
 
     /**
-     * Supprime un artiste de la liste des artistes du festival.
+     * Supprime un artiste du festival, ainsi que toutes ses représentations.
      *
      * @param artiste l'artiste à supprimer
      * @throws FestivalException si l'artiste n'a pas été trouvé
      */
     public void removeArtiste(Artiste artiste) throws FestivalException {
-        if (!artistes.remove(artiste))
+        if (!artistes.contains(artiste))
             throw new FestivalException("L'artiste n'a pas été trouvé");
+        for (Representation representation : new ArrayList<>(artiste.getRepresentations()))
+            removeRepresentation(representation);
+        artistes.remove(artiste);
         LOGGER.info("Removed Artiste from Festival.artistes");
     }
 
     /**
      * Retourne la liste des artistes du festival.
      *
-     * @return la liste des artistes
+     * @return la liste des artistes, non modifiable
      */
-    public ArrayList<Artiste> getArtistes() {
-        return artistes;
+    public List<Artiste> getArtistes() {
+        return Collections.unmodifiableList(artistes);
     }
 
     /**
-     * Ajoute une représentation à la liste des représentations du festival.
+     * Indique si une scène est libre pendant un créneau.
+     *
+     * @param scene      la scène
+     * @param startDelta le début du créneau en minutes depuis le début du festival
+     * @param duration   la durée du créneau en minutes
+     * @return true si aucune représentation n'occupe la scène pendant ce créneau
+     */
+    public boolean isSceneFree(String scene, int startDelta, int duration) {
+        return findCollision(scene, startDelta, duration, null) == null;
+    }
+
+    /**
+     * Cherche une représentation occupant la scène pendant le créneau donné.
+     *
+     * @param scene      la scène
+     * @param startDelta le début du créneau en minutes depuis le début du festival
+     * @param duration   la durée du créneau en minutes
+     * @param ignored    une représentation à ne pas prendre en compte (celle qu'on déplace), ou null
+     * @return la première représentation en collision, ou null s'il n'y en a pas
+     */
+    private Representation findCollision(String scene, int startDelta, int duration, Representation ignored) {
+        return representations.stream()
+                .filter(other -> other != ignored && other.isColliding(scene, startDelta, duration))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Planifie une représentation d'un artiste engagé au festival.
      *
      * @param representation la représentation à ajouter
-     * @throws FestivalException si la représentation est null ou en collision avec une autre
+     * @throws FestivalException si la représentation est null, déjà planifiée, concerne un artiste
+     *                           non engagé ou chevauche une autre représentation sur la même scène
      */
     public void addRepresentation(Representation representation) throws FestivalException {
         if (representation == null)
             throw new FestivalException("La représentation est null, doit être défini");
+        if (representations.contains(representation))
+            throw new FestivalException("La représentation est déjà planifiée");
+        if (!artistes.contains(representation.getArtiste()))
+            throw new FestivalException(String.format("L'artiste \"%s\" n'est pas engagé au festival", representation.getArtiste().getName()));
 
-        Representation top = representations.ceiling(representation),
-                bottom = representations.floor(representation);
+        Representation collision = findCollision(representation.getScene(), representation.getStartDelta(), representation.getDuration(), null);
+        if (collision != null)
+            throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifiés", collision));
 
-        if (top != null && top.isColliding(representation))
-            if (bottom != null && bottom.isColliding(representation))
-                throw new FestivalException(String.format("La représentation rentre en collision avec %s et %s, les départs/durées doivent être modifié", bottom, top));
-            else
-                throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifié", top));
-        else if (bottom != null && bottom.isColliding(representation))
-            throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifié", bottom));
-
+        try {
+            representation.getArtiste().addRepresentation(representation);
+        } catch (ArtisteException e) {
+            throw new FestivalException(e.getMessage());
+        }
         representations.add(representation);
         LOGGER.info("Added Representation to Festival.representations");
     }
 
     /**
-     * Supprime une représentation de la liste des représentations du festival.
+     * Déplace une représentation planifiée, en vérifiant que la scène est libre sur le nouveau créneau.
+     *
+     * @param representation la représentation à modifier
+     * @param startDelta     le nouveau début en minutes depuis le début du festival
+     * @param duration       la nouvelle durée en minutes
+     * @param scene          la nouvelle scène
+     * @throws FestivalException       si la représentation n'est pas planifiée ou si le créneau est occupé
+     * @throws RepresentationException si les nouvelles valeurs ne sont pas valides
+     */
+    public void updateRepresentation(Representation representation, int startDelta, int duration, String scene) throws FestivalException, RepresentationException {
+        if (!representations.contains(representation))
+            throw new FestivalException("La représentation n'a pas été trouvée");
+        // Valide les nouvelles valeurs avant toute modification
+        new Representation(startDelta, duration, scene, representation.getArtiste());
+
+        Representation collision = findCollision(scene, startDelta, duration, representation);
+        if (collision != null)
+            throw new FestivalException(String.format("La représentation rentre en collision avec %s, les départs/durées doivent être modifiés", collision));
+
+        representation.setStartDelta(startDelta);
+        representation.setDuration(duration);
+        representation.setScene(scene);
+        LOGGER.info("Updated Representation of Festival.representations");
+    }
+
+    /**
+     * Supprime une représentation du festival et de son artiste.
      *
      * @param representation la représentation à supprimer
      * @throws FestivalException si la représentation n'a pas été trouvée
@@ -342,16 +446,23 @@ public class Festival implements Serializable {
     public void removeRepresentation(Representation representation) throws FestivalException {
         if (!representations.remove(representation))
             throw new FestivalException("La représentation n'a pas été trouvée");
+        try {
+            representation.getArtiste().removeRepresentation(representation);
+        } catch (ArtisteException e) {
+            LOGGER.warning("Representation was not linked to its Artiste: " + e.getMessage());
+        }
         LOGGER.info("Removed Representation from Festival.representations");
     }
 
     /**
-     * Retourne la liste des représentations du festival.
+     * Retourne les représentations du festival, triées par début puis par scène.
      *
-     * @return la liste des représentations
+     * @return une copie triée et non modifiable des représentations
      */
-    public TreeSet<Representation> getRepresentations() {
-        return representations;
+    public List<Representation> getRepresentations() {
+        return representations.stream()
+                .sorted(Comparator.comparingInt(Representation::getStartDelta).thenComparing(Representation::getScene))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -370,24 +481,27 @@ public class Festival implements Serializable {
     }
 
     /**
-     * Supprime un type de ticket de la liste des types de tickets du festival.
+     * Supprime un type de ticket du festival, en détachant ses avantages des stocks.
      *
      * @param ticketType le type de ticket à supprimer
      * @throws FestivalException si le type de ticket n'a pas été trouvé
      */
     public void removeTicketType(TypeTicket ticketType) throws FestivalException {
-        if (!ticketTypes.remove(ticketType))
+        if (!ticketTypes.contains(ticketType))
             throw new FestivalException("Le type de ticket n'a pas été trouvé");
-        LOGGER.info("Removed TypeTicket from.ticketTypes");
+        for (Avantage avantage : new ArrayList<>(ticketType.getAvantages()))
+            avantage.detach();
+        ticketTypes.remove(ticketType);
+        LOGGER.info("Removed TypeTicket from Festival.ticketTypes");
     }
 
     /**
      * Retourne la liste des types de tickets du festival.
      *
-     * @return la liste des types de tickets
+     * @return la liste des types de tickets, non modifiable
      */
-    public ArrayList<TypeTicket> getTicketTypes() {
-        return ticketTypes;
+    public List<TypeTicket> getTicketTypes() {
+        return Collections.unmodifiableList(ticketTypes);
     }
 
     /**
@@ -406,29 +520,27 @@ public class Festival implements Serializable {
     }
 
     /**
-     * Supprime un stock de la liste des stocks du festival.
+     * Supprime un stock du festival, en détachant ses avantages des types de tickets.
      *
      * @param stock le stock à supprimer
-     * @throws FestivalException   si le stock n'a pas été trouvé
-     * @throws TypeTicketException si un ticket ne veux pas changer de quantité
-     * @throws StockException      si un avantage ne veux pas changer de quantité
+     * @throws FestivalException si le stock n'a pas été trouvé
      */
-    public void removeStock(Stock stock) throws FestivalException, TypeTicketException, StockException {
-        if (!stocks.remove(stock))
+    public void removeStock(Stock stock) throws FestivalException {
+        if (!stocks.contains(stock))
             throw new FestivalException("Le stock n'a pas été trouvé");
-        ArrayList<Avantage> oldAvantages = (ArrayList<Avantage>) stock.getAvantages().clone();
-        for (Avantage avantage : oldAvantages)
-            avantage.disconnect();
+        for (Avantage avantage : new ArrayList<>(stock.getAvantages()))
+            avantage.detach();
+        stocks.remove(stock);
         LOGGER.info("Removed Stock from Festival.stocks");
     }
 
     /**
      * Retourne la liste des stocks du festival.
      *
-     * @return la liste des stocks
+     * @return la liste des stocks, non modifiable
      */
-    public ArrayList<Stock> getStocks() {
-        return stocks;
+    public List<Stock> getStocks() {
+        return Collections.unmodifiableList(stocks);
     }
 
     /**
@@ -481,30 +593,5 @@ public class Festival implements Serializable {
 
         LOGGER.info("Calculated best quantity of ticket to sold");
         return results.getValue();
-    }
-
-    /**
-     * Retourne le prix total du festival.
-     * Le prix total est calculé en additionnant le prix de location et le prix des stocks.
-     *
-     * @param o l'objet à comparer
-     * @return true si les objets sont égaux, false sinon
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Festival festival = (Festival) o;
-        return Float.compare(locationPrice, festival.locationPrice) == 0 && Double.compare(area, festival.area) == 0 && Objects.equals(file, festival.file) && Objects.equals(name, festival.name) && Objects.equals(start, festival.start) && Objects.equals(location, festival.location) && Objects.equals(artistes, festival.artistes) && Objects.equals(ticketTypes, festival.ticketTypes) && Objects.equals(stocks, festival.stocks) && Objects.equals(representations, festival.representations);
-    }
-
-    /**
-     * Retourne le hashcode du festival.
-     *
-     * @return le hashcode du festival
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(file, name, start, locationPrice, location, area, artistes, ticketTypes, stocks, representations);
     }
 }

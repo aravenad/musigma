@@ -2,7 +2,6 @@ package com.musigma.models;
 
 import com.musigma.models.exception.FestivalException;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.Test;
@@ -13,12 +12,10 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Défauts connus de la persistance et des validations transverses (AUDIT.md §3.2 et §3.4).
- * Ces tests échouent tant que les défauts ne sont pas corrigés : lancer avec {@code mvn test -Pbugs}.
+ * Régressions de la persistance et des validations transverses (AUDIT.md §3.2 et §3.4).
  */
-@Tag("bug")
-@DisplayName("Défauts connus — persistance")
-class PersistenceBugTest {
+@DisplayName("Persistance")
+class PersistenceTest {
 
     @ParameterizedTest(name = "{0}")
     @ValueSource(classes = {Festival.class, Artiste.class, Representation.class, TypeTicket.class, Stock.class, Avantage.class})

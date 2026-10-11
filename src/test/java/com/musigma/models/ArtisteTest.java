@@ -1,10 +1,10 @@
 package com.musigma.models;
 
 import com.musigma.models.exception.ArtisteException;
+import com.musigma.models.exception.RepresentationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,9 +14,9 @@ class ArtisteTest {
     Artiste artiste;
 
     @BeforeEach
-    void setUp() throws ArtisteException {
-        representation = new Representation(60, 30, "Scene name", new Artiste("Test", "Test", 1));
+    void setUp() throws ArtisteException, RepresentationException {
         artiste = new Artiste("Artiste Name", "Artiste Genre", 10000);
+        representation = new Representation(60, 30, "Scene name", artiste);
     }
 
     @Test
@@ -37,10 +37,10 @@ class ArtisteTest {
 
     @Test
     void setPrice() {
-        assertDoesNotThrow(() -> artiste.setName("New Artiste Genre"), "L'artiste doit pouvoir changé de genre par un genre valide");
-        assertEquals("New Artiste Genre", artiste.getName(), "L'artiste doit avoir changé de genre par le genre valide");
-        assertThrows(ArtisteException.class, () -> artiste.setName(null), "L'artiste ne doit pas pouvoir changé de genre par un genre invalide car null");
-        assertThrows(ArtisteException.class, () -> artiste.setName(""), "L'artiste ne doit pas pouvoir changé de genre par un genre invalide car vide");
+        assertDoesNotThrow(() -> artiste.setPrice(500), "L'artiste doit pouvoir changer de cachet par un cachet valide");
+        assertEquals(500, artiste.getPrice(), "L'artiste doit avoir changé de cachet par le cachet valide");
+        assertDoesNotThrow(() -> artiste.setPrice(0), "L'artiste doit pouvoir avoir un cachet nul");
+        assertThrows(ArtisteException.class, () -> artiste.setPrice(-1), "L'artiste ne doit pas pouvoir avoir un cachet négatif");
     }
 
     @Test
@@ -51,23 +51,16 @@ class ArtisteTest {
     }
 
     @Test
+    void addRepresentationOfAnotherArtiste() throws ArtisteException, RepresentationException {
+        Representation other = new Representation(60, 30, "Scene name", new Artiste("Autre", "Jazz", 1));
+        assertThrows(ArtisteException.class, () -> artiste.addRepresentation(other), "Un artiste ne doit pas pouvoir ajouter la représentation d'un autre artiste");
+    }
+
+    @Test
     void removeRepresentation() throws ArtisteException {
         artiste.addRepresentation(representation);
         assertDoesNotThrow(() -> artiste.removeRepresentation(representation), "Un artiste doit pouvoir retirer une de ces représentations");
         assertFalse(artiste.getRepresentations().contains(representation), "L'artiste doit avoir retiré la représentation");
         assertThrows(ArtisteException.class, () -> artiste.removeRepresentation(representation), "Un artiste ne doit pas pouvoir retirer une representation n'étant pas parmis les siennes");
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ArtisteTest that = (ArtisteTest) o;
-        return Objects.equals(representation, that.representation) && Objects.equals(artiste, that.artiste);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(representation, artiste);
     }
 }

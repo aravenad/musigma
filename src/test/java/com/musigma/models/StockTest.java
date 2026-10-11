@@ -30,10 +30,11 @@ class StockTest {
     }
 
     @Test
-    void setAbsoluteQuantity() {
-        stock.setFixed(true);
-        assertThrows(StockException.class, () -> stock.setQuantity(200), "Le stock ne doit pas pouvoir être requantifié tant qu'il est fixé");
-        stock.setFixed(false);
+    void setAbsoluteQuantity() throws AvantageException {
+        avantage.connect(); // 100 tickets consomment 100 unités du stock limité
+        assertDoesNotThrow(() -> stock.setQuantity(150), "Un stock limité doit pouvoir être requantifié au-dessus de sa consommation");
+        assertThrows(StockException.class, () -> stock.setQuantity(50), "Un stock limité ne doit pas descendre sous ce que consomment les tickets");
+        assertDoesNotThrow(() -> stock.setFixed(false));
         assertDoesNotThrow(() -> stock.setQuantity(200), "Le stock doit pouvoir être requantifié par une quantité valide");
         assertEquals(200, stock.getQuantity(), "Le stock doit être requantifié par la quantité valide");
         assertThrows(StockException.class, () -> stock.setQuantity(0), "Le stock ne doit pas pouvoir être requantifié par une quantité invalide car nulle (0)");
@@ -49,18 +50,23 @@ class StockTest {
     }
 
     @Test
-    void removeAvantage() throws StockException {
+    void removeAvantage() throws StockException, AvantageException {
         stock.addAvantage(avantage);
         assertDoesNotThrow(() -> stock.removeAvantage(avantage), "Le stock doit pouvoir retirer un de ses avantages");
         assertFalse(stock.getAvantages().contains(avantage), "Le stock doit avoir retirer l'avantage de siens");
+        assertFalse(ticket.getAvantages().contains(avantage), "Le type de ticket doit aussi avoir perdu l'avantage");
         assertThrows(StockException.class, () -> stock.removeAvantage(avantage), "Le stock ne doit pas pouvoir retirer un avantage n'étant pas des siens");
     }
 
     @Test
-    void setFixed() {
+    void setFixed() throws StockException, AvantageException, TypeTicketException {
         stock.setFixed(true);
         assertTrue(stock.isFixed(), "Le stock doit avoir été fixé");
         stock.setFixed(false);
         assertFalse(stock.isFixed(), "Le stock doit avoir été défixé");
+
+        avantage.connect();
+        ticket.setQuantity(150); // possible car le stock n'est plus limité
+        assertThrows(StockException.class, () -> stock.setFixed(true), "Un stock ne doit pas pouvoir être limité sous ce que consomment déjà les tickets");
     }
 }

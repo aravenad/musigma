@@ -5,20 +5,18 @@ import com.musigma.models.exception.FestivalException;
 import com.musigma.models.exception.RepresentationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Défauts connus du planning (AUDIT.md §3.2), UC4.1 et UC4.2.
- * Ces tests échouent tant que les défauts ne sont pas corrigés : lancer avec {@code mvn test -Pbugs}.
+ * Régressions du planning (AUDIT.md §3.2), UC4.1 et UC4.2.
  */
-@Tag("bug")
-@DisplayName("Défauts connus — planning")
-class PlanningBugTest {
+@DisplayName("Planning")
+class PlanningTest {
 
     Festival festival;
     Artiste artiste;
@@ -32,7 +30,7 @@ class PlanningBugTest {
 
     @Test
     @DisplayName("M1 — deux représentations simultanées sur deux scènes différentes sont conservées")
-    void simultaneousRepresentationsOnDifferentScenes() throws FestivalException {
+    void simultaneousRepresentationsOnDifferentScenes() throws FestivalException, RepresentationException {
         festival.addRepresentation(new Representation(600, 60, "Scène 1", artiste));
         festival.addRepresentation(new Representation(600, 60, "Scène 2", artiste));
         assertEquals(2, festival.getRepresentations().size(), "Une représentation simultanée sur une autre scène ne doit pas être perdue");
@@ -40,7 +38,7 @@ class PlanningBugTest {
 
     @Test
     @DisplayName("M2 — une collision sur la même scène est détectée même si une autre scène s'intercale")
-    void collisionHiddenByAnotherScene() throws FestivalException {
+    void collisionHiddenByAnotherScene() throws FestivalException, RepresentationException {
         festival.addRepresentation(new Representation(600, 120, "Scène 1", artiste)); // 10h00-12h00
         festival.addRepresentation(new Representation(660, 30, "Scène 2", artiste));  // 11h00-11h30
         Representation colliding = new Representation(690, 60, "Scène 1", artiste);   // 11h30-12h30
@@ -50,14 +48,32 @@ class PlanningBugTest {
 
     @Test
     @DisplayName("M3 — relier un artiste et sa représentation ne provoque pas de récursion infinie")
-    void artisteRepresentationCycle() {
+    void artisteRepresentationCycle() throws RepresentationException {
         Representation representation = new Representation(600, 60, "Scène 1", artiste);
         assertDoesNotThrow(() -> {
-            artiste.addRepresentation(representation);
+            festival.addRepresentation(representation);
             artiste.hashCode();
             representation.hashCode();
             artiste.equals(new Artiste("Gorillaz", "Pop", 1000));
+            festival.isModified();
         });
+    }
+
+    @Test
+    @DisplayName("Déplacer une représentation vérifie que la nouvelle scène est libre")
+    void updateRepresentationChecksCollision() throws FestivalException, RepresentationException {
+        Representation first = new Representation(600, 60, "Scène 1", artiste);
+        Representation second = new Representation(600, 60, "Scène 2", artiste);
+        festival.addRepresentation(first);
+        festival.addRepresentation(second);
+
+        assertThrows(FestivalException.class, () -> festival.updateRepresentation(second, 630, 60, "Scène 1"), "Le créneau est occupé par la première représentation");
+        assertEquals("Scène 2", second.getScene(), "Un déplacement refusé ne doit rien modifier");
+        assertThrows(RepresentationException.class, () -> festival.updateRepresentation(second, 700, -5, "Scène 1"), "Durée invalide");
+        assertDoesNotThrow(() -> festival.updateRepresentation(second, 660, 60, "Scène 1"), "Le créneau suivant est libre");
+        assertEquals(List.of(first, second), festival.getRepresentations(), "Les représentations sont triées par début");
+        assertFalse(festival.isSceneFree("Scène 1", 650, 30));
+        assertTrue(festival.isSceneFree("Scène 2", 650, 30));
     }
 
     @Test
@@ -73,7 +89,7 @@ class PlanningBugTest {
 
     @Test
     @DisplayName("M6 — planifier une représentation la rattache à son artiste")
-    void representationLinkedToArtiste() throws FestivalException {
+    void representationLinkedToArtiste() throws FestivalException, RepresentationException {
         Representation representation = new Representation(600, 60, "Scène 1", artiste);
         festival.addRepresentation(representation);
         assertTrue(artiste.getRepresentations().contains(representation));
@@ -81,14 +97,14 @@ class PlanningBugTest {
 
     @Test
     @DisplayName("M6 — seul un artiste engagé au festival peut être planifié (UC4.1 avant UC4.2)")
-    void representationRequiresEngagedArtiste() throws ArtisteException {
+    void representationRequiresEngagedArtiste() throws ArtisteException, RepresentationException {
         Artiste notEngaged = new Artiste("Inconnu", "Jazz", 10);
         assertThrows(FestivalException.class, () -> festival.addRepresentation(new Representation(600, 60, "Scène 1", notEngaged)));
     }
 
     @Test
     @DisplayName("M6 — retirer un artiste retire ses représentations")
-    void removeArtisteRemovesRepresentations() throws FestivalException {
+    void removeArtisteRemovesRepresentations() throws FestivalException, RepresentationException {
         Representation representation = new Representation(600, 60, "Scène 1", artiste);
         festival.addRepresentation(representation);
         festival.removeArtiste(artiste);

@@ -5,6 +5,8 @@ package com.musigma.models.exception;
  */
 public class AvantageException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructeur de la classe AvantageError.
      *
